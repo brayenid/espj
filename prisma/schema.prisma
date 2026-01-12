@@ -1,0 +1,329 @@
+// prisma/schema.prisma
+
+generator client {
+  provider = "prisma-client-js"
+  // kalau kamu mau output custom seperti sebelumnya:
+  // output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+enum SpjDocType {
+  TELAAHAN_STAF
+  SURAT_TUGAS
+  SPD
+  DOPD
+  KUITANSI
+  VISUM
+  LAPORAN
+}
+
+enum RosterRole {
+  KEPALA_JALAN
+  PENGIKUT
+}
+
+enum LaporanHasilMode {
+  POINTS
+  NARRATIVE
+}
+
+enum UserRole {
+  SUPER_ADMIN
+  TIM_ORGANISASI
+  TIM_KEUANGAN
+  TIM_UMUM
+}
+
+model User {
+  id       String   @id @default(uuid())
+  name     String
+  username String   @unique
+  role     UserRole @default(TIM_ORGANISASI)
+
+  // kredensial
+  passwordHash String
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  spjs Spj[]
+}
+
+model Pegawai {
+  id        String   @id @default(uuid())
+  nip       String?
+  nama      String
+  pangkat   String?
+  golongan  String?
+  jabatan   String
+  instansi  String   @default("Sekretariat Daerah Kabupaten Kutai Barat")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  rosterItems SpjRosterItem[]
+  signerLinks SpjSigner[]     @relation("SignerPegawai")
+}
+
+model Spj {
+  id        String   @id @default(uuid())
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  createdById String
+  createdBy   User   @relation(fields: [createdById], references: [id])
+
+  // Penomoran (opsional, bisa diisi belakangan)
+  noTelaahan   String?
+  noSuratTugas String?
+  noSpd        String?
+
+  // Waktu & Tempat
+  kotaTandaTangan String   @default("Sendawar")
+  tglSuratTugas   DateTime
+  tglSpd          DateTime
+  tglBerangkat    DateTime
+  tglKembali      DateTime
+  lamaPerjalanan  Int
+
+  tempatBerangkat String @default("Sendawar")
+  tempatTujuan    String
+  maksudDinas     String @db.Text
+  alatAngkut      String @default("Darat")
+
+  // Anggaran (diisi manual, master SPJ)
+  tahunAnggaran    String?
+  kodeKegiatan     String?
+  judulKegiatan    String?
+  kodeSubKegiatan  String?
+  judulSubKegiatan String?
+  upGu             String?
+  nomorBku         String?
+  kodeRekening     String?
+  judulRekening    String?
+  akunAnggaran     String? @default("DPA SKPD Bagian Organisasi")
+
+  // Bukti dukung (sederhana: 1 URL)
+  buktiDukungUrl String?
+
+  // Data DOPD
+  tingkatPerjalanan String?
+
+  // Relasi pusat
+  roster  SpjRosterItem[]
+  rincian RincianBiayaItem[]
+  signers SpjSigner[]
+
+  // Dokumen spesifik
+  telaahan      SpjTelaahanStaf?
+  visum         SpjVisum?
+  kuitansi      SpjKuitansi?
+  laporan       SpjLaporan?
+  userId        String?
+  spjSuratTugas SpjSuratTugas?
+}
+
+//
+// ROSTER: sumber kebenaran personel (urutannya penting).
+// Dari sini kita bisa default:
+// - kepala jalan = item dengan role KEPALA_JALAN (atau urutan pertama)
+// - pengikut = sisanya
+//
+model SpjRosterItem {
+  id    String @id @default(uuid())
+  spjId String
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  pegawaiId String
+  pegawai   Pegawai @relation(fields: [pegawaiId], references: [id])
+
+  order Int
+  role  RosterRole
+
+  // snapshot (biar dokumen lama tidak berubah)
+  nama     String
+  nip      String?
+  jabatan  String
+  golongan String?
+  pangkat  String?
+  instansi String?
+
+  biayaItems      RincianBiayaItem[]
+  spjSuratTugases SpjSuratTugas[]
+
+  @@unique([spjId, order])
+  @@index([spjId, role])
+}
+
+//
+// SIGNER fleksibel per dokumen:
+// - docType menentukan untuk dokumen apa
+// - roleKey adalah “slot/role” (bebas tapi konsisten di app, mis: "PENANDATANGAN_UTAMA", "PPK", "BENDAHARA", dll)
+// - snapshot untuk menjaga konsistensi
+//
+model SpjSigner {
+  id    String @id @default(uuid())
+  spjId String
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  docType SpjDocType
+  order   Int        @default(1)
+  roleKey String // fleksibel tapi tetap jelas (dikontrol di aplikasi)
+
+  pegawaiId String?
+  pegawai   Pegawai? @relation("SignerPegawai", fields: [pegawaiId], references: [id])
+
+  // snapshot penandatangan
+  nama     String
+  nip      String?
+  jabatan  String
+  golongan String?
+  pangkat  String?
+  instansi String?
+
+  // kalau kamu mau bedakan “jabatan yang ditampilkan” (kadang ada koma/Plt.)
+  jabatanTampil String?
+
+  @@unique([spjId, docType, order, roleKey])
+  @@index([spjId, docType])
+}
+
+//
+// TELAAHAN STAF (1-1 dengan SPJ)
+//
+model SpjTelaahanStaf {
+  id    String @id @default(uuid())
+  spjId String @unique
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  // meta naskah
+  kepada   String? @default("Bupati Kutai Barat")
+  sifat    String? @default("Penting")
+  lampiran String? @default("-")
+  perihal  String? @db.Text
+
+  dasar       String?  @db.Text
+  praAnggapan String[]
+  fakta       String[]
+
+  analisis   String? @db.Text
+  kesimpulan String? @db.Text
+  saran      String? @db.Text
+}
+
+//
+// VISUM (template): hanya butuh stageCount default 4
+//
+model SpjVisum {
+  id    String @id @default(uuid())
+  spjId String @unique
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  stageCount Int @default(4)
+}
+
+//
+// KUITANSI: tanggal opsional (dari bendahara)
+// Rinciannya dihitung dari DOPD (group by kategori)
+//
+model SpjKuitansi {
+  id    String @id @default(uuid())
+  spjId String @unique
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  tanggalKuitansi DateTime?
+}
+
+//
+// LAPORAN: mode default POINTS + pembuka template + poin-poin / narasi
+//
+model SpjLaporan {
+  id    String @id @default(uuid())
+  spjId String @unique
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  // ===== header/meta laporan (biar bisa edit dan sesuai template)
+  dasarLaporan String? @db.Text
+  kegiatan     String? @db.Text
+  waktu        String?
+  lokasi       String?
+  tujuan       String?
+
+  // ===== penandatangan kiri (snapshot + override jabatan tampil)
+  signerPegawaiId     String?
+  signerNama          String?
+  signerNip           String?
+  signerJabatan       String?
+  signerPangkat       String?
+  signerGolongan      String?
+  signerJabatanTampil String?
+
+  // ===== hasil laporan (existing)
+  hasilMode    LaporanHasilMode @default(POINTS)
+  hasilPembuka String?          @db.Text
+  hasilPoin    String[]
+  hasilNarasi  String?          @db.Text
+}
+
+model SpjSuratTugas {
+  id    String @id @default(uuid())
+  spjId String @unique
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  nomor String? // nomor surat tugas (kalau kosong, bisa ambil dari spj.noSuratTugas)
+  untuk String  @db.Text
+
+  // siapa yang ditugaskan (ambil dari roster)
+  assignedRosterItemId String?
+  assignedRosterItem   SpjRosterItem? @relation(fields: [assignedRosterItemId], references: [id], onDelete: SetNull)
+
+  // signer fleksibel (ambil dari master Pegawai) + snapshot
+  signerPegawaiId       String?
+  signerNama            String
+  signerNip             String?
+  signerJabatan         String
+  signerPangkatGolongan String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+//
+// DOPD: item biaya per orang (roster item)
+// rupiah tanpa desimal -> Int
+//
+model RincianBiayaItem {
+  id    String @id @default(uuid())
+  spjId String
+  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+
+  rosterItemId String
+  rosterItem   SpjRosterItem @relation(fields: [rosterItemId], references: [id], onDelete: Cascade)
+
+  kategori String // mis: "Uang Harian", "Transport", "Penginapan", dll
+  uraian   String // mis: "Uang harian", "Tiket PP", dll
+
+  hargaSatuan Int // rupiah
+  total       Int // rupiah (cache hasil hitung)
+
+  factors RincianBiayaFactor[]
+
+  @@index([spjId])
+  @@index([rosterItemId])
+}
+
+model RincianBiayaFactor {
+  id     String           @id @default(uuid())
+  itemId String
+  item   RincianBiayaItem @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  order Int
+  label String // contoh: "org", "hari", "kali", "malam"
+  qty   Int
+
+  @@unique([itemId, order])
+}
