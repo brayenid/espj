@@ -119,9 +119,9 @@ export function buildSuratTugasDocument(props: SuratTugasPdfProps): React.ReactE
   const { spj, suratTugas, roster } = props
 
   // contoh dokumen: "6 (enam) hari, tanggal 10 November s.d. tanggal 15 November 2025"
-  const lamaText = `${spj.lamaPerjalanan} (${terbilangId(spj.lamaPerjalanan)}) hari, tanggal ${fmtDate(
-    spj.tglBerangkat
-  )} s.d. tanggal ${fmtDate(spj.tglKembali)}`
+  const lamaText = `${terbilangId(spj.lamaPerjalanan)}, tanggal ${fmtDate(spj.tglBerangkat)} s.d. tanggal ${fmtDate(
+    spj.tglKembali
+  )}`
 
   return (
     <Document>

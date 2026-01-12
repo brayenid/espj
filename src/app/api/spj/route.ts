@@ -4,6 +4,9 @@ import { createSpjDraft } from '@/server/spj/mutations'
 export const runtime = 'nodejs'
 export const dynamic = 'force-dynamic'
 
+/**
+ * POST: Membuat Draft SPJ Baru
+ */
 export async function POST(req: Request) {
   const body = await req.json().catch(() => null)
   const result = await createSpjDraft(body)

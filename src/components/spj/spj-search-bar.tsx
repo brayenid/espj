@@ -2,7 +2,6 @@
 
 import { useRouter } from 'next/navigation'
 import { useState } from 'react'
-import Link from 'next/link'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -29,7 +28,7 @@ export default function SpjSearchBar({ initialQ }: { initialQ?: string }) {
         <Input
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="Cari berdasarkan tujuan, nomor surat, atau tanggal..."
+          placeholder="Cari berdasarkan tujuan, nomor surat, nama pelaksana..."
           className="pl-9 h-9 border-border/50 bg-background/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 rounded-md shadow-sm"
         />
         {q && (
@@ -50,8 +49,8 @@ export default function SpjSearchBar({ initialQ }: { initialQ?: string }) {
         type="submit"
         size="sm"
         variant="secondary"
-        className="h-9 px-4 border border-border/50 rounded-md shadow-sm">
-        Filter
+        className="h-9 px-4 border border-border/50 rounded-md shadow-sm cursor-pointer">
+        Cari
       </Button>
     </form>
   )

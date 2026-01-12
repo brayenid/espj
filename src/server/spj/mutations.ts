@@ -1,6 +1,7 @@
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { z } from 'zod'
+import { revalidatePath } from 'next/cache'
 
 export const createSpjDraftSchema = z.object({
   tempatTujuan: z.string().min(2, 'Tujuan wajib diisi'),
@@ -31,9 +32,21 @@ function toDate(value: string) {
 }
 
 function diffDaysInclusive(start: Date, end: Date) {
-  const ms = end.getTime() - start.getTime()
-  const days = Math.floor(ms / (1000 * 60 * 60 * 24)) + 1
-  return Math.max(days, 1)
+  // Pastikan input adalah objek Date yang valid
+  const dStart = new Date(start)
+  const dEnd = new Date(end)
+
+  // Reset jam ke 00:00:00 agar selisih jam tidak mengacaukan pembulatan hari
+  dStart.setHours(0, 0, 0, 0)
+  dEnd.setHours(0, 0, 0, 0)
+
+  const ms = dEnd.getTime() - dStart.getTime()
+
+  // Menggunakan Math.round untuk menangani floating point precision
+  const days = Math.round(ms / (1000 * 60 * 60 * 24))
+
+  // Kembalikan selisih murni (tanpa +1)
+  return Math.max(days, 0)
 }
 
 export async function createSpjDraft(input: unknown) {
@@ -80,4 +93,45 @@ export async function createSpjDraft(input: unknown) {
   })
 
   return { ok: true as const, id: spj.id }
+}
+
+export async function deleteSpj(id: string) {
+  try {
+    const session = await auth()
+    if (!session?.user?.id) {
+      return { success: false, message: 'Anda harus login untuk melakukan ini.' }
+    }
+
+    const userId = session.user.id
+    const role = session.user.role
+
+    // 1. Verifikasi kepemilikan sebelum hapus (Security Check)
+    const existingSpj = await prisma.spj.findUnique({
+      where: { id },
+      select: { createdById: true }
+    })
+
+    if (!existingSpj) {
+      return { success: false, message: 'Data SPJ tidak ditemukan.' }
+    }
+
+    // Hanya pemilik atau SUPER_ADMIN yang boleh menghapus
+    if (existingSpj.createdById !== userId && role !== 'SUPER_ADMIN') {
+      return { success: false, message: 'Anda tidak memiliki izin untuk menghapus SPJ ini.' }
+    }
+
+    // 2. Eksekusi Penghapusan
+    // Cascade delete pada schema akan mengurus tabel terkait (roster, rincian, dll)
+    await prisma.spj.delete({
+      where: { id }
+    })
+
+    // 3. Revalidasi cache agar daftar SPJ di UI terupdate
+    revalidatePath('/spj')
+
+    return { success: true, message: 'SPJ berhasil dihapus.' }
+  } catch (error) {
+    console.error('DELETE_SPJ_ERROR:', error)
+    return { success: false, message: 'Terjadi kesalahan sistem saat menghapus data.' }
+  }
 }

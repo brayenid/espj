@@ -2,14 +2,12 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
 import { listSpjForCurrentUser } from '@/server/spj/queries'
-import { prisma } from '@/lib/prisma'
-
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
 
 import SpjSearchBar from '@/components/spj/spj-search-bar'
-import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus, User2Icon, UserCircle } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus } from 'lucide-react'
 
 function fmtDate(d: Date) {
   return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
@@ -42,70 +40,40 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
   const pageNum = Number.isFinite(Number(pageRaw)) ? Math.max(1, Math.floor(Number(pageRaw))) : 1
   const pageSize = 10
 
-  const items = await listSpjForCurrentUser()
+  // FETCH: Menggunakan filter database
+  const { items: pageItems, total } = await listSpjForCurrentUser({
+    q: qRaw,
+    skip: (pageNum - 1) * pageSize,
+    take: pageSize
+  })
 
-  const filtered = qRaw
-    ? items.filter((x) => {
-        const hay = [
-          x.tempatTujuan,
-          x.noSuratTugas ?? '',
-          x.noSpd ?? '',
-          fmtDate(x.tglBerangkat),
-          fmtDate(x.tglKembali)
-        ]
-          .join(' ')
-          .toLowerCase()
-
-        return hay.includes(qRaw.toLowerCase())
-      })
-    : items
-
-  const total = filtered.length
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
+  // Redirect jika page out of range
   if (pageNum > totalPages && totalPages > 0) {
     redirect(buildQueryString({ q: qRaw, page: String(totalPages) }) || '?page=1')
   }
 
-  const start = (pageNum - 1) * pageSize
-  const pageItems = filtered.slice(start, start + pageSize)
-
-  const ids = pageItems.map((x) => x.id)
-  const rosterRows = ids.length
-    ? await prisma.spjRosterItem.findMany({
-        where: { spjId: { in: ids } },
-        orderBy: [{ spjId: 'asc' }, { role: 'asc' }, { order: 'asc' }],
-        select: { spjId: true, role: true, order: true, nama: true }
-      })
-    : []
-
-  const rosterPreview = new Map<string, string>()
-  for (const id of ids) {
-    const rows = rosterRows.filter((r) => r.spjId === id)
-    if (rows.length === 0) {
-      rosterPreview.set(id, '-')
-      continue
-    }
-
-    const kepala = rows.find((r) => r.role === 'KEPALA_JALAN') ?? rows[0]
-    const pengikutCount = rows.filter((r) => r.role === 'PENGIKUT').length
-
-    rosterPreview.set(id, pengikutCount > 0 ? `${kepala.nama} + ${pengikutCount} orang` : `${kepala.nama}`)
+  // Preview Pelaksana: Diolah langsung dari include roster
+  const getRosterPreview = (roster: { nama: string; role: string }[]) => {
+    if (!roster || roster.length === 0) return '-'
+    const kepala = roster.find((r) => r.role === 'KEPALA_JALAN') ?? roster[0]
+    const pengikutCount = roster.filter((r) => r.role === 'PENGIKUT').length
+    return pengikutCount > 0 ? `${kepala.nama} + ${pengikutCount} orang` : kepala.nama
   }
 
+  // Pagination Logic
   const prevHref = buildQueryString({ q: qRaw, page: String(Math.max(1, pageNum - 1)) })
   const nextHref = buildQueryString({ q: qRaw, page: String(Math.min(totalPages, pageNum + 1)) })
-
   const windowSize = 5
   const half = Math.floor(windowSize / 2)
   const pStart = Math.max(1, pageNum - half)
   const pEnd = Math.min(totalPages, pStart + windowSize - 1)
-  const pStart2 = Math.max(1, pEnd - windowSize + 1)
-  const pages = Array.from({ length: pEnd - pStart2 + 1 }).map((_, i) => pStart2 + i)
+  const pStartFinal = Math.max(1, pEnd - windowSize + 1)
+  const pages = Array.from({ length: pEnd - pStartFinal + 1 }).map((_, i) => pStartFinal + i)
 
   return (
     <div className="mx-auto w-full max-w-7xl space-y-8 p-4">
-      {/* Header Linear Style */}
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
           <h1 className="text-xl font-medium tracking-tight text-foreground flex items-center gap-2">
@@ -114,7 +82,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
           </h1>
           <p className="text-sm text-muted-foreground/80">Manajemen dan monitoring pembuatan dokumen SPJ Anda.</p>
         </div>
-
         <div className="flex items-center gap-2">
           <Button asChild size="sm" className="h-9 bg-foreground text-background hover:bg-foreground/90 shadow-sm">
             <Link href="/spj/new">
@@ -127,7 +94,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
 
       <Separator className="bg-border/50" />
 
-      {/* Action Bar (Search & Stats) */}
       <div className="space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div className="w-full max-w-md">
@@ -139,7 +105,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
         </div>
       </div>
 
-      {/* Linear Style Table Container */}
       <div className="rounded-lg border border-border/50 bg-card/30 backdrop-blur-sm overflow-hidden">
         <Table>
           <TableHeader className="bg-muted/40">
@@ -148,21 +113,16 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
               <TableHead className="hidden md:table-cell py-3 font-medium text-foreground">Pelaksana</TableHead>
               <TableHead className="py-3 font-medium text-foreground">Periode</TableHead>
               <TableHead className="hidden lg:table-cell py-3 font-medium text-foreground">No. Surat</TableHead>
-              <TableHead className="w-[80px]" />
+              <TableHead className="w-20" />
             </TableRow>
           </TableHeader>
           <TableBody>
             {pageItems.length === 0 ? (
               <TableRow>
                 <TableCell colSpan={5} className="py-20 text-center">
-                  <div className="flex flex-col items-center justify-center space-y-2">
-                    <p className="text-sm text-muted-foreground">
-                      {qRaw ? `Tidak ada hasil untuk "${qRaw}"` : 'Belum ada data perjalanan dinas.'}
-                    </p>
-                    <Button variant="link" asChild className="text-xs">
-                      <Link href="/spj/new">Mulai buat sekarang</Link>
-                    </Button>
-                  </div>
+                  <p className="text-sm text-muted-foreground">
+                    {qRaw ? `Tidak ada hasil untuk "${qRaw}"` : 'Belum ada data perjalanan dinas.'}
+                  </p>
                 </TableCell>
               </TableRow>
             ) : (
@@ -172,11 +132,9 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                     <div className="font-medium text-[14px]">{spj.tempatTujuan}</div>
                     <div className="text-xs text-muted-foreground lg:hidden mt-1">{safe(spj.noSuratTugas)}</div>
                   </TableCell>
-
                   <TableCell className="hidden md:table-cell py-4">
-                    <span className="text-sm text-muted-foreground/90">{safe(rosterPreview.get(spj.id))}</span>
+                    <span className="text-sm text-muted-foreground/90">{getRosterPreview(spj.roster)}</span>
                   </TableCell>
-
                   <TableCell className="py-4 tabular-nums text-sm">
                     <div className="flex flex-col">
                       <span>{fmtDate(spj.tglBerangkat)}</span>
@@ -186,11 +144,9 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                       <span>{fmtDate(spj.tglKembali)}</span>
                     </div>
                   </TableCell>
-
                   <TableCell className="hidden lg:table-cell py-4 text-sm text-muted-foreground font-mono">
                     {safe(spj.noSuratTugas)}
                   </TableCell>
-
                   <TableCell className="text-right py-4">
                     <Button
                       asChild
@@ -199,7 +155,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                       className="h-8 w-8 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
                       <Link href={`/spj/${spj.id}`}>
                         <ChevronRight className="h-4 w-4" />
-                        <span className="sr-only">Buka</span>
                       </Link>
                     </Button>
                   </TableCell>
@@ -215,16 +170,14 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
             Halaman <span className="text-foreground font-medium">{pageNum}</span> dari{' '}
             <span className="text-foreground font-medium">{totalPages}</span>
           </div>
-
           <div className="flex items-center gap-1.5">
-            <Button asChild variant="outline" size="icon" className="h-8 w-8 border-border/60" disabled={pageNum <= 1}>
+            <Button asChild variant="outline" size="icon" className="h-8 w-8" disabled={pageNum <= 1}>
               <Link
                 href={pageNum <= 1 ? '#' : prevHref || '?page=1'}
-                className={pageNum <= 1 ? 'pointer-events-none' : ''}>
+                className={pageNum <= 1 ? 'pointer-events-none opacity-50' : ''}>
                 <ArrowLeft className="h-3.5 w-3.5" />
               </Link>
             </Button>
-
             <div className="flex items-center gap-1 mx-1">
               {pages.map((p) => (
                 <Link
@@ -239,16 +192,10 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                 </Link>
               ))}
             </div>
-
-            <Button
-              asChild
-              variant="outline"
-              size="icon"
-              className="h-8 w-8 border-border/60"
-              disabled={pageNum >= totalPages}>
+            <Button asChild variant="outline" size="icon" className="h-8 w-8" disabled={pageNum >= totalPages}>
               <Link
                 href={pageNum >= totalPages ? '#' : nextHref || `?page=${totalPages}`}
-                className={pageNum >= totalPages ? 'pointer-events-none' : ''}>
+                className={pageNum >= totalPages ? 'pointer-events-none opacity-50' : ''}>
                 <ArrowRight className="h-3.5 w-3.5" />
               </Link>
             </Button>

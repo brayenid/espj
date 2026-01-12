@@ -1,13 +1,21 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 'use client'
 
-import { useMemo, useState } from 'react'
+import { useMemo, useState, useTransition } from 'react'
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter
+} from '@/components/ui/dialog'
 import { Separator } from '@/components/ui/separator'
 
 import SpjMetaForm from '@/components/spj/forms/spj-meta-form'
@@ -26,7 +34,9 @@ import {
   Clock,
   MapPin,
   Landmark,
-  Link2
+  Link2,
+  Trash2,
+  AlertTriangle
 } from 'lucide-react'
 
 // --- Types ---
@@ -121,6 +131,7 @@ export default function SpjMaster({
   visumStageCount: number
 }) {
   const router = useRouter()
+  const [isPending, startTransition] = useTransition()
 
   // Logic: Roster Sorting
   const rosterSorted = useMemo(() => {
@@ -151,7 +162,7 @@ export default function SpjMaster({
   }, [signers])
 
   // UI States
-  const [open, setOpen] = useState<null | 'META' | 'SIGNERS' | 'VISUM' | 'LAPORAN'>(null)
+  const [open, setOpen] = useState<null | 'META' | 'SIGNERS' | 'DELETE'>(null)
   const [pdfOpen, setPdfOpen] = useState(false)
   const [pdfKey, setPdfKey] = useState<PdfKey | null>(null)
 
@@ -176,6 +187,28 @@ export default function SpjMaster({
   function openPdf(k: PdfKey) {
     setPdfKey(k)
     setPdfOpen(true)
+  }
+
+  // Action: Delete
+  async function onDelete() {
+    startTransition(async () => {
+      try {
+        const res = await fetch(`/api/spj/${spj.id}`, { method: 'DELETE' })
+        const data = await res.json()
+
+        if (!res.ok || !data.ok) {
+          throw new Error(data.message || 'Gagal menghapus data')
+        }
+
+        toast.success('SPJ Berhasil dihapus')
+        router.push('/spj')
+        router.refresh()
+      } catch (err: any) {
+        toast.error(err.message)
+      } finally {
+        close()
+      }
+    })
   }
 
   return (
@@ -205,11 +238,12 @@ export default function SpjMaster({
               Preview {item.label}
             </Button>
           ))}
+          <Separator orientation="vertical" className="h-9 mx-1 hidden md:block" />
         </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        {/* LEFT COLUMN: Data Details (8 Columns) */}
+        {/* LEFT COLUMN */}
         <div className="lg:col-span-8 space-y-6">
           <Card className="rounded-xl border-border/40 bg-card/40 shadow-none overflow-hidden">
             <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 bg-muted/10 px-6 py-4">
@@ -217,17 +251,26 @@ export default function SpjMaster({
                 <Info className="w-4 h-4 text-muted-foreground" />
                 <CardTitle className="text-sm font-medium">Data Perjalanan & Anggaran</CardTitle>
               </div>
-              <Button
-                size="sm"
-                variant="outline"
-                className="h-8 border-border/60 text-xs shadow-sm"
-                onClick={() => setOpen('META')}>
-                <Edit3 className="w-3.5 h-3.5 mr-2" /> Edit Data
-              </Button>
+              <div className="flex gap-3">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10 border border-transparent hover:border-destructive/20"
+                  onClick={() => setOpen('DELETE')}>
+                  <Trash2 className="w-4 h-4 mr-2" />
+                  Hapus SPJ
+                </Button>
+                <Button
+                  size="sm"
+                  variant="outline"
+                  className="h-8 border-border/60 text-xs shadow-sm"
+                  onClick={() => setOpen('META')}>
+                  <Edit3 className="w-3.5 h-3.5 mr-2" /> Edit Data
+                </Button>
+              </div>
             </CardHeader>
             <CardContent className="p-6">
               <div className="grid gap-8">
-                {/* Maksud Dinas */}
                 <div className="space-y-2">
                   <label className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
                     Maksud Perjalanan Dinas
@@ -251,7 +294,7 @@ export default function SpjMaster({
                   <Section title="Waktu & Lokasi" icon={Clock}>
                     <div className="flex items-center gap-3 p-2.5 mb-2 bg-primary/5 rounded-lg border border-primary/10">
                       <Calendar className="w-4 h-4 text-primary" />
-                      <span className="text-sm font-semibold text-primary">{spj.lamaPerjalanan} Hari Kalender</span>
+                      <span className="text-sm font-semibold text-primary">{spj.lamaPerjalanan} Hari</span>
                     </div>
                     <Row label="Berangkat" value={fmtDateId(spj.tglBerangkat)} />
                     <Row label="Kembali" value={fmtDateId(spj.tglKembali)} />
@@ -286,9 +329,8 @@ export default function SpjMaster({
           </Card>
         </div>
 
-        {/* RIGHT COLUMN: People & Logic (4 Columns) */}
+        {/* RIGHT COLUMN */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Status Dokumen */}
           <Card className="rounded-xl border-border/40 bg-card/40 shadow-none">
             <CardHeader className="px-5 py-4 border-b border-border/40">
               <CardTitle className="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
@@ -305,15 +347,9 @@ export default function SpjMaster({
                 <StatusBadge label="Visum" active={docs.visum} />
                 <StatusBadge label="Laporan" active={docs.laporan} />
               </div>
-              <Separator className="my-4 bg-border/40" />
-              <div className="flex justify-between items-center text-xs">
-                <span className="text-muted-foreground">Kolom Tanda Tangan Visum:</span>
-                <span className="font-mono font-medium">{visumStageCount} Tahap</span>
-              </div>
             </CardContent>
           </Card>
 
-          {/* Pegawai/Roster */}
           <Card className="rounded-xl border-border/40 bg-card/40 shadow-none">
             <CardHeader className="px-5 py-4 border-b border-border/40">
               <CardTitle className="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
@@ -339,7 +375,6 @@ export default function SpjMaster({
             </CardContent>
           </Card>
 
-          {/* Penandatangan Grouped View */}
           <Card className="rounded-xl border-border/40 bg-card/40 shadow-none">
             <CardHeader className="px-5 py-4 border-b border-border/40 flex flex-row items-center justify-between">
               <CardTitle className="text-xs font-bold uppercase tracking-wider flex items-center gap-2 text-muted-foreground">
@@ -368,20 +403,40 @@ export default function SpjMaster({
                     </div>
                   ))
               )}
-              {signers.length > 3 && (
-                <Button
-                  variant="link"
-                  className="p-0 h-auto text-[10px] font-bold text-primary"
-                  onClick={() => setOpen('SIGNERS')}>
-                  LIHAT SEMUA ({signers.length})
-                </Button>
-              )}
             </CardContent>
           </Card>
         </div>
       </div>
 
-      {/* --- MODALS (Full Functionality Restored) --- */}
+      {/* --- MODALS --- */}
+
+      {/* Confirm Delete Dialog */}
+      <Dialog open={open === 'DELETE'} onOpenChange={(v) => !v && close()}>
+        <DialogContent className="max-w-md border-destructive/20 shadow-2xl">
+          <DialogHeader>
+            <div className="h-12 w-12 rounded-full bg-destructive/10 flex items-center justify-center mb-4">
+              <AlertTriangle className="h-6 w-6 text-destructive" />
+            </div>
+            <DialogTitle>Hapus Data SPJ?</DialogTitle>
+            <DialogDescription className="text-sm">
+              Tindakan ini permanen. Seluruh data terkait perjalanan dinas ini termasuk roster, penandatangan, dan
+              rincian biaya akan ikut dihapus dari database.
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter className="gap-2 sm:gap-0 mt-4">
+            <Button variant="ghost" onClick={close} disabled={isPending}>
+              Batalkan
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={onDelete}
+              disabled={isPending}
+              className="bg-destructive hover:bg-destructive/90">
+              {isPending ? 'Menghapus...' : 'Ya, Hapus Permanen'}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
 
       {/* PDF Preview */}
       <PdfPreviewDialog
@@ -392,7 +447,7 @@ export default function SpjMaster({
         url={currentPdf?.url ?? null}
       />
 
-      {/* 1. META EDIT MODAL */}
+      {/* META EDIT MODAL */}
       <Dialog open={open === 'META'} onOpenChange={(v) => !v && close()}>
         <DialogContent className="w-[96vw] max-w-6xl max-h-[90vh] overflow-y-auto border-border/40 shadow-2xl p-0 gap-0">
           <DialogHeader className="px-6 py-4 border-b bg-muted/20">
@@ -412,7 +467,7 @@ export default function SpjMaster({
         </DialogContent>
       </Dialog>
 
-      {/* 2. SIGNERS VIEW MODAL */}
+      {/* SIGNERS VIEW MODAL */}
       <Dialog open={open === 'SIGNERS'} onOpenChange={(v) => !v && close()}>
         <DialogContent className="w-[96vw] max-w-4xl max-h-[85vh] overflow-y-auto border-border/40 p-0 gap-0">
           <DialogHeader className="px-6 py-4 border-b bg-muted/20">

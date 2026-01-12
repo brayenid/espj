@@ -4,6 +4,7 @@ import React from 'react'
 import { Document, Page, Text, View, StyleSheet, type DocumentProps } from '@react-pdf/renderer'
 
 import KopSurat from '@/pdf/components/kop-surat'
+import { terbilangId } from '@/lib/utils'
 
 type RosterItem = {
   id: string
@@ -158,34 +159,6 @@ function fmtPangkatGol(pangkat: string | null, golongan: string | null) {
   return '-'
 }
 
-// ===== Terbilang (khusus hari) -> "8 (delapan) Hari"
-function terbilang(n: number): string {
-  const x = Math.floor(Math.abs(n || 0))
-  const s = ['', 'satu', 'dua', 'tiga', 'empat', 'lima', 'enam', 'tujuh', 'delapan', 'sembilan', 'sepuluh', 'sebelas']
-
-  if (x === 0) return 'nol'
-  if (x < 12) return s[x]
-  if (x < 20) return `${s[x - 10]} belas`
-  if (x < 100) {
-    const puluh = Math.floor(x / 10)
-    const satuan = x % 10
-    return `${s[puluh]} puluh${satuan ? ' ' + s[satuan] : ''}`
-  }
-  if (x < 200) return `seratus${x % 100 ? ' ' + terbilang(x - 100) : ''}`
-  if (x < 1000) {
-    const r = x % 100
-    return `${s[Math.floor(x / 100)]} ratus${r ? ' ' + terbilang(r) : ''}`
-  }
-  // cukup untuk kebutuhan hari SPD; kalau butuh >999 nanti kita extend
-  return String(x)
-}
-
-function terbilangHari(n: number) {
-  const v = Math.max(0, Math.floor(Number(n) || 0))
-  if (v === 0) return `0 (nol) Hari`
-  return `${v} (${terbilang(v)}) Hari`
-}
-
 function Cell({
   children,
   style,
@@ -258,6 +231,10 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
   const signerJabatan = signer?.jabatanTampil?.trim() || signer?.jabatan || ''
 
   const year = props.spj.tglSpd.getFullYear()
+
+  console.log('====================================')
+  console.log({ lama: props.spj.lamaPerjalanan })
+  console.log('====================================')
 
   return (
     <Document>
@@ -411,7 +388,7 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
             <Cell style={styles.colValue} lastCol>
               <View style={styles.subRow}>
                 <Text style={styles.subKey}>a.</Text>
-                <Text style={styles.subLabel}>{terbilangHari(props.spj.lamaPerjalanan)}</Text>
+                <Text style={styles.subLabel}>{terbilangId(props.spj.lamaPerjalanan)}</Text>
               </View>
               <View style={styles.subRow}>
                 <Text style={styles.subKey}>b.</Text>

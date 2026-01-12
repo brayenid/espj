@@ -16,7 +16,7 @@ import { Badge } from '@/components/ui/badge'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 
-import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import {
   CalendarDays,
   ChevronRight,
@@ -31,11 +31,10 @@ import {
   UserPlus,
   X
 } from 'lucide-react'
-import { cn } from '@/lib/utils'
 
 const schema = z.object({
   noSpd: z.string().optional().nullable(),
-  tglSpd: z.string().min(10, 'Tanggal wajib diisi'),
+  tglSpd: z.optional(z.string()),
   kotaTandaTangan: z.string().min(2, 'Kota wajib diisi'),
   signerPegawaiId: z.string().optional().nullable()
 })
@@ -424,7 +423,7 @@ export default function SpdForm({
                               </Command>
                             </PopoverContent>
                           </Popover>
-
+                          {/* 
                           {currentSignerId && currentSignerId !== '__none__' && (
                             <div className="p-4 rounded-xl border border-primary/20 bg-primary/[0.02] transition-all animate-in slide-in-from-top-1">
                               <div className="flex items-center gap-3">
@@ -441,7 +440,7 @@ export default function SpdForm({
                                 </div>
                               </div>
                             </div>
-                          )}
+                          )} */}
                         </div>
                       </FormControl>
                       <FormMessage />
