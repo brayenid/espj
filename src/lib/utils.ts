@@ -65,10 +65,23 @@ export function calculateDiffDays(startDate: Date, endDate: Date): number {
   return Math.max(0, diffDays)
 }
 
-export function fmtDateId(d: Date) {
+export function fmtDateId(d: Date | string) {
+  if (!d) return ''
   try {
-    return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
-  } catch {
+    const date = new Date(d)
+
+    // Pastikan valid date
+    if (isNaN(date.getTime())) return ''
+
+    return date.toLocaleDateString('id-ID', {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      // KUNCI UTAMA: Paksa timezone agar server & client sama
+      timeZone: 'Asia/Kuala_Lumpur'
+    })
+  } catch (error) {
+    console.error('Error formatting date:', error)
     return ''
   }
 }
