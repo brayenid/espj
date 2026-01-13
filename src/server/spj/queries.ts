@@ -67,7 +67,7 @@ export async function listSpjForCurrentUser(options?: { q?: string; skip?: numbe
       where,
       skip,
       take,
-      orderBy: { tglBerangkat: 'desc' }, // Urutkan berdasarkan tanggal berangkat terbaru
+      orderBy: { createdAt: 'desc' }, // Urutkan berdasarkan tanggal berangkat terbaru
       include: {
         // Langsung ambil roster untuk preview di tabel agar hemat query
         roster: {
