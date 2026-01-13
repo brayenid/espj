@@ -38,6 +38,7 @@ import {
   Trash2,
   AlertTriangle
 } from 'lucide-react'
+import { fmtDateId } from '@/lib/utils'
 
 // --- Types ---
 type RosterItem = {
@@ -97,13 +98,6 @@ type SpjLite = {
 type PdfKey = 'SPD' | 'DOPD' | 'KUITANSI' | 'VISUM' | 'LAPORAN' | 'TS' | 'ST'
 
 // --- Helpers ---
-function fmtDateId(d: Date) {
-  try {
-    return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
-  } catch {
-    return ''
-  }
-}
 
 function safe(s?: string | null, fb = '-') {
   const t = (s ?? '').trim()

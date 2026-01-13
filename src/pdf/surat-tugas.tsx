@@ -2,7 +2,7 @@ import React from 'react'
 import { Document, Page, Text, View, StyleSheet, type DocumentProps } from '@react-pdf/renderer'
 
 import KopSurat from '@/pdf/components/kop-surat'
-import { terbilangId } from '@/lib/utils'
+import { fmtDateId, terbilangId } from '@/lib/utils'
 
 type Roster = {
   id: string
@@ -44,8 +44,8 @@ export type SuratTugasPdfProps = {
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 34,
-    paddingBottom: 36,
+    paddingTop: 30,
+    paddingBottom: 30,
     paddingHorizontal: 42,
     fontSize: 11,
     lineHeight: 1.35,
@@ -54,7 +54,7 @@ const styles = StyleSheet.create({
 
   blockCenter: { alignItems: 'center' },
   title: {
-    marginTop: 6,
+    marginTop: 0,
     fontSize: 12,
     fontWeight: 700,
     textTransform: 'uppercase'
@@ -91,15 +91,11 @@ const styles = StyleSheet.create({
   ttdBox: { width: 240 },
   ttdDate: { textAlign: 'left' },
   ttdJabatan: { marginTop: 2 },
-  ttdSpace: { height: 60 },
+  ttdSpace: { height: 40 },
   ttdName: { fontWeight: 700, textDecoration: 'underline' },
   ttdPangkat: { marginTop: 2 },
   ttdNip: { marginTop: 2 }
 })
-
-function fmtDate(d: Date) {
-  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
-}
 
 function fmtMonthYear(d: Date) {
   return d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
@@ -119,7 +115,7 @@ export function buildSuratTugasDocument(props: SuratTugasPdfProps): React.ReactE
   const { spj, suratTugas, roster } = props
 
   // contoh dokumen: "6 (enam) hari, tanggal 10 November s.d. tanggal 15 November 2025"
-  const lamaText = `${terbilangId(spj.lamaPerjalanan)}, tanggal ${fmtDate(spj.tglBerangkat)} s.d. tanggal ${fmtDate(
+  const lamaText = `${terbilangId(spj.lamaPerjalanan)}, tanggal ${fmtDateId(spj.tglBerangkat)} s.d. tanggal ${fmtDateId(
     spj.tglKembali
   )}`
 

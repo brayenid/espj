@@ -2,6 +2,7 @@
 import React from 'react'
 import { Document, Page, Text, View, StyleSheet, type DocumentProps } from '@react-pdf/renderer'
 import KopSurat from '@/pdf/components/kop-surat'
+import { fmtDateId } from '@/lib/utils'
 
 export type RosterItemPdf = {
   order: number
@@ -251,14 +252,6 @@ function splitParagraphs(text: string) {
     .split(/\n+/)
     .map((t) => t.trim())
     .filter(Boolean)
-}
-
-function fmtDateId(d: Date) {
-  return d.toLocaleDateString('id-ID', {
-    day: '2-digit',
-    month: 'long',
-    year: 'numeric'
-  })
 }
 
 function fmtPangkatGolongan(pangkat: string | null, golongan: string | null) {

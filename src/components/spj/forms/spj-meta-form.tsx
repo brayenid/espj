@@ -16,7 +16,7 @@ import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
-import { Loader2, Save, Link2, FileText, Landmark, ClipboardList, CalendarDays, ArrowRight } from 'lucide-react'
+import { Loader2, Save, Link2, Landmark, ClipboardList, CalendarDays } from 'lucide-react'
 
 // QA: Validasi Cross-Field untuk rentang tanggal
 const schema = z

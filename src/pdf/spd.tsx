@@ -4,7 +4,7 @@ import React from 'react'
 import { Document, Page, Text, View, StyleSheet, type DocumentProps } from '@react-pdf/renderer'
 
 import KopSurat from '@/pdf/components/kop-surat'
-import { terbilangId } from '@/lib/utils'
+import { fmtDateId, terbilangId } from '@/lib/utils'
 
 type RosterItem = {
   id: string
@@ -124,10 +124,6 @@ function sortRoster(roster: RosterItem[]) {
     if (a.role !== b.role) return a.role === 'KEPALA_JALAN' ? -1 : 1
     return a.order - b.order
   })
-}
-
-function fmtDate(d: Date) {
-  return d.toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
 }
 
 function fmtMonthYearNow() {
@@ -315,11 +311,11 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
               </View>
               <View style={styles.subRow}>
                 <Text style={styles.subKey}>b.</Text>
-                <Text style={styles.subLabel}>{fmtDate(props.spj.tglBerangkat)}</Text>
+                <Text style={styles.subLabel}>{fmtDateId(props.spj.tglBerangkat)}</Text>
               </View>
               <View style={styles.subRow}>
                 <Text style={styles.subKey}>c.</Text>
-                <Text style={styles.subLabel}>{fmtDate(props.spj.tglKembali)}</Text>
+                <Text style={styles.subLabel}>{fmtDateId(props.spj.tglKembali)}</Text>
               </View>
             </Cell>
           </View>

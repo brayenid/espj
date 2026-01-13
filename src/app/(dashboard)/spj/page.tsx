@@ -9,11 +9,7 @@ import { Separator } from '@/components/ui/separator'
 import SpjSearchBar from '@/components/spj/spj-search-bar'
 import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus, Clock } from 'lucide-react'
 import SpjDuplicateButton from '@/components/spj/spj-duplicate-button'
-
-// Fungsi untuk format tanggal (tanpa jam)
-function fmtDate(d: Date) {
-  return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
-}
+import { fmtDateId } from '@/lib/utils'
 
 // Fungsi khusus untuk createdAt (dengan waktu jika diperlukan)
 function fmtDateTime(d: Date) {
@@ -146,7 +142,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                   <TableCell className="py-4">
                     <div className="font-medium text-[14px]">{spj.tempatTujuan}</div>
                     <div className="text-[10px] text-muted-foreground mt-0.5 xl:hidden italic">
-                      Dibuat: {fmtDateTime(spj.createdAt)}
+                      Dibuat: {fmtDateId(spj.createdAt)}
                     </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell py-4">
@@ -154,11 +150,11 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                   </TableCell>
                   <TableCell className="py-4 tabular-nums text-sm">
                     <div className="flex flex-col">
-                      <span>{fmtDate(spj.tglBerangkat)}</span>
+                      <span>{fmtDateId(spj.tglBerangkat)}</span>
                       <span className="text-[10px] text-muted-foreground uppercase tracking-widest leading-none">
                         s/d
                       </span>
-                      <span>{fmtDate(spj.tglKembali)}</span>
+                      <span>{fmtDateId(spj.tglKembali)}</span>
                     </div>
                   </TableCell>
                   {/* Sel Baru: Created At */}

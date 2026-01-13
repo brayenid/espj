@@ -3,6 +3,7 @@ import React from 'react'
 import { Document, Page, StyleSheet, Text, View, type DocumentProps } from '@react-pdf/renderer'
 import KopSurat from '@/pdf/components/kop-surat'
 import { LaporanHasilMode } from '@prisma/client'
+import { fmtDateId } from '@/lib/utils'
 
 type RosterItem = {
   id: string
@@ -54,14 +55,6 @@ function sortRoster(list: RosterItem[]) {
 function safeText(s?: string | null, fallback = '-') {
   const t = (s ?? '').trim()
   return t.length ? t : fallback
-}
-
-function fmtIdDate(d: Date) {
-  try {
-    return d.toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
-  } catch {
-    return ''
-  }
 }
 
 function fmtPangkatGol(pangkat: string | null, gol: string | null) {
@@ -122,7 +115,7 @@ export function buildLaporanDocument(props: LaporanPdfProps): React.ReactElement
 
   const kegiatanRaw = (laporan?.kegiatan ?? '').trim()
   const kegiatan = safeText(laporan?.kegiatan, '-')
-  const waktu = safeText(laporan?.waktu ?? fmtIdDate(new Date()), '-')
+  const waktu = safeText(laporan?.waktu ?? fmtDateId(new Date()), '-')
   const lokasi = safeText(laporan?.lokasi, '-')
   const tujuan = safeText(laporan?.tujuan, '-')
 

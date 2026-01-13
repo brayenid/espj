@@ -64,3 +64,11 @@ export function calculateDiffDays(startDate: Date, endDate: Date): number {
 
   return Math.max(0, diffDays)
 }
+
+export function fmtDateId(d: Date) {
+  try {
+    return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'long', year: 'numeric' })
+  } catch {
+    return ''
+  }
+}
