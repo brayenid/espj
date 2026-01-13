@@ -18,7 +18,6 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import {
-  CalendarDays,
   ChevronRight,
   ClipboardCheck,
   FileSignature,
@@ -283,30 +282,6 @@ export default function SpdForm({
                     </FormItem>
                   )}
                 />
-
-                {/* TANGGAL SPD */}
-                <FormField
-                  control={form.control}
-                  name="tglSpd"
-                  render={({ field }) => (
-                    <FormItem className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <CalendarDays className="w-3.5 h-3.5 text-muted-foreground" />
-                        <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-                          Tanggal SPD
-                        </FormLabel>
-                      </div>
-                      <FormControl>
-                        <Input
-                          type="date"
-                          {...field}
-                          className="h-11 rounded-xl bg-muted/10 border-border/40 text-sm px-4 font-mono"
-                        />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
               </div>
 
               <div className="grid gap-8 md:grid-cols-2">
@@ -452,27 +427,27 @@ export default function SpdForm({
               <Separator className="bg-border/40" />
 
               {/* FOOTER ACTIONS */}
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
                 <Button
                   type="button"
-                  variant="ghost"
-                  className="h-11 px-6 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+                  variant="outline"
+                  className="h-10 font-medium text-muted-foreground hover:text-foreground"
                   onClick={() => window.open(`/spj/${spjId}/spd/print`, '_blank')}
                   disabled={rosterSorted.length === 0}>
-                  <Printer className="w-4 h-4 mr-2" /> PREVIEW SPD PDF
+                  <Printer className="w-4 h-4 mr-2" /> Preview PDF
                 </Button>
 
                 <Button
                   type="submit"
                   disabled={saving || rosterSorted.length === 0}
-                  className="h-11 px-12 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-xs shadow-lg shadow-foreground/10 transition-all">
+                  className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all">
                   {saving ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> MENYIMPAN...
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menyimpan...
                     </>
                   ) : (
                     <>
-                      <Save className="w-4 h-4 mr-2" /> SIMPAN SPD
+                      <Save className="w-4 h-4 mr-2" /> Simpan SPD
                     </>
                   )}
                 </Button>

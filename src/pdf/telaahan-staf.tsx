@@ -27,6 +27,7 @@ export type TelaahanPdfData = {
   analisis: string | null
   kesimpulan: string | null
   saran: string | null
+  tglTelaahan: Date | undefined
 }
 
 export type SpjPdfData = {
@@ -285,7 +286,7 @@ export function buildTelaahanStafDocument(props: TelaahanStafPdfProps): React.Re
 
   const kepadaYth = telaahan.kepada ?? 'Sekretaris Daerah Kabupaten Kutai Barat'
   const dari = signer?.jabatan ?? 'Kepala Bagian Organisasi'
-  const tanggal = fmtDateId(spj.tglSuratTugas)
+  const tanggal = fmtDateId(telaahan.tglTelaahan as Date)
   const nomor = spj.noTelaahan ?? ''
   const lampiran = telaahan.lampiran ?? '-'
   const perihal = telaahan.perihal ?? '-'

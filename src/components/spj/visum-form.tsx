@@ -30,7 +30,7 @@ export default function VisumForm({ spjId, initialStageCount }: { spjId: string;
   const [saving, setSaving] = useState(false)
 
   const defaultValues = useMemo<FormInput>(() => {
-    return { stageCount: initialStageCount || 4 }
+    return { stageCount: initialStageCount || 3 }
   }, [initialStageCount])
 
   const form = useForm<FormInput, any, FormValues>({
@@ -91,13 +91,13 @@ export default function VisumForm({ spjId, initialStageCount }: { spjId: string;
                         onBlur={field.onBlur}
                         inputMode="numeric"
                         className="rounded-2xl w-40"
-                        placeholder="Contoh: 4"
+                        placeholder="Contoh: 3"
                         value={field.value == null ? '' : String(field.value)}
                         onChange={(e) => field.onChange(e.target.value)} // ✅ biar coerce jalan
                       />
                     </FormControl>
                     <FormDescription className="text-[11px]">
-                      Tentukan jumlah kolom visum yang akan muncul di PDF (Umumnya 4 tahap).
+                      Tentukan jumlah kolom visum yang akan muncul di PDF.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
@@ -108,22 +108,22 @@ export default function VisumForm({ spjId, initialStageCount }: { spjId: string;
                 <Button
                   type="button"
                   variant="ghost"
-                  className="h-11 px-6 text-xs font-bold text-muted-foreground hover:text-primary transition-colors"
+                  className="h-10 font-medium text-muted-foreground hover:text-foreground"
                   onClick={() => window.open(`/spj/${spjId}/visum/print`, '_blank')}>
-                  <Printer className="w-4 h-4 mr-2" /> PREVIEW PDF
+                  <Printer className="w-4 h-4 mr-2" /> Preview PDF
                 </Button>
 
                 <Button
                   type="submit"
                   disabled={saving}
-                  className="h-11 px-12 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-xs shadow-sm transition-all">
+                  className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all">
                   {saving ? (
                     <>
-                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> MENYIMPAN...
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menyimpan...
                     </>
                   ) : (
                     <>
-                      <Save className="w-4 h-4 mr-2" /> SIMPAN
+                      <Save className="w-4 h-4 mr-2" /> Simpan
                     </>
                   )}
                 </Button>

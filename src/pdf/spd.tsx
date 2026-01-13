@@ -22,17 +22,15 @@ type Spj = {
   noSpd: string | null
   tglSpd: Date
   kotaTandaTangan: string
-
   tempatBerangkat: string
   tempatTujuan: string
   maksudDinas: string
   alatAngkut: string
-
   lamaPerjalanan: number
   tglBerangkat: Date
   tglKembali: Date
-
   akunAnggaran: string | null
+  judulAnggaran?: string | null
 }
 
 type Signer = {
@@ -51,7 +49,7 @@ export type SpdPdfProps = {
   signer: Signer | null
 }
 
-const BW = 0.7 // border width normal (nggak tebal)
+const BW = 0.7
 
 const styles = StyleSheet.create({
   page: {
@@ -62,20 +60,15 @@ const styles = StyleSheet.create({
     lineHeight: 1.25,
     fontFamily: 'Helvetica'
   },
-
   titleWrap: { marginTop: 6, alignItems: 'center' },
   title: { fontSize: 12, fontWeight: 700, textTransform: 'uppercase' },
   nomor: { marginTop: 8 },
-
   table: {
     marginTop: 10,
     borderWidth: BW,
     borderColor: '#000'
   },
-
   row: { flexDirection: 'row' },
-
-  // cell: border standar (normal)
   cell: {
     borderRightWidth: BW,
     borderBottomWidth: BW,
@@ -84,52 +77,44 @@ const styles = StyleSheet.create({
     paddingHorizontal: 4
   },
   lastCol: { borderRightWidth: 0 },
-
   colNo: { width: 18, textAlign: 'center' },
   colLabel: { width: 230 },
   colValue: { flex: 1 },
-
   subRow: { flexDirection: 'row' },
   subKey: { width: 16 },
   subLabel: { flex: 1 },
 
-  // ===== Row 8 layout (sesuai lampiran)
-  row8LeftWrap: { width: '100%' },
-  row8LeftHeader: { marginBottom: 2 },
-  row8Line: { marginTop: 2 },
-
-  row8RightWrap: { width: '100%' },
-  row8RightHeaderRow: {
+  // Gaya khusus Poin 8 agar garis vertikal menerus
+  row8Header: {
     flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 2
+    borderBottomWidth: BW,
+    borderColor: '#000',
+    backgroundColor: '#fff'
   },
-  row8RightTglHeader: {
-    width: 95,
-    textAlign: 'center',
+  row8Body: {
+    flexDirection: 'row'
+  },
+  col8Nama: {
+    width: 230, // Harus sama dengan colLabel
     borderRightWidth: BW,
     borderColor: '#000',
-    paddingRight: 4
+    padding: 4
   },
-  row8RightKetHeader: {
-    flex: 1,
+  col8Tgl: {
+    width: 95, // Lebar kolom tanggal lahir
+    borderRightWidth: BW,
+    borderColor: '#000',
+    padding: 4,
     textAlign: 'center'
   },
-  row8RightRow: { flexDirection: 'row', alignItems: 'flex-start', marginTop: 2 },
-  row8RightTgl: {
-    width: 95,
-    borderRightWidth: BW,
-    borderColor: '#000',
-    paddingRight: 4
-  },
-  row8RightKet: {
+  col8Ket: {
     flex: 1,
+    padding: 4,
     textAlign: 'center'
   },
 
-  // signature
   signWrap: { marginTop: 30, alignItems: 'flex-end', marginRight: -80 },
-  signBox: { width: 255 }, // tetap kanan, jangan ketengah
+  signBox: { width: 255 },
   signSpace: { height: 48 },
   signName: { fontWeight: 700, textDecoration: 'underline' }
 })
@@ -159,17 +144,7 @@ function fmtPangkatGol(pangkat: string | null, golongan: string | null) {
   return '-'
 }
 
-function Cell({
-  children,
-  style,
-  lastCol,
-  lastRow
-}: {
-  children: React.ReactNode
-  style: any
-  lastCol?: boolean
-  lastRow?: boolean
-}) {
+function Cell({ children, style, lastCol, lastRow }: any) {
   return (
     <View
       style={[
@@ -183,64 +158,18 @@ function Cell({
   )
 }
 
-function PengikutLeft({ pengikut }: { pengikut: RosterItem[] }) {
-  const MAX = 5
-  return (
-    <View style={styles.row8LeftWrap}>
-      <Text style={styles.row8LeftHeader}>Pengikut : Nama</Text>
-      {Array.from({ length: MAX }).map((_, i) => {
-        const p = pengikut[i]
-        return (
-          <Text key={i} style={styles.row8Line}>
-            {i + 1}. {p?.nama ?? ''}
-          </Text>
-        )
-      })}
-    </View>
-  )
-}
-
-function PengikutRight({ pengikut }: { pengikut: RosterItem[] }) {
-  const MAX = 5
-  return (
-    <View style={styles.row8RightWrap}>
-      <View style={styles.row8RightHeaderRow}>
-        <Text style={styles.row8RightTglHeader}>Tanggal Lahir</Text>
-        <Text style={styles.row8RightKetHeader}>Keterangan</Text>
-      </View>
-
-      {Array.from({ length: MAX }).map((_, i) => {
-        const p = pengikut[i]
-        return (
-          <View key={i} style={styles.row8RightRow}>
-            <Text style={styles.row8RightTgl}>{/* kosong sesuai lampiran */}</Text>
-            <Text style={styles.row8RightKet}>{p ? p.jabatan : ''}</Text>
-          </View>
-        )
-      })}
-    </View>
-  )
-}
-
 export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<DocumentProps> {
   const rosterSorted = sortRoster(props.roster)
   const kepala = rosterSorted.find((r) => r.role === 'KEPALA_JALAN') ?? rosterSorted[0] ?? null
   const pengikut = rosterSorted.filter((r) => r.role === 'PENGIKUT')
-
   const signer = props.signer
   const signerJabatan = signer?.jabatanTampil?.trim() || signer?.jabatan || ''
-
-  const year = props.spj.tglSpd.getFullYear()
-
-  console.log('====================================')
-  console.log({ lama: props.spj.lamaPerjalanan })
-  console.log('====================================')
+  const MAX_PENGIKUT = 5
 
   return (
     <Document>
       <Page size="A4" style={styles.page}>
         <KopSurat />
-
         <View style={styles.titleWrap}>
           <Text style={styles.title}>SURAT PERJALANAN DINAS (SPD)</Text>
           <Text style={styles.nomor}>
@@ -249,7 +178,7 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
         </View>
 
         <View style={styles.table}>
-          {/* 1 */}
+          {/* Baris 1-7 tetap seperti sebelumnya */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>1</Text>
@@ -262,7 +191,6 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
             </Cell>
           </View>
 
-          {/* 2 */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>2</Text>
@@ -276,7 +204,6 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
             </Cell>
           </View>
 
-          {/* 3 */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>3</Text>
@@ -308,12 +235,11 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
               </View>
               <View style={styles.subRow}>
                 <Text style={styles.subKey}>c.</Text>
-                <Text style={styles.subLabel}>{/* kosong sesuai desain */}</Text>
+                <Text style={styles.subLabel}>-</Text>
               </View>
             </Cell>
           </View>
 
-          {/* 4 */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>4</Text>
@@ -326,7 +252,6 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
             </Cell>
           </View>
 
-          {/* 5 */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>5</Text>
@@ -339,7 +264,6 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
             </Cell>
           </View>
 
-          {/* 6 */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>6</Text>
@@ -366,7 +290,6 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
             </Cell>
           </View>
 
-          {/* 7 */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>7</Text>
@@ -401,32 +324,54 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
             </Cell>
           </View>
 
-          {/* 8 Pengikut (sesuai lampiran: Nama di kiri, Tgl/Ket di kanan) */}
+          {/* PERBAIKAN POIN 8: Garis pemisah Nama, Tgl Lahir, Ket memanjang ke bawah */}
           <View style={styles.row}>
-            <Cell style={styles.colNo}>
+            <Cell style={[styles.colNo, { borderBottomWidth: BW }]}>
               <Text>8</Text>
             </Cell>
-
-            <Cell style={[styles.colLabel, { paddingVertical: 4, paddingHorizontal: 6 }]}>
-              <PengikutLeft pengikut={pengikut} />
-            </Cell>
-
-            <Cell style={[styles.colValue, { paddingVertical: 4, paddingHorizontal: 6 }]} lastCol>
-              <PengikutRight pengikut={pengikut} />
-            </Cell>
+            <View style={{ flex: 1, borderBottomWidth: BW, borderColor: '#000' }}>
+              {/* Header Poin 8 */}
+              <View style={styles.row8Header}>
+                <View style={[styles.col8Nama, { borderBottomWidth: 0 }]}>
+                  <Text>Pengikut : Nama</Text>
+                </View>
+                <View style={[styles.col8Tgl, { borderBottomWidth: 0 }]}>
+                  <Text>Tanggal Lahir</Text>
+                </View>
+                <View style={[styles.col8Ket, { borderBottomWidth: 0 }]}>
+                  <Text>Keterangan</Text>
+                </View>
+              </View>
+              {/* Body Poin 8 */}
+              {Array.from({ length: MAX_PENGIKUT }).map((_, i) => {
+                const p = pengikut[i]
+                return (
+                  <View key={i} style={styles.row8Body}>
+                    <View style={[styles.col8Nama, { borderRightWidth: BW, borderBottomWidth: 0 }]}>
+                      <Text>
+                        {i + 1}. {p?.nama ?? ''}
+                      </Text>
+                    </View>
+                    <View style={[styles.col8Tgl, { borderRightWidth: BW, borderBottomWidth: 0 }]}>
+                      <Text>{/* Kosong sesuai SS */}</Text>
+                    </View>
+                    <View style={[styles.col8Ket, { borderBottomWidth: 0 }]}>
+                      <Text>{p?.jabatan ?? ''}</Text>
+                    </View>
+                  </View>
+                )
+              })}
+            </View>
           </View>
 
-          {/* 9 */}
+          {/* 9 PEMBEBANAN ANGGARAN */}
           <View style={styles.row}>
             <Cell style={styles.colNo}>
               <Text>9</Text>
             </Cell>
             <Cell style={styles.colLabel}>
               <Text>Pembebanan Anggaran</Text>
-            </Cell>
-            <Cell style={styles.colValue} lastCol>
-              <Text>{props.spj.akunAnggaran ?? '-'}</Text>
-              <View style={{ marginTop: 4 }}>
+              <View style={{ marginTop: 8 }}>
                 <View style={styles.subRow}>
                   <Text style={styles.subKey}>a.</Text>
                   <Text style={styles.subLabel}>Instansi</Text>
@@ -436,20 +381,22 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
                   <Text style={styles.subLabel}>Akun</Text>
                 </View>
               </View>
-              <View style={{ marginTop: 2 }}>
+            </Cell>
+            <Cell style={styles.colValue} lastCol>
+              <Text>{props.spj.akunAnggaran ?? 'DPA SKPD Bagian Organisasi'}</Text>
+              <View style={{ marginTop: 8 }}>
                 <View style={styles.subRow}>
                   <Text style={styles.subKey}>a.</Text>
                   <Text style={styles.subLabel}>{kepala?.instansi ?? 'Sekretariat Daerah Kabupaten Kutai Barat'}</Text>
                 </View>
                 <View style={styles.subRow}>
                   <Text style={styles.subKey}>b.</Text>
-                  <Text style={styles.subLabel}>{/* kosong sesuai desain */}</Text>
+                  <Text style={styles.subLabel}>{'-'}</Text>
                 </View>
               </View>
             </Cell>
           </View>
 
-          {/* 10 (last row => remove bottom border) */}
           <View style={styles.row}>
             <Cell style={styles.colNo} lastRow>
               <Text>10</Text>
@@ -465,17 +412,14 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
           </View>
         </View>
 
-        {/* Signature (tetap kanan, dan tanggal month-year mengikuti hari ini) */}
         <View style={styles.signWrap}>
           <View style={styles.signBox}>
             <Text>Dikeluarkan di {props.spj.kotaTandaTangan}</Text>
             <Text>
-              Tanggal, {'        '} {fmtMonthYearNow()}
+              Tanggal, {'            '} {fmtMonthYearNow()}
             </Text>
             <Text>{signerJabatan ? `${signerJabatan},` : ''}</Text>
-
             <View style={styles.signSpace} />
-
             <Text style={styles.signName}>{signer?.nama ?? ''}</Text>
             <Text>{fmtPangkatGol(signer?.pangkat ?? null, signer?.golongan ?? null)}</Text>
             <Text>{signer?.nip ? `NIP. ${signer.nip}` : ''}</Text>

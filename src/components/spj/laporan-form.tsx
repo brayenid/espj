@@ -488,17 +488,18 @@ export default function LaporanForm({
                         </Button>
                       </div>
                       {hasilPoin.map((p, idx) => (
-                        <div key={idx} className="flex gap-2 group">
-                          <Input
+                        <div key={idx} className="flex gap-2 group items-start">
+                          <Textarea
                             value={p}
                             onChange={(e) => updatePoin(idx, e.target.value)}
                             placeholder={`Poin ${idx + 1}`}
-                            className="h-10 text-sm"
+                            rows={2}
+                            className="min-h-[40px] text-sm rounded-lg resize-none"
                           />
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-10 w-10 text-muted-foreground hover:text-destructive"
+                            className="h-10 w-10 flex-shrink-0 text-muted-foreground hover:text-destructive"
                             onClick={() => removePoin(idx)}
                             disabled={hasilPoin.length <= 1}>
                             <Trash2 className="w-4 h-4" />

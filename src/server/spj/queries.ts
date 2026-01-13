@@ -127,7 +127,12 @@ export async function getSpjDetailForCurrentUser(spjId: string) {
       judulRekening: true,
       akunAnggaran: true,
 
-      buktiDukungUrl: true
+      buktiDukungUrl: true,
+      telaahan: {
+        select: {
+          tglTelaahan: true
+        }
+      }
     }
   })
 

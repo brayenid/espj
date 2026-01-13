@@ -117,7 +117,6 @@ function SignerCombobox({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <UserCircle className="w-3.5 h-3.5 text-muted-foreground" />
         <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
       </div>
 
@@ -126,7 +125,7 @@ function SignerCombobox({
           <div
             className={cn(
               'group flex flex-col items-start p-4 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-sm',
-              value && 'border-primary/20 bg-primary/[0.02]'
+              value && 'border-primary/20 bg-primary/2'
             )}>
             {value ? (
               <div className="w-full text-left">
@@ -360,7 +359,7 @@ export default function KuitansiForm({
                 </div>
                 <div className="flex items-start gap-2 p-3 bg-primary/[0.03] rounded-lg border border-primary/10">
                   <Info className="w-3.5 h-3.5 text-primary mt-0.5" />
-                  <p className="text-[10px] text-primary/80 leading-relaxed">
+                  <p className="text-[12px] text-primary/80 leading-relaxed">
                     Rincian ini dikelompokkan berdasarkan kategori biaya pada DOPD. Jika ingin mengubah angka, silakan
                     ubah pada menu <strong>DOPD</strong>.
                   </p>
@@ -385,7 +384,7 @@ export default function KuitansiForm({
 
         {/* 4. RIGHT COLUMN: Anggaran (SPJ Master) */}
         <div className="lg:col-span-4 space-y-6">
-          <Card className="rounded-xl border-border/40 shadow-none bg-muted/5 sticky top-24">
+          <Card className="rounded-xl border-border/40 shadow-none sticky top-24">
             <CardHeader className="bg-muted/10 border-b border-border/40 px-6 py-4">
               <CardTitle className="text-sm font-bold flex items-center gap-2 text-muted-foreground">
                 <FileSpreadsheet className="w-4 h-4" /> Data Anggaran
@@ -398,7 +397,7 @@ export default function KuitansiForm({
                   <Input
                     value={anggaran.tahunAnggaran}
                     onChange={(e) => setAnggaran({ ...anggaran, tahunAnggaran: e.target.value })}
-                    className="h-9 rounded-lg text-xs"
+                    className="h-9 rounded-lg text-xs bg-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -406,7 +405,7 @@ export default function KuitansiForm({
                   <Input
                     value={anggaran.upGu}
                     onChange={(e) => setAnggaran({ ...anggaran, upGu: e.target.value })}
-                    className="h-9 rounded-lg text-xs"
+                    className="h-9 rounded-lg text-xs bg-white"
                   />
                 </div>
                 <div className="space-y-2">
@@ -414,7 +413,7 @@ export default function KuitansiForm({
                   <Input
                     value={anggaran.nomorBku}
                     onChange={(e) => setAnggaran({ ...anggaran, nomorBku: e.target.value })}
-                    className="h-9 rounded-lg text-xs"
+                    className="h-9 rounded-lg text-xs bg-white"
                   />
                 </div>
               </div>
@@ -430,13 +429,13 @@ export default function KuitansiForm({
                     value={anggaran.kodeRekening}
                     onChange={(e) => setAnggaran({ ...anggaran, kodeRekening: e.target.value })}
                     placeholder="Kode Rekening..."
-                    className="h-9 rounded-lg text-xs font-mono"
+                    className="h-9 rounded-lg text-xs bg-white"
                   />
                   <Textarea
                     value={anggaran.judulRekening}
                     onChange={(e) => setAnggaran({ ...anggaran, judulRekening: e.target.value })}
                     placeholder="Judul Rekening..."
-                    className="text-xs min-h-[60px] rounded-lg resize-none"
+                    className="text-xs min-h-15 rounded-lg bg-white resize-none"
                   />
                 </div>
 
@@ -447,7 +446,7 @@ export default function KuitansiForm({
 
                   <div className="grid gap-4">
                     {/* Kelompok Kegiatan */}
-                    <div className="group space-y-2 p-3 rounded-xl border border-border/40 bg-background/50 focus-within:border-primary/30 focus-within:bg-primary/[0.01] transition-all">
+                    <div className="group space-y-2 p-3 rounded-xl border border-border/40 bg-background/50 focus-within:border-primary/30 focus-within:bg-primary/1 transition-all">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <Badge
@@ -464,12 +463,12 @@ export default function KuitansiForm({
                         value={anggaran.judulKegiatan}
                         onChange={(e) => setAnggaran({ ...anggaran, judulKegiatan: e.target.value })}
                         placeholder="Masukkan judul kegiatan..."
-                        className="text-[12px] p-2 min-h-[50px] h-auto bg-muted/20 border-dashed border-border/60 rounded-md shadow-none focus-visible:ring-1 focus-visible:ring-primary/20 resize-none leading-relaxed"
+                        className="text-xs min-h-15 rounded-lg bg-white resize-none"
                       />
                     </div>
 
                     {/* Kelompok Sub Kegiatan */}
-                    <div className="group space-y-2 p-3 rounded-xl border border-border/40 bg-background/50 focus-within:border-primary/30 focus-within:bg-primary/[0.01] transition-all">
+                    <div className="group space-y-2 p-3 rounded-xl border border-border/40 bg-background/50 focus-within:border-primary/30 focus-within:bg-primary/1 transition-all">
                       <div className="flex items-center justify-between">
                         <div className="flex items-center gap-1.5">
                           <Badge
@@ -486,7 +485,7 @@ export default function KuitansiForm({
                         value={anggaran.judulSubKegiatan}
                         onChange={(e) => setAnggaran({ ...anggaran, judulSubKegiatan: e.target.value })}
                         placeholder="Masukkan judul sub kegiatan..."
-                        className="text-[12px] p-2 min-h-[50px] h-auto bg-muted/20 border-dashed border-border/60 rounded-md shadow-none focus-visible:ring-1 focus-visible:ring-primary/20 resize-none leading-relaxed"
+                        className="text-xs min-h-15 rounded-lg bg-white resize-none"
                       />
                     </div>
                   </div>

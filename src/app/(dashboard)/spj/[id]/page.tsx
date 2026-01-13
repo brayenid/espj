@@ -82,7 +82,6 @@ export default async function SpjMasterPage(props: PageProps) {
           laporan: !!spj.laporan,
           dopd: spj.rincian.length > 0
         }}
-        visumStageCount={spj.visum?.stageCount ?? 4}
       />
     </div>
   )

@@ -7,10 +7,23 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Separator } from '@/components/ui/separator'
 
 import SpjSearchBar from '@/components/spj/spj-search-bar'
-import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus } from 'lucide-react'
+import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus, Clock } from 'lucide-react'
+import SpjDuplicateButton from '@/components/spj/spj-duplicate-button'
 
+// Fungsi untuk format tanggal (tanpa jam)
 function fmtDate(d: Date) {
   return new Date(d).toLocaleDateString('id-ID', { day: '2-digit', month: 'short', year: 'numeric' })
+}
+
+// Fungsi khusus untuk createdAt (dengan waktu jika diperlukan)
+function fmtDateTime(d: Date) {
+  return new Date(d).toLocaleDateString('id-ID', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit'
+  })
 }
 
 function safe(s?: string | null, fb = '-') {
@@ -40,7 +53,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
   const pageNum = Number.isFinite(Number(pageRaw)) ? Math.max(1, Math.floor(Number(pageRaw))) : 1
   const pageSize = 10
 
-  // FETCH: Menggunakan filter database
   const { items: pageItems, total } = await listSpjForCurrentUser({
     q: qRaw,
     skip: (pageNum - 1) * pageSize,
@@ -49,12 +61,10 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
-  // Redirect jika page out of range
   if (pageNum > totalPages && totalPages > 0) {
     redirect(buildQueryString({ q: qRaw, page: String(totalPages) }) || '?page=1')
   }
 
-  // Preview Pelaksana: Diolah langsung dari include roster
   const getRosterPreview = (roster: { nama: string; role: string }[]) => {
     if (!roster || roster.length === 0) return '-'
     const kepala = roster.find((r) => r.role === 'KEPALA_JALAN') ?? roster[0]
@@ -62,7 +72,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
     return pengikutCount > 0 ? `${kepala.nama} + ${pengikutCount} orang` : kepala.nama
   }
 
-  // Pagination Logic
   const prevHref = buildQueryString({ q: qRaw, page: String(Math.max(1, pageNum - 1)) })
   const nextHref = buildQueryString({ q: qRaw, page: String(Math.min(totalPages, pageNum + 1)) })
   const windowSize = 5
@@ -112,6 +121,12 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
               <TableHead className="py-3 font-medium text-foreground">Tujuan</TableHead>
               <TableHead className="hidden md:table-cell py-3 font-medium text-foreground">Pelaksana</TableHead>
               <TableHead className="py-3 font-medium text-foreground">Periode</TableHead>
+              {/* Kolom Baru: Created At */}
+              <TableHead className="hidden xl:table-cell py-3 font-medium text-foreground text-center">
+                <div className="flex items-center justify-center gap-1.5">
+                  <Clock className="w-3.5 h-3.5" /> Dibuat
+                </div>
+              </TableHead>
               <TableHead className="hidden lg:table-cell py-3 font-medium text-foreground">No. Surat</TableHead>
               <TableHead className="w-20" />
             </TableRow>
@@ -119,7 +134,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
           <TableBody>
             {pageItems.length === 0 ? (
               <TableRow>
-                <TableCell colSpan={5} className="py-20 text-center">
+                <TableCell colSpan={6} className="py-20 text-center">
                   <p className="text-sm text-muted-foreground">
                     {qRaw ? `Tidak ada hasil untuk "${qRaw}"` : 'Belum ada data perjalanan dinas.'}
                   </p>
@@ -130,7 +145,9 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                 <TableRow key={spj.id} className="group border-border/40 transition-colors hover:bg-muted/20">
                   <TableCell className="py-4">
                     <div className="font-medium text-[14px]">{spj.tempatTujuan}</div>
-                    <div className="text-xs text-muted-foreground lg:hidden mt-1">{safe(spj.noSuratTugas)}</div>
+                    <div className="text-[10px] text-muted-foreground mt-0.5 xl:hidden italic">
+                      Dibuat: {fmtDateTime(spj.createdAt)}
+                    </div>
                   </TableCell>
                   <TableCell className="hidden md:table-cell py-4">
                     <span className="text-sm text-muted-foreground/90">{getRosterPreview(spj.roster)}</span>
@@ -144,19 +161,26 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                       <span>{fmtDate(spj.tglKembali)}</span>
                     </div>
                   </TableCell>
+                  {/* Sel Baru: Created At */}
+                  <TableCell className="hidden xl:table-cell py-4 text-center">
+                    <div className="text-[11px] font-mono text-muted-foreground/80">{fmtDateTime(spj.createdAt)}</div>
+                  </TableCell>
                   <TableCell className="hidden lg:table-cell py-4 text-sm text-muted-foreground font-mono">
                     {safe(spj.noSuratTugas)}
                   </TableCell>
                   <TableCell className="text-right py-4">
-                    <Button
-                      asChild
-                      variant="ghost"
-                      size="icon"
-                      className="h-8 w-8 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Link href={`/spj/${spj.id}`}>
-                        <ChevronRight className="h-4 w-4" />
-                      </Link>
-                    </Button>
+                    <div className="flex items-center justify-end gap-1">
+                      <SpjDuplicateButton id={spj.id} />
+                      <Button
+                        asChild
+                        variant="ghost"
+                        size="icon"
+                        className="h-8 w-8 rounded-md opacity-0 group-hover:opacity-100 transition-opacity">
+                        <Link href={`/spj/${spj.id}`}>
+                          <ChevronRight className="h-4 w-4" />
+                        </Link>
+                      </Button>
+                    </div>
                   </TableCell>
                 </TableRow>
               ))
@@ -164,7 +188,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
           </TableBody>
         </Table>
 
-        {/* Footer Pagination */}
+        {/* Footer Pagination tetap sama */}
         <div className="flex items-center justify-between px-4 py-3 border-t border-border/50 bg-muted/20">
           <div className="text-xs text-muted-foreground">
             Halaman <span className="text-foreground font-medium">{pageNum}</span> dari{' '}

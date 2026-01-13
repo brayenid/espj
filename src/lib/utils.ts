@@ -48,7 +48,6 @@ export function terbilangId(n: number) {
 
 /**
  * Helper Fungsi untuk menghitung selisih murni (Non-Inklusif)
- * 2 Feb ke 5 Feb = 3 Hari
  */
 export function calculateDiffDays(startDate: Date, endDate: Date): number {
   if (!startDate || !endDate) return 0
@@ -61,7 +60,7 @@ export function calculateDiffDays(startDate: Date, endDate: Date): number {
   end.setHours(0, 0, 0, 0)
 
   const diffTime = end.getTime() - start.getTime()
-  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24))
+  const diffDays = Math.round(diffTime / (1000 * 60 * 60 * 24)) + 1
 
   return Math.max(0, diffDays)
 }

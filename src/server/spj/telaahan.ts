@@ -2,6 +2,7 @@ import { prisma } from '@/lib/prisma'
 import { getSpjDetailForCurrentUser } from '@/server/spj/queries'
 import { z } from 'zod'
 
+// QA: Tambahkan tglTelaahan ke schema agar sinkron dengan Client Form
 export const telaahanSchema = z.object({
   kepada: z.string().optional().nullable(),
   sifat: z.string().optional().nullable(),
@@ -12,7 +13,11 @@ export const telaahanSchema = z.object({
   fakta: z.array(z.string().min(1)).default([]),
   analisis: z.string().optional().nullable(),
   kesimpulan: z.string().optional().nullable(),
-  saran: z.string().optional().nullable()
+  saran: z.string().optional().nullable(),
+  // Menerima string (ISO dari client) dan mengubahnya menjadi Date object
+  tglTelaahan: z.preprocess((arg) => {
+    if (typeof arg === 'string' || arg instanceof Date) return new Date(arg)
+  }, z.date().optional().nullable())
 })
 
 export type TelaahanInput = z.infer<typeof telaahanSchema>
@@ -35,7 +40,8 @@ export async function getTelaahanForCurrentUser(spjId: string) {
         fakta: true,
         analisis: true,
         kesimpulan: true,
-        saran: true
+        saran: true,
+        tglTelaahan: true // Ambil field tanggal dari DB
       }
     }),
     prisma.spjRosterItem.findMany({
@@ -72,6 +78,7 @@ export async function upsertTelaahanForCurrentUser(spjId: string, input: unknown
     where: { spjId },
     create: {
       spjId,
+      tglTelaahan: data.tglTelaahan ?? new Date(), // Simpan tanggal
       kepada: data.kepada ?? 'Bupati Kutai Barat',
       sifat: data.sifat ?? 'Penting',
       lampiran: data.lampiran ?? '-',
@@ -84,6 +91,7 @@ export async function upsertTelaahanForCurrentUser(spjId: string, input: unknown
       saran: data.saran ?? null
     },
     update: {
+      tglTelaahan: data.tglTelaahan ?? new Date(), // Update tanggal
       kepada: data.kepada ?? null,
       sifat: data.sifat ?? null,
       lampiran: data.lampiran ?? null,

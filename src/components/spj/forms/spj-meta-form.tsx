@@ -5,35 +5,50 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { format } from 'date-fns'
+import { id as localeId } from 'date-fns/locale'
 
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
-import { Loader2, Save, Link2, FileText, Landmark, ClipboardList } from 'lucide-react'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { Calendar } from '@/components/ui/calendar'
+import { cn } from '@/lib/utils'
+import { Loader2, Save, Link2, FileText, Landmark, ClipboardList, CalendarDays, ArrowRight } from 'lucide-react'
 
-const schema = z.object({
-  noTelaahan: z.string().trim().nullable(),
-  noSuratTugas: z.string().trim().nullable(),
-  noSpd: z.string().trim().nullable(),
+// QA: Validasi Cross-Field untuk rentang tanggal
+const schema = z
+  .object({
+    noTelaahan: z.string().trim().nullable(),
+    noSuratTugas: z.string().trim().nullable(),
+    noSpd: z.string().trim().nullable(),
 
-  tahunAnggaran: z.string().trim().nullable(),
-  kodeKegiatan: z.string().trim().nullable(),
-  judulKegiatan: z.string().trim().nullable(),
-  kodeSubKegiatan: z.string().trim().nullable(),
-  judulSubKegiatan: z.string().trim().nullable(),
-  upGu: z.string().trim().nullable(),
-  nomorBku: z.string().trim().nullable(),
-  kodeRekening: z.string().trim().nullable(),
-  judulRekening: z.string().trim().nullable(),
-  akunAnggaran: z.string().trim().nullable(),
+    tahunAnggaran: z.string().trim().nullable(),
+    kodeKegiatan: z.string().trim().nullable(),
+    judulKegiatan: z.string().trim().nullable(),
+    kodeSubKegiatan: z.string().trim().nullable(),
+    judulSubKegiatan: z.string().trim().nullable(),
+    upGu: z.string().trim().nullable(),
+    nomorBku: z.string().trim().nullable(),
+    kodeRekening: z.string().trim().nullable(),
+    judulRekening: z.string().trim().nullable(),
+    akunAnggaran: z.string().trim().nullable(),
 
-  buktiDukungUrl: z.optional(z.string()),
+    buktiDukungUrl: z.optional(z.string()),
 
-  maksudDinas: z.string().trim().nullable(),
-  tingkatPerjalanan: z.optional(z.string().trim().nullable())
-})
+    maksudDinas: z.string().trim().nullable(),
+    tingkatPerjalanan: z.optional(z.string().trim().nullable()),
+
+    // Field Baru
+    tglBerangkat: z.date({ error: 'Tanggal berangkat wajib diisi' }),
+    tglKembali: z.date({ error: 'Tanggal kembali wajib diisi' })
+  })
+  .refine((data) => data.tglKembali >= data.tglBerangkat, {
+    message: 'Tanggal kembali tidak boleh sebelum tanggal berangkat',
+    path: ['tglKembali'] // Error akan muncul di field tglKembali
+  })
 
 type FormValues = z.infer<typeof schema>
 
@@ -47,7 +62,6 @@ export default function SpjMetaForm({
     noTelaahan: string | null
     noSuratTugas: string | null
     noSpd: string | null
-
     tahunAnggaran: string | null
     kodeKegiatan: string | null
     judulKegiatan: string | null
@@ -58,11 +72,12 @@ export default function SpjMetaForm({
     kodeRekening: string | null
     judulRekening: string | null
     akunAnggaran: string | null
-
     buktiDukungUrl: string | null
     maksudDinas: string
-
     tingkatPerjalanan: string | null
+    // Tambahan initial data
+    tglBerangkat: Date | string
+    tglKembali: Date | string
   }
   onSaved?: () => void
 }) {
@@ -71,7 +86,6 @@ export default function SpjMetaForm({
       noTelaahan: initial.noTelaahan ?? null,
       noSuratTugas: initial.noSuratTugas ?? null,
       noSpd: initial.noSpd ?? null,
-
       tahunAnggaran: initial.tahunAnggaran ?? null,
       kodeKegiatan: initial.kodeKegiatan ?? null,
       judulKegiatan: initial.judulKegiatan ?? null,
@@ -82,10 +96,12 @@ export default function SpjMetaForm({
       kodeRekening: initial.kodeRekening ?? null,
       judulRekening: initial.judulRekening ?? null,
       akunAnggaran: initial.akunAnggaran ?? null,
-
       buktiDukungUrl: initial.buktiDukungUrl ?? undefined,
       maksudDinas: initial.maksudDinas ?? null,
-      tingkatPerjalanan: initial.tingkatPerjalanan ?? null
+      tingkatPerjalanan: initial.tingkatPerjalanan ?? null,
+      // Init dates
+      tglBerangkat: new Date(initial.tglBerangkat),
+      tglKembali: new Date(initial.tglKembali)
     }
   }, [initial])
 
@@ -94,7 +110,6 @@ export default function SpjMetaForm({
     defaultValues,
     mode: 'onBlur'
   })
-
   const [saving, setSaving] = useState(false)
 
   async function onSubmit(values: FormValues) {
@@ -103,7 +118,11 @@ export default function SpjMetaForm({
       const res = await fetch(`/api/spj/${spjId}/meta`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(values)
+        body: JSON.stringify({
+          ...values,
+          tglBerangkat: values.tglBerangkat.toISOString(),
+          tglKembali: values.tglKembali.toISOString()
+        })
       })
 
       if (!res.ok) {
@@ -123,12 +142,73 @@ export default function SpjMetaForm({
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-        {/* Section: Penomoran */}
-        <div className="space-y-4">
+        {/* Section: Waktu & Penomoran */}
+        <div className="space-y-6">
           <div className="flex items-center gap-2 text-muted-foreground">
-            <FileText className="w-4 h-4" />
-            <h4 className="text-[11px] font-bold uppercase tracking-widest">Administrasi Surat</h4>
+            <CalendarDays className="w-4 h-4" />
+            <h4 className="text-[11px] font-bold uppercase tracking-widest">Waktu & Administrasi</h4>
           </div>
+
+          {/* Date Range Row */}
+          <div className="grid gap-4 md:grid-cols-2 bg-muted/20 p-4 rounded-xl border border-border/40">
+            <FormField
+              control={form.control}
+              name="tglBerangkat"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="text-[13px] text-muted-foreground">Tanggal Berangkat</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50',
+                            !field.value && 'text-muted-foreground'
+                          )}>
+                          {field.value ? format(field.value, 'PPP', { locale: localeId }) : <span>Pilih tanggal</span>}
+                          <CalendarDays className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage className="text-[11px]" />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={form.control}
+              name="tglKembali"
+              render={({ field }) => (
+                <FormItem className="flex flex-col">
+                  <FormLabel className="text-[13px] text-muted-foreground">Tanggal Kembali</FormLabel>
+                  <Popover>
+                    <PopoverTrigger asChild>
+                      <FormControl>
+                        <Button
+                          variant={'outline'}
+                          className={cn(
+                            'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50',
+                            !field.value && 'text-muted-foreground'
+                          )}>
+                          {field.value ? format(field.value, 'PPP', { locale: localeId }) : <span>Pilih tanggal</span>}
+                          <CalendarDays className="ml-auto h-4 w-4 opacity-50" />
+                        </Button>
+                      </FormControl>
+                    </PopoverTrigger>
+                    <PopoverContent className="w-auto p-0" align="start">
+                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                    </PopoverContent>
+                  </Popover>
+                  <FormMessage className="text-[11px]" />
+                </FormItem>
+              )}
+            />
+          </div>
+
           <div className="grid gap-4 md:grid-cols-3">
             <FormField
               control={form.control}
@@ -342,7 +422,7 @@ export default function SpjMetaForm({
                       className="rounded-md border-border/50 bg-background/50 h-9"
                       {...field}
                       value={field.value ?? ''}
-                      placeholder="Nomor BKU (Biasa Diisi Bendahara)"
+                      placeholder="Nomor BKU"
                     />
                   </FormControl>
                   <FormMessage className="text-[11px]" />

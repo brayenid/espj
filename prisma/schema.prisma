@@ -196,9 +196,10 @@ model SpjSigner {
 // TELAAHAN STAF (1-1 dengan SPJ)
 //
 model SpjTelaahanStaf {
-  id    String @id @default(uuid())
-  spjId String @unique
-  spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
+  id          String   @id @default(uuid())
+  spjId       String   @unique
+  spj         Spj      @relation(fields: [spjId], references: [id], onDelete: Cascade)
+  tglTelaahan DateTime @default(now())
 
   // meta naskah
   kepada   String? @default("Bupati Kutai Barat")
@@ -223,7 +224,7 @@ model SpjVisum {
   spjId String @unique
   spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
 
-  stageCount Int @default(4)
+  stageCount Int @default(3)
 }
 
 //

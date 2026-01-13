@@ -7,12 +7,17 @@ import { z } from 'zod'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useFieldArray, useForm } from 'react-hook-form'
 import { toast } from 'sonner'
+import { format } from 'date-fns'
+import { id as localeId } from 'date-fns/locale'
 
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Separator } from '@/components/ui/separator'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
+import { Calendar } from '@/components/ui/calendar'
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+import { cn } from '@/lib/utils'
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
@@ -21,6 +26,7 @@ import { Badge } from '@/components/ui/badge'
 import PRESETS from '@/data/telaahan-presets.json'
 import {
   BookOpen,
+  CalendarDays,
   Crown,
   FileText,
   ListChecks,
@@ -31,9 +37,11 @@ import {
   Save,
   Trash2,
   Users,
-  Zap
+  Zap,
+  Calendar as CalendarIcon
 } from 'lucide-react'
 
+// QA: Ubah tglTelaahan menjadi Date object agar kompatibel dengan Calendar Shadcn
 const schema = z.object({
   kepada: z.string().optional().nullable(),
   sifat: z.string().optional().nullable(),
@@ -44,7 +52,8 @@ const schema = z.object({
   fakta: z.array(z.object({ value: z.string().min(1, 'Tidak boleh kosong') })),
   analisis: z.string().optional().nullable(),
   kesimpulan: z.string().optional().nullable(),
-  saran: z.string().optional().nullable()
+  saran: z.string().optional().nullable(),
+  tglTelaahan: z.date().optional()
 })
 
 type FormValues = z.infer<typeof schema>
@@ -71,6 +80,7 @@ type InitialTelaahan = {
   analisis: string | null
   kesimpulan: string | null
   saran: string | null
+  tglTelaahan?: string | Date | null
 } | null
 
 type PresetKey = keyof typeof PRESETS
@@ -169,7 +179,9 @@ export default function TelaahanForm({
       fakta: (initial?.fakta ?? []).map((v) => ({ value: v })),
       analisis: initial?.analisis ?? '',
       kesimpulan: initial?.kesimpulan ?? '',
-      saran: initial?.saran ?? ''
+      saran: initial?.saran ?? '',
+      // Konversi string dari DB ke Objek Date untuk DatePicker
+      tglTelaahan: initial?.tglTelaahan ? new Date(initial.tglTelaahan) : new Date()
     }
   }, [initial, initialSpj])
 
@@ -182,13 +194,11 @@ export default function TelaahanForm({
   const pra = useFieldArray({ control: form.control, name: 'praAnggapan' })
   const fak = useFieldArray({ control: form.control, name: 'fakta' })
 
-  // Fungsi untuk text area biasa (replace value)
   function applyPreset(key: PresetKey, text: string) {
     form.setValue(key as any, text, { shouldDirty: true, shouldTouch: true, shouldValidate: true })
     setPresetOpen(null)
   }
 
-  // Fungsi khusus untuk array (append value)
   function appendPresetToArray(arrayHelper: any, text: string) {
     arrayHelper.append({ value: text })
     setPresetOpen(null)
@@ -199,6 +209,8 @@ export default function TelaahanForm({
     try {
       const payload = {
         ...values,
+        // QA: Kirim tanggal dalam format ISO agar API tetap menerima string
+        tglTelaahan: values.tglTelaahan?.toISOString(),
         praAnggapan: values.praAnggapan.map((x) => x.value.trim()).filter(Boolean),
         fakta: values.fakta.map((x) => x.value.trim()).filter(Boolean)
       }
@@ -224,8 +236,6 @@ export default function TelaahanForm({
     }
   }
 
-  const kepala = roster.find((r) => r.role === 'KEPALA_JALAN')
-
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       <Card className="rounded-lg border-border/50 bg-card/40 shadow-none overflow-hidden">
@@ -246,8 +256,43 @@ export default function TelaahanForm({
         <CardContent className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
-              {/* Meta Section */}
-              <div className="grid gap-6 md:grid-cols-3 bg-muted/10 p-5 rounded-lg border border-border/30">
+              <div className="grid gap-6 md:grid-cols-4 bg-muted/10 p-5 rounded-lg border border-border/30">
+                {/* DATE PICKER SHADCN */}
+                <FormField
+                  control={form.control}
+                  name="tglTelaahan"
+                  render={({ field }) => (
+                    <FormItem className="space-y-3 flex flex-col">
+                      <div className="flex items-center gap-2 mb-1.5">
+                        <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground">Tanggal</FormLabel>
+                      </div>
+                      <Popover>
+                        <PopoverTrigger asChild>
+                          <FormControl>
+                            <Button
+                              variant={'outline'}
+                              className={cn(
+                                'h-9 w-full rounded-md border-border/40 text-sm px-4 font-mono justify-start text-left font-normal',
+                                !field.value && 'text-muted-foreground'
+                              )}>
+                              <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
+                              {field.value ? (
+                                format(field.value, 'PPP', { locale: localeId })
+                              ) : (
+                                <span>Pilih tanggal</span>
+                              )}
+                            </Button>
+                          </FormControl>
+                        </PopoverTrigger>
+                        <PopoverContent className="w-auto p-0 rounded-md shadow-xl border-border/40" align="start">
+                          <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                        </PopoverContent>
+                      </Popover>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
                 <FormField
                   control={form.control}
                   name="kepada"
@@ -324,7 +369,6 @@ export default function TelaahanForm({
 
               <Separator className="bg-border/40" />
 
-              {/* Dasar Section */}
               <div className="space-y-4">
                 <FormField
                   control={form.control}
@@ -342,7 +386,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-primary/50 text-primary bg-primary/5 px-3"
+                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
                           onClick={() => setPresetOpen('dasar')}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -353,6 +397,7 @@ export default function TelaahanForm({
                           value={field.value ?? ''}
                           rows={6}
                           className="rounded-md border-border/50 bg-background shadow-xs text-sm leading-relaxed p-4"
+                          placeholder="Masukan dasar perjalanan atau lihat preset"
                         />
                       </FormControl>
                       <FormMessage />
@@ -361,7 +406,6 @@ export default function TelaahanForm({
                 />
               </div>
 
-              {/* Pra-anggapan Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -371,12 +415,11 @@ export default function TelaahanForm({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* NEW: Tombol Preset untuk Pra-anggapan */}
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-primary/50 text-primary bg-primary/5 px-3"
+                      className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
                       onClick={() => setPresetOpen('praAnggapan' as any)}>
                       <Zap className="w-3 h-3 mr-1.5" /> Preset
                     </Button>
@@ -404,21 +447,21 @@ export default function TelaahanForm({
                         name={`praAnggapan.${idx}.value`}
                         render={({ field }) => (
                           <FormItem className="space-y-0">
-                            <div className="flex gap-2 group">
-                              <div className="h-9 w-9 flex items-center justify-center text-[10px] font-mono border border-border/40 rounded-md bg-muted/20 text-muted-foreground">
+                            <div className="flex gap-2 group items-start">
+                              <div className="h-9 w-9 shrink-0 flex items-center justify-center text-[10px] font-mono border border-border/40 rounded-md bg-muted/20 text-muted-foreground">
                                 {idx + 1}
                               </div>
                               <FormControl>
-                                <Input
+                                <Textarea
                                   {...field}
-                                  className="h-9 rounded-md border-border/50 bg-background shadow-xs text-[13px]"
+                                  className="min-h-15 rounded-md border-border/50 bg-background shadow-xs text-[13px] py-2 resize-y"
                                 />
                               </FormControl>
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                                className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"
                                 onClick={() => pra.remove(idx)}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
@@ -432,7 +475,6 @@ export default function TelaahanForm({
                 </div>
               </div>
 
-              {/* Fakta Section */}
               <div className="space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -442,12 +484,11 @@ export default function TelaahanForm({
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    {/* NEW: Tombol Preset untuk Fakta */}
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-primary/50 text-primary bg-primary/5 px-3"
+                      className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
                       onClick={() => setPresetOpen('fakta' as any)}>
                       <Zap className="w-3 h-3 mr-1.5" /> Preset
                     </Button>
@@ -475,21 +516,21 @@ export default function TelaahanForm({
                         name={`fakta.${idx}.value`}
                         render={({ field }) => (
                           <FormItem className="space-y-0">
-                            <div className="flex gap-2 group">
-                              <div className="h-9 w-9 flex items-center justify-center text-[10px] font-mono border border-border/40 rounded-md bg-muted/20 text-muted-foreground">
+                            <div className="flex gap-2 group items-start">
+                              <div className="h-9 w-9 shrink-0 flex items-center justify-center text-[10px] font-mono border border-border/40 rounded-md bg-muted/20 text-muted-foreground">
                                 {idx + 1}
                               </div>
                               <FormControl>
-                                <Input
+                                <Textarea
                                   {...field}
-                                  className="h-9 rounded-md border-border/50 bg-background shadow-xs text-[13px]"
+                                  className="min-h-15 rounded-md border-border/50 bg-background shadow-xs text-[13px] py-2 resize-y"
                                 />
                               </FormControl>
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                                className="h-9 w-9 flex-shrink-0 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"
                                 onClick={() => fak.remove(idx)}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
@@ -505,8 +546,7 @@ export default function TelaahanForm({
 
               <Separator className="bg-border/40" />
 
-              {/* Analisis & Kesimpulan Section */}
-              <div className="grid gap-8 md:grid-cols-2">
+              <div className="grid gap-8 md:grid-cols-2 items-start">
                 <FormField
                   control={form.control}
                   name="analisis"
@@ -523,7 +563,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-primary/50 text-primary bg-primary/5 px-3"
+                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
                           onClick={() => setPresetOpen('analisis' as any)}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -534,6 +574,7 @@ export default function TelaahanForm({
                           value={field.value ?? ''}
                           rows={5}
                           className="rounded-md border-border/50 bg-background shadow-xs text-sm p-3"
+                          placeholder='Masukan kalimat analisis atau lihat preset"'
                         />
                       </FormControl>
                       <FormMessage />
@@ -557,7 +598,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-primary/50 text-primary bg-primary/5 px-3"
+                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
                           onClick={() => setPresetOpen('kesimpulan' as any)}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -568,6 +609,7 @@ export default function TelaahanForm({
                           value={field.value ?? ''}
                           rows={5}
                           className="rounded-md border-border/50 bg-background shadow-xs text-sm p-3"
+                          placeholder='Masukan kesimpulan atau lihat preset"'
                         />
                       </FormControl>
                       <FormMessage />
@@ -576,7 +618,6 @@ export default function TelaahanForm({
                 />
               </div>
 
-              {/* Saran Section */}
               <FormField
                 control={form.control}
                 name="saran"
@@ -593,7 +634,7 @@ export default function TelaahanForm({
                         type="button"
                         size="sm"
                         variant="outline"
-                        className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-primary/50 text-primary bg-primary/5 px-3"
+                        className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
                         onClick={() => setPresetOpen('saran' as any)}>
                         <Zap className="w-3 h-3 mr-1.5" /> Preset
                       </Button>
@@ -604,6 +645,7 @@ export default function TelaahanForm({
                         value={field.value ?? ''}
                         rows={4}
                         className="rounded-md border-border/50 bg-background shadow-xs text-sm p-3"
+                        placeholder="Masukan kalimat saran atau kalimat pembuka. Bisa juga meluhat preset"
                       />
                     </FormControl>
                     <FormDescription className="text-[12px] text-muted-foreground/90">
@@ -614,9 +656,8 @@ export default function TelaahanForm({
                 )}
               />
 
-              {/* Roster Preview */}
               <div className="bg-muted/10 border border-border/30 rounded-lg p-6">
-                <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest mb-4 flex items-center gap-2">
+                <div className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest mb-4 flex items-center gap-2">
                   <Users className="w-3.5 h-3.5" /> Personel Terkait Dokumen
                 </div>
                 {roster.length === 0 ? (
@@ -627,7 +668,7 @@ export default function TelaahanForm({
                       <Badge
                         key={r.id}
                         variant="secondary"
-                        className="bg-background border-border/50 text-[11px] font-medium py-1 px-3">
+                        className="bg-background tracking-wider border-border/50 text-sm font-medium py-1 px-3">
                         {r.nama}{' '}
                         {r.role === 'KEPALA_JALAN' && <Crown className="w-3 h-3 ml-2 text-primary fill-primary/10" />}
                       </Badge>
@@ -636,14 +677,14 @@ export default function TelaahanForm({
                 )}
               </div>
 
-              {/* Footer Actions */}
               <div className="flex items-center justify-end gap-4 pt-8 border-t border-border/40">
                 <Button
                   variant="outline"
                   size="sm"
-                  className="h-10 text-xs font-medium text-muted-foreground hover:text-foreground"
+                  type="button"
+                  className="h-10 font-medium text-muted-foreground hover:text-foreground"
                   onClick={() => window.open(`/spj/${spjId}/telaahan/print`, '_blank')}>
-                  <Printer className="w-3.5 h-3.5 mr-2" /> PREVIEW PDF
+                  <Printer className="w-3.5 h-3.5 mr-2" /> Preview PDF
                 </Button>
 
                 <Button
@@ -666,7 +707,6 @@ export default function TelaahanForm({
         </CardContent>
       </Card>
 
-      {/* Preset Modals */}
       <PresetPicker
         open={presetOpen === 'dasar'}
         onOpenChange={(v) => setPresetOpen(v ? 'dasar' : null)}
@@ -700,8 +740,6 @@ export default function TelaahanForm({
         onPick={(text) => applyPreset('saran', text)}
       />
 
-      {/* NEW: Preset Modals untuk Pra-anggapan & Fakta (Menggunakan appendPresetToArray) */}
-      {/* Menggunakan 'as any' karena tipe PresetKey di TS mungkin belum update jika JSON belum di-save */}
       <PresetPicker
         open={presetOpen === ('praAnggapan' as any)}
         onOpenChange={(v) => setPresetOpen(v ? ('praAnggapan' as any) : null)}

@@ -266,7 +266,7 @@ export default function SuratTugasForm({
         <CardContent className="p-8">
           <Form {...form}>
             <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-              <div className="grid gap-8 md:grid-cols-2">
+              <div className="grid gap-8 md:grid-cols-2 items-start">
                 {/* NOMOR SURAT */}
                 <FormField
                   control={form.control}
@@ -380,7 +380,7 @@ export default function SuratTugasForm({
                             </PopoverContent>
                           </Popover>
 
-                          {signerValue && signerValue !== '__none__' && (
+                          {/* {signerValue && signerValue !== '__none__' && (
                             <div className="p-4 rounded-xl border border-primary/20 bg-primary/[0.02] animate-in slide-in-from-top-1 duration-300">
                               <div className="flex items-center gap-3">
                                 <div className="p-2 bg-background rounded-lg border border-border/40 shadow-sm">
@@ -394,7 +394,7 @@ export default function SuratTugasForm({
                                 </div>
                               </div>
                             </div>
-                          )}
+                          )} */}
                         </div>
                       </FormControl>
                       <FormMessage />
@@ -423,7 +423,7 @@ export default function SuratTugasForm({
                         placeholder="Masukkan maksud perjalanan dinas secara lengkap..."
                       />
                     </FormControl>
-                    <FormDescription className="text-[10px] italic">
+                    <FormDescription className="text-[11px]">
                       Redaksi ini akan muncul pada kolom UNTUK di dokumen fisik Surat Tugas.
                     </FormDescription>
                     <FormMessage />
@@ -434,28 +434,29 @@ export default function SuratTugasForm({
               <Separator className="bg-border/40" />
 
               {/* ACTION FOOTER */}
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between pt-4">
+              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end pt-4">
                 <Button
+                  variant="outline"
+                  size="sm"
                   type="button"
-                  variant="ghost"
-                  className="h-11 px-6 text-xs font-bold text-muted-foreground hover:text-foreground"
+                  className="h-10 font-medium text-muted-foreground hover:text-foreground"
                   onClick={() => window.open(`/spj/${spjId}/surat-tugas/print`, '_blank')}
                   disabled={rosterSorted.length === 0}>
-                  <Printer className="w-4 h-4 mr-2" /> PREVIEW PDF
+                  <Printer className="w-4 h-4 mr-2" /> Preview PDF
                 </Button>
 
                 <div className="flex items-center gap-3">
                   <Button
                     type="submit"
                     disabled={saving || rosterSorted.length === 0}
-                    className="h-11 px-10 rounded-xl bg-foreground text-background hover:bg-foreground/90 font-bold text-xs shadow-sm transition-all">
+                    className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all">
                     {saving ? (
                       <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> MENYIMPAN...
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menyimpan...
                       </>
                     ) : (
                       <>
-                        <Save className="w-4 h-4 mr-2" /> SIMPAN SURAT TUGAS
+                        <Save className="w-4 h-4 mr-2" /> Simpan Surat Tugas
                       </>
                     )}
                   </Button>

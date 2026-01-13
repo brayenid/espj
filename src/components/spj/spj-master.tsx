@@ -94,7 +94,7 @@ type SpjLite = {
   tingkatPerjalanan: string | null
 }
 
-type PdfKey = 'SPD' | 'DOPD' | 'KUITANSI' | 'VISUM' | 'LAPORAN'
+type PdfKey = 'SPD' | 'DOPD' | 'KUITANSI' | 'VISUM' | 'LAPORAN' | 'TS' | 'ST'
 
 // --- Helpers ---
 function fmtDateId(d: Date) {
@@ -114,8 +114,7 @@ export default function SpjMaster({
   spj,
   roster,
   signers,
-  docs,
-  visumStageCount
+  docs
 }: {
   spj: SpjLite
   roster: RosterItem[]
@@ -128,7 +127,6 @@ export default function SpjMaster({
     laporan: boolean
     dopd: boolean
   }
-  visumStageCount: number
 }) {
   const router = useRouter()
   const [isPending, startTransition] = useTransition()
@@ -171,7 +169,9 @@ export default function SpjMaster({
   const pdfItems = useMemo(() => {
     const base = `/spj/${spj.id}`
     return [
+      { key: 'TS' as const, label: 'Telaahan ', url: `${base}/telaahan/print` },
       { key: 'SPD' as const, label: 'SPD', url: `${base}/spd/print` },
+      { key: 'ST' as const, label: 'Surat Tugas', url: `${base}/surat-tugas/print` },
       { key: 'DOPD' as const, label: 'DOPD', url: `${base}/dopd/print` },
       { key: 'KUITANSI' as const, label: 'Kuitansi', url: `${base}/kuitansi/print` },
       { key: 'VISUM' as const, label: 'Visum', url: `${base}/visum/print` },
@@ -235,7 +235,7 @@ export default function SpjMaster({
               className="h-9 border-border/60 hover:bg-background shadow-xs text-xs font-medium cursor-pointer"
               onClick={() => openPdf(item.key)}>
               <FileDown className="w-3.5 h-3.5 mr-2 opacity-60" />
-              Preview {item.label}
+              {item.label}
             </Button>
           ))}
           <Separator orientation="vertical" className="h-9 mx-1 hidden md:block" />
