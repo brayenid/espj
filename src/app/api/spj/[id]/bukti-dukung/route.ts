@@ -1,9 +1,9 @@
 import { NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 
-export async function PUT(req: Request, { params }: { params: { id: string } }) {
+export async function PUT(req: Request, { params }: { params: Promise<{ id: string }> }) {
   try {
-    const spjId = params.id
+    const spjId = (await params).id
     if (!spjId) return NextResponse.json({ message: 'Missing spj id' }, { status: 400 })
 
     const body = (await req.json()) as { buktiDukungUrl?: string | null }

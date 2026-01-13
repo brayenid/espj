@@ -12,11 +12,15 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
+// Perbaikan Skema: Menggunakan .transform atau cara yang lebih eksplisit untuk sinkronisasi tipe
 const schema = z.object({
-  buktiDukungUrl: z.preprocess((v) => {
-    const s = typeof v === 'string' ? v.trim() : ''
-    return s.length ? s : null
-  }, z.string().url('URL tidak valid. Contoh: https://...').nullable())
+  buktiDukungUrl: z
+    .string()
+    .trim()
+    .nullable()
+    .or(z.literal('')) // Mengizinkan string kosong
+    .transform((v) => (v === '' || v === null ? null : v)) // Ubah string kosong jadi null
+    .pipe(z.string().url('URL tidak valid. Contoh: https://...').nullable())
 })
 
 type FormValues = z.infer<typeof schema>
@@ -35,7 +39,8 @@ export default function BuktiDukungForm({ spjId, initialUrl }: { spjId: string; 
     mode: 'onBlur'
   })
 
-  const url = form.watch('buktiDukungUrl')
+  // Memantau nilai URL untuk tombol "Buka Link"
+  const urlValue = form.watch('buktiDukungUrl')
 
   async function onSubmit(values: FormValues) {
     setSaving(true)
@@ -79,7 +84,8 @@ export default function BuktiDukungForm({ spjId, initialUrl }: { spjId: string; 
                   <FormControl>
                     <Input
                       {...field}
-                      value={(field.value ?? '') as any}
+                      // Memastikan value tidak pernah null di level HTML Input (karena Input tidak suka null)
+                      value={field.value ?? ''}
                       onChange={(e) => field.onChange(e.target.value)}
                       placeholder="https://drive.google.com/…"
                       className="rounded-2xl"
@@ -97,10 +103,10 @@ export default function BuktiDukungForm({ spjId, initialUrl }: { spjId: string; 
                 type="button"
                 variant="secondary"
                 className="rounded-2xl"
-                disabled={!url}
+                // Tombol aktif jika ada input teks
+                disabled={!urlValue}
                 onClick={() => {
-                  const u = (url ?? '').toString().trim()
-                  if (u) window.open(u, '_blank')
+                  if (urlValue) window.open(urlValue, '_blank')
                 }}>
                 Buka Link
               </Button>

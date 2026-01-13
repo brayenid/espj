@@ -1,7 +1,7 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useState, useEffect } from 'react'
+import { useRouter } from 'next/navigation'
 import { signIn } from 'next-auth/react'
 import { z } from 'zod'
 import { toast } from 'sonner'
@@ -17,12 +17,20 @@ const schema = z.object({
 
 export default function LoginForm() {
   const router = useRouter()
-  const params = useSearchParams()
-  const callbackUrl = params.get('callbackUrl') ?? '/spj'
 
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [loading, setLoading] = useState(false)
+  const [callbackUrl, setCallbackUrl] = useState('/spj')
+
+  // Mengambil callbackUrl tanpa hook useSearchParams untuk menghindari kebutuhan akan <Suspense>
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search)
+      const url = params.get('callbackUrl')
+      if (url) setCallbackUrl(url)
+    }
+  }, [])
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -49,6 +57,8 @@ export default function LoginForm() {
       }
 
       toast.success('Akses diberikan. Mengarahkan...')
+
+      // Mengarahkan pengguna
       router.push(callbackUrl)
       router.refresh()
     } catch {
