@@ -8,7 +8,6 @@ const schema = z
     noTelaahan: z.string().trim().nullable().optional(),
     noSuratTugas: z.string().trim().nullable().optional(),
     noSpd: z.string().trim().nullable().optional(),
-
     tahunAnggaran: z.string().trim().nullable().optional(),
     kodeKegiatan: z.string().trim().nullable().optional(),
     judulKegiatan: z.string().trim().nullable().optional(),
@@ -19,11 +18,10 @@ const schema = z
     kodeRekening: z.string().trim().nullable().optional(),
     judulRekening: z.string().trim().nullable().optional(),
     akunAnggaran: z.string().trim().nullable().optional(),
-
     buktiDukungUrl: z.string().trim().nullable().optional(),
     maksudDinas: z.string().trim().nullable().optional(),
     tingkatPerjalanan: z.string().trim().nullable().optional(),
-
+    tempatTujuan: z.string(),
     // Tambahkan field tanggal dengan pre-processing ke objek Date
     tglBerangkat: z.preprocess((val) => new Date(val as string), z.date()),
     tglKembali: z.preprocess((val) => new Date(val as string), z.date())
@@ -67,7 +65,6 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
         noTelaahan: data.noTelaahan,
         noSuratTugas: data.noSuratTugas,
         noSpd: data.noSpd,
-
         tahunAnggaran: data.tahunAnggaran,
         kodeKegiatan: data.kodeKegiatan,
         judulKegiatan: data.judulKegiatan,
@@ -78,11 +75,10 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
         kodeRekening: data.kodeRekening,
         judulRekening: data.judulRekening,
         akunAnggaran: data.akunAnggaran,
-
         buktiDukungUrl: data.buktiDukungUrl,
         maksudDinas: data.maksudDinas ?? undefined,
         tingkatPerjalanan: data.tingkatPerjalanan,
-
+        tempatTujuan: data.tempatTujuan,
         // Simpan tanggal dan hasil hitung durasi
         tglBerangkat: data.tglBerangkat,
         tglKembali: data.tglKembali,

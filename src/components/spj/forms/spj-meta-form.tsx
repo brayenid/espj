@@ -24,7 +24,6 @@ const schema = z
     noTelaahan: z.string().trim().nullable(),
     noSuratTugas: z.string().trim().nullable(),
     noSpd: z.string().trim().nullable(),
-
     tahunAnggaran: z.string().trim().nullable(),
     kodeKegiatan: z.string().trim().nullable(),
     judulKegiatan: z.string().trim().nullable(),
@@ -35,12 +34,10 @@ const schema = z
     kodeRekening: z.string().trim().nullable(),
     judulRekening: z.string().trim().nullable(),
     akunAnggaran: z.string().trim().nullable(),
-
     buktiDukungUrl: z.optional(z.string()),
-
     maksudDinas: z.string().trim().nullable(),
     tingkatPerjalanan: z.optional(z.string().trim().nullable()),
-
+    tempatTujuan: z.string(),
     // Field Baru
     tglBerangkat: z.date({ error: 'Tanggal berangkat wajib diisi' }),
     tglKembali: z.date({ error: 'Tanggal kembali wajib diisi' })
@@ -75,6 +72,7 @@ export default function SpjMetaForm({
     buktiDukungUrl: string | null
     maksudDinas: string
     tingkatPerjalanan: string | null
+    tempatTujuan: string
     // Tambahan initial data
     tglBerangkat: Date | string
     tglKembali: Date | string
@@ -99,6 +97,7 @@ export default function SpjMetaForm({
       buktiDukungUrl: initial.buktiDukungUrl ?? undefined,
       maksudDinas: initial.maksudDinas ?? null,
       tingkatPerjalanan: initial.tingkatPerjalanan ?? null,
+      tempatTujuan: initial.tempatTujuan ?? null,
       // Init dates
       tglBerangkat: new Date(initial.tglBerangkat),
       tglKembali: new Date(initial.tglKembali)
@@ -203,6 +202,27 @@ export default function SpjMetaForm({
                       <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
                     </PopoverContent>
                   </Popover>
+                  <FormMessage className="text-[11px]" />
+                </FormItem>
+              )}
+            />
+          </div>
+
+          <div className="grid gap-4 md:grid-cols-1">
+            <FormField
+              control={form.control}
+              name="tempatTujuan"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-[13px] text-muted-foreground">Tempat Tujuan</FormLabel>
+                  <FormControl>
+                    <Input
+                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder="Misal: Samarinda"
+                    />
+                  </FormControl>
                   <FormMessage className="text-[11px]" />
                 </FormItem>
               )}
