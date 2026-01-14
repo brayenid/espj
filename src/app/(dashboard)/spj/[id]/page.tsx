@@ -3,7 +3,6 @@ import { prisma } from '@/lib/prisma'
 import SpjMaster from '@/components/spj/spj-master'
 import { ChevronRight, Home, Banknote, CheckCircle2, AlertCircle, Info } from 'lucide-react'
 import Link from 'next/link'
-import { cn } from '@/lib/utils'
 
 type PageProps = {
   params: { id: string } | Promise<{ id: string }>
@@ -32,7 +31,7 @@ export default async function SpjMasterPage(props: PageProps) {
   if (!spj) return notFound()
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 p-4">
+    <div className="mx-auto w-full max-w-7xl space-y-6">
       {/* 1. Breadcrumb */}
       <nav className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
         <Link href="/spj" className="hover:text-foreground transition-colors flex items-center gap-1">

@@ -90,7 +90,7 @@ export default function VisumForm({ spjId, initialStageCount }: { spjId: string;
                         ref={field.ref}
                         onBlur={field.onBlur}
                         inputMode="numeric"
-                        className="rounded-2xl w-full sm:w-40"
+                        className="rounded-xl w-full sm:w-40 shadow-none"
                         placeholder="Contoh: 3"
                         value={field.value == null ? '' : String(field.value)}
                         onChange={(e) => field.onChange(e.target.value)} // ✅ biar coerce jalan

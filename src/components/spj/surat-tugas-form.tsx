@@ -266,7 +266,7 @@ export default function SuratTugasForm({
                         <Input
                           {...field}
                           value={field.value ?? ''}
-                          className="h-11 rounded-xl bg-muted/20 border-border/40 font-mono text-sm px-4 focus-visible:ring-1"
+                          className="h-11 rounded-xl bg-muted/20 border-border/40 font-mono text-sm px-4 focus-visible:ring-1 shadow-none"
                           placeholder="Contoh: 090/001/ORG-TU.P/I/2026"
                         />
                       </FormControl>
@@ -305,7 +305,7 @@ export default function SuratTugasForm({
                                       if (selected) setSelected(null)
                                     }}
                                     placeholder="Cari Nama / NIP / Jabatan..."
-                                    className="h-11 pl-10 rounded-xl bg-muted/20 border-border/40 text-sm"
+                                    className="h-11 pl-10 rounded-xl bg-muted/20 border-border/40 text-sm shadow-none"
                                   />
                                 </div>
                                 <Button
@@ -323,7 +323,7 @@ export default function SuratTugasForm({
                               </div>
                             </PopoverTrigger>
 
-                            <PopoverContent className="w-[340px] p-0" align="start">
+                            <PopoverContent className="w-85 p-0" align="start">
                               <Command shouldFilter={false}>
                                 <CommandInput value={q} onValueChange={setQ} placeholder="Ketik nama pejabat..." />
                                 <CommandList>
@@ -402,7 +402,7 @@ export default function SuratTugasForm({
                       <Textarea
                         {...field}
                         rows={6}
-                        className="rounded-xl bg-muted/20 border-border/40 text-sm p-4 leading-relaxed focus-visible:ring-1"
+                        className="rounded-xl bg-muted/20 border-border/40 text-sm p-4 leading-relaxed focus-visible:ring-1 shadow-none"
                         placeholder="Masukkan maksud perjalanan dinas secara lengkap..."
                       />
                     </FormControl>

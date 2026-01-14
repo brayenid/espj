@@ -157,8 +157,8 @@ function SignerCombobox({
         <PopoverTrigger asChild>
           <div
             className={cn(
-              'group flex flex-col items-start p-4 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-sm',
-              value && 'border-primary/20 bg-primary/[0.02]'
+              'group flex flex-col items-start p-4 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-none',
+              value && 'border-primary/20 bg-primary/2'
             )}>
             {value ? (
               <div className="w-full text-left">
@@ -300,7 +300,7 @@ export default function LaporanForm({
   return (
     <div className="space-y-6 pb-20 animate-in fade-in duration-500">
       {/* 1. Header Bar */}
-      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border border-border/40 p-6 rounded-xl shadow-sm flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border border-border/40 p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="p-2.5 bg-primary/10 rounded-lg">
             <ClipboardCheck className="w-5 h-5 text-primary" />
@@ -315,18 +315,18 @@ export default function LaporanForm({
           <Button
             variant="outline"
             size="sm"
-            className="rounded-lg h-9 font-bold text-[11px] border-border/60"
+            className="rounded-lg h-9 font-semibold text-sm border-border/60 shadow-none"
             onClick={() => window.open(`/spj/${spjId}/laporan/print`, '_blank')}
             disabled={rosterSorted.length === 0}>
-            <Printer className="w-3.5 h-3.5 mr-2" /> PREVIEW PDF
+            <Printer className="w-3.5 h-3.5 mr-2" /> Preview PDF
           </Button>
           <Button
             size="sm"
-            className="rounded-lg h-9 px-6 font-bold text-[11px] shadow-sm"
+            className="rounded-lg h-9 px-6 font-semibold text-sm shadow-none"
             onClick={onSave}
             disabled={saving}>
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Save className="w-3.5 h-3.5 mr-2" />}
-            SIMPAN
+            Simpan
           </Button>
         </div>
       </div>
@@ -350,7 +350,7 @@ export default function LaporanForm({
                   value={signerJabatanTampil}
                   onChange={(e) => setSignerJabatanTampil(e.target.value)}
                   placeholder="Contoh: KEPALA BAGIAN..."
-                  className="h-10 rounded-lg text-sm"
+                  className="h-10 rounded-lg text-sm shadow-none shadow-none"
                 />
               </div>
             </CardContent>
@@ -396,19 +396,23 @@ export default function LaporanForm({
                   <Input
                     value={dasarLaporan}
                     onChange={(e) => setDasarLaporan(e.target.value)}
-                    className="h-10 rounded-lg text-sm"
+                    className="h-10 rounded-lg text-sm shadow-none"
                   />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-bold uppercase text-muted-foreground">Waktu</label>
-                  <Input value={waktu} onChange={(e) => setWaktu(e.target.value)} className="h-10 rounded-lg text-sm" />
+                  <Input
+                    value={waktu}
+                    onChange={(e) => setWaktu(e.target.value)}
+                    className="h-10 rounded-lg text-sm shadow-none"
+                  />
                 </div>
                 <div className="space-y-2">
                   <label className="text-[11px] font-bold uppercase text-muted-foreground">Lokasi</label>
                   <Input
                     value={lokasi}
                     onChange={(e) => setLokasi(e.target.value)}
-                    className="h-10 rounded-lg text-sm"
+                    className="h-10 rounded-lg text-sm shadow-none"
                   />
                 </div>
                 <div className="space-y-2">
@@ -416,7 +420,7 @@ export default function LaporanForm({
                   <Input
                     value={tujuan}
                     onChange={(e) => setTujuan(e.target.value)}
-                    className="h-10 rounded-lg text-sm"
+                    className="h-10 rounded-lg text-sm shadow-none"
                   />
                 </div>
               </div>
@@ -427,7 +431,7 @@ export default function LaporanForm({
                   value={kegiatan}
                   onChange={(e) => setKegiatan(e.target.value)}
                   rows={3}
-                  className="rounded-lg text-sm resize-none"
+                  className="rounded-lg text-sm resize-none shadow-none"
                 />
               </div>
 
@@ -470,7 +474,7 @@ export default function LaporanForm({
                       value={hasilPembuka}
                       onChange={(e) => setHasilPembuka(e.target.value)}
                       rows={2}
-                      className="rounded-lg text-sm border-dashed"
+                      className="rounded-lg text-sm border-dashed shadow-none"
                       placeholder="Setelah melakukan kegiatan..."
                     />
                   </div>
@@ -494,12 +498,12 @@ export default function LaporanForm({
                             onChange={(e) => updatePoin(idx, e.target.value)}
                             placeholder={`Poin ${idx + 1}`}
                             rows={2}
-                            className="min-h-[40px] text-sm rounded-lg resize-none"
+                            className="min-h-10 text-sm rounded-lg resize-none shadow-none"
                           />
                           <Button
                             variant="ghost"
                             size="icon"
-                            className="h-10 w-10 flex-shrink-0 text-muted-foreground hover:text-destructive"
+                            className="h-10 w-10 shrink-0 shadow-none text-muted-foreground hover:text-destructive"
                             onClick={() => removePoin(idx)}
                             disabled={hasilPoin.length <= 1}>
                             <Trash2 className="w-4 h-4" />

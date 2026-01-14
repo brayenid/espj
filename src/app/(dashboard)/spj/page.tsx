@@ -90,7 +90,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
         </div>
         <div className="flex items-center gap-2">
           <SpjExportModal />
-          <Button asChild size="sm" className="h-9 bg-foreground text-background hover:bg-foreground/90 shadow-sm">
+          <Button asChild size="sm" className="h-9 bg-foreground text-background hover:bg-foreground/90">
             <Link href="/spj/new">
               <Plus className="mr-2 h-4 w-4" />
               Buat SPJ

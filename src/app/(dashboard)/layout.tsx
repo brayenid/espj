@@ -100,7 +100,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
       </nav>
 
       {/* --- MAIN CONTENT AREA --- */}
-      <main className="flex-1 w-full max-w-7xl mx-auto px-4 py-8">
+      <main className="flex-1 w-full max-w-7xl mx-auto p-2">
         <div className="animate-in fade-in duration-700">{children}</div>
       </main>
 

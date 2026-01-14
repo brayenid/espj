@@ -69,7 +69,7 @@ export default function SpjExportModal() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-9 gap-2 cursor-pointer">
+        <Button variant="outline" size="sm" className="h-9 gap-2 cursor-pointer shadow-none!">
           <FileSpreadsheet className="w-4 h-4 text-green-600" />
           Ekspor Excel
         </Button>

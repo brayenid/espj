@@ -268,7 +268,7 @@ export default function TelaahanForm({
                             <Button
                               variant={'outline'}
                               className={cn(
-                                'h-9 w-full rounded-md border-border/40 text-sm px-4 font-mono justify-start text-left font-normal',
+                                'h-9 w-full rounded-md border-border/40 text-sm px-4 font-mono justify-start text-left font-normal shadow-none',
                                 !field.value && 'text-muted-foreground'
                               )}>
                               <CalendarIcon className="mr-2 h-4 w-4 opacity-50" />
@@ -299,7 +299,7 @@ export default function TelaahanForm({
                         <Input
                           {...field}
                           value={field.value ?? ''}
-                          className="h-9 rounded-md border-border/50 bg-background shadow-xs text-xs"
+                          className="h-9 rounded-md border-border/50 bg-background shadow-none text-xs"
                         />
                       </FormControl>
                       <FormMessage />
@@ -316,7 +316,7 @@ export default function TelaahanForm({
                         <Input
                           {...field}
                           value={field.value ?? ''}
-                          className="h-9 rounded-md border-border/50 bg-background shadow-xs text-xs"
+                          className="h-9 rounded-md border-border/50 bg-background shadow-none text-xs"
                         />
                       </FormControl>
                       <FormMessage />
@@ -333,7 +333,7 @@ export default function TelaahanForm({
                         <Input
                           {...field}
                           value={field.value ?? ''}
-                          className="h-9 rounded-md border-border/50 bg-background shadow-xs text-xs"
+                          className="h-9 rounded-md border-border/50 bg-background shadow-none text-xs"
                         />
                       </FormControl>
                       <FormMessage />
@@ -355,7 +355,7 @@ export default function TelaahanForm({
                         {...field}
                         value={field.value ?? ''}
                         rows={3}
-                        className="rounded-md border-border/50 bg-background shadow-xs text-[13px] font-medium resize-none focus-visible:ring-1"
+                        className="rounded-md border-border/50 bg-background shadow-none text-[13px] font-medium resize-none focus-visible:ring-1"
                       />
                     </FormControl>
                     <FormMessage />
@@ -383,7 +383,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
+                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto shadow-none"
                           onClick={() => setPresetOpen('dasar')}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -393,7 +393,7 @@ export default function TelaahanForm({
                           {...field}
                           value={field.value ?? ''}
                           rows={6}
-                          className="rounded-md border-border/50 bg-background shadow-xs text-sm leading-relaxed p-4"
+                          className="rounded-md border-border/50 bg-background shadow-none text-sm leading-relaxed p-4"
                           placeholder="Masukan dasar perjalanan atau lihat preset"
                         />
                       </FormControl>
@@ -417,7 +417,7 @@ export default function TelaahanForm({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
+                      className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto shadow-none"
                       onClick={() => setPresetOpen('praAnggapan' as any)}>
                       <Zap className="w-3 h-3 mr-1.5" /> Preset
                     </Button>
@@ -425,7 +425,7 @@ export default function TelaahanForm({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-8 sm:h-7 rounded-md text-[10px] border-border/60 shadow-xs px-3 w-full sm:w-auto"
+                      className="h-8 sm:h-7 rounded-md text-[10px] border-border/60 shadow-none px-3 w-full sm:w-auto"
                       onClick={() => pra.append({ value: '' })}>
                       <Plus className="w-3 h-3 mr-1.5" /> Tambah Poin
                     </Button>
@@ -434,7 +434,7 @@ export default function TelaahanForm({
 
                 <div className="grid gap-3">
                   {pra.fields.length === 0 ? (
-                    <div className="p-4 text-center border border-dashed rounded-md text-xs text-muted-foreground italic">
+                    <div className="p-4 text-center border border-dashed rounded-md text-xs text-muted-foreground">
                       Klik &quot;Tambah Poin&quot; atau &quot;Preset&quot; untuk mengisi pra-anggapan.
                     </div>
                   ) : (
@@ -452,7 +452,7 @@ export default function TelaahanForm({
                               <FormControl className="flex-1">
                                 <Textarea
                                   {...field}
-                                  className="min-h-15 rounded-md border-border/50 bg-background shadow-xs text-[13px] py-2 resize-y"
+                                  className="min-h-15 rounded-md border-border/50 bg-background shadow-none text-[13px] py-2 resize-y"
                                 />
                               </FormControl>
                               <Button
@@ -487,7 +487,7 @@ export default function TelaahanForm({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
+                      className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto shadow-none"
                       onClick={() => setPresetOpen('fakta' as any)}>
                       <Zap className="w-3 h-3 mr-1.5" /> Preset
                     </Button>
@@ -495,7 +495,7 @@ export default function TelaahanForm({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-8 sm:h-7 rounded-md text-[10px] border-border/60 shadow-xs px-3 w-full sm:w-auto"
+                      className="h-8 sm:h-7 rounded-md text-[10px] border-border/60 shadow-none px-3 w-full sm:w-auto"
                       onClick={() => fak.append({ value: '' })}>
                       <Plus className="w-3 h-3 mr-1.5" /> Tambah Poin
                     </Button>
@@ -504,7 +504,7 @@ export default function TelaahanForm({
 
                 <div className="grid gap-3">
                   {fak.fields.length === 0 ? (
-                    <div className="p-4 text-center border border-dashed rounded-md text-xs text-muted-foreground italic">
+                    <div className="p-4 text-center border border-dashed rounded-md text-xs text-muted-foreground">
                       Klik &quot;Tambah Poin&quot; atau &quot;Preset&quot; untuk mengisi fakta.
                     </div>
                   ) : (
@@ -522,7 +522,7 @@ export default function TelaahanForm({
                               <FormControl className="flex-1">
                                 <Textarea
                                   {...field}
-                                  className="min-h-15 rounded-md border-border/50 bg-background shadow-xs text-[13px] py-2 resize-y"
+                                  className="min-h-15 rounded-md border-border/50 bg-background shadow-none text-[13px] py-2 resize-y"
                                 />
                               </FormControl>
                               <Button
@@ -563,7 +563,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
+                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto shadow-none"
                           onClick={() => setPresetOpen('analisis' as any)}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -573,8 +573,8 @@ export default function TelaahanForm({
                           {...field}
                           value={field.value ?? ''}
                           rows={5}
-                          className="rounded-md border-border/50 bg-background shadow-xs text-sm p-3"
-                          placeholder='Masukan kalimat analisis atau lihat preset"'
+                          className="rounded-md border-border/50 bg-background shadow-none text-sm p-3"
+                          placeholder="Masukan kalimat analisis atau lihat preset"
                         />
                       </FormControl>
                       <FormMessage />
@@ -598,7 +598,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
+                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto shadow-none"
                           onClick={() => setPresetOpen('kesimpulan' as any)}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -608,8 +608,8 @@ export default function TelaahanForm({
                           {...field}
                           value={field.value ?? ''}
                           rows={5}
-                          className="rounded-md border-border/50 bg-background shadow-xs text-sm p-3"
-                          placeholder='Masukan kesimpulan atau lihat preset"'
+                          className="rounded-md border-border/50 bg-background shadow-none text-sm p-3"
+                          placeholder="Masukan kesimpulan atau lihat preset"
                         />
                       </FormControl>
                       <FormMessage />
@@ -635,7 +635,7 @@ export default function TelaahanForm({
                         type="button"
                         size="sm"
                         variant="outline"
-                        className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
+                        className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto shadow-none"
                         onClick={() => setPresetOpen('saran' as any)}>
                         <Zap className="w-3 h-3 mr-1.5" /> Preset
                       </Button>
@@ -645,7 +645,7 @@ export default function TelaahanForm({
                         {...field}
                         value={field.value ?? ''}
                         rows={4}
-                        className="rounded-md border-border/50 bg-background shadow-xs text-sm p-3"
+                        className="rounded-md border-border/50 bg-background shadow-none text-sm p-3"
                         placeholder="Masukan kalimat saran atau kalimat pembuka. Bisa juga meluhat preset"
                       />
                     </FormControl>

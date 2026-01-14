@@ -249,7 +249,7 @@ export default function KuitansiForm({
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20">
       {/* 1. TOP SUMMARY BAR */}
-      <div className="sticky top-0 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/40 shadow-sm sm:mx-0 sm:px-0 sm:rounded-xl sm:border sm:px-6">
+      <div className="sticky top-0 z-30 -mx-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/40 sm:mx-0 sm:rounded-xl sm:border px-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="p-2.5 bg-primary/10 rounded-lg">
@@ -266,17 +266,17 @@ export default function KuitansiForm({
             <Button
               variant="outline"
               size="sm"
-              className="rounded-lg h-9 font-bold text-[11px] border-border/60 shadow-sm"
+              className="rounded-lg h-9 font-semibold text-sm border-border/60 shadow-none"
               onClick={() => window.open(`/spj/${spjId}/kuitansi/print`, '_blank')}>
-              <Printer className="w-3.5 h-3.5 mr-2" /> PREVIEW PDF
+              <Printer className="w-3.5 h-3.5 mr-2" /> Preview PDF
             </Button>
             <Button
               size="sm"
-              className="rounded-lg h-9 px-6 font-bold text-[11px] shadow-sm"
+              className="rounded-lg h-9 px-6 font-semibold text-sm   shadow-none"
               onClick={onSave}
               disabled={saving}>
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Save className="w-3.5 h-3.5 mr-2" />}
-              SIMPAN KUITANSI
+              Simpan Kuitansi
             </Button>
           </div>
         </div>
@@ -397,7 +397,8 @@ export default function KuitansiForm({
                   <Input
                     value={anggaran.tahunAnggaran}
                     onChange={(e) => setAnggaran({ ...anggaran, tahunAnggaran: e.target.value })}
-                    className="h-9 rounded-lg text-xs bg-white"
+                    className="h-9 rounded-lg text-xs bg-white shadow-none"
+                    placeholder="Masukan tahun anggaran"
                   />
                 </div>
                 <div className="space-y-2">
@@ -405,7 +406,8 @@ export default function KuitansiForm({
                   <Input
                     value={anggaran.upGu}
                     onChange={(e) => setAnggaran({ ...anggaran, upGu: e.target.value })}
-                    className="h-9 rounded-lg text-xs bg-white"
+                    className="h-9 rounded-lg text-xs bg-white shadow-none"
+                    placeholder="Umumnya diisi oleh bendahara"
                   />
                 </div>
                 <div className="space-y-2">
@@ -413,7 +415,8 @@ export default function KuitansiForm({
                   <Input
                     value={anggaran.nomorBku}
                     onChange={(e) => setAnggaran({ ...anggaran, nomorBku: e.target.value })}
-                    className="h-9 rounded-lg text-xs bg-white"
+                    className="h-9 rounded-lg text-xs bg-white shadow-none"
+                    placeholder="Umumnya diisi oleh bendahara"
                   />
                 </div>
               </div>
@@ -429,13 +432,13 @@ export default function KuitansiForm({
                     value={anggaran.kodeRekening}
                     onChange={(e) => setAnggaran({ ...anggaran, kodeRekening: e.target.value })}
                     placeholder="Kode Rekening..."
-                    className="h-9 rounded-lg text-xs bg-white"
+                    className="h-9 rounded-lg text-xs bg-white shadow-none"
                   />
                   <Textarea
                     value={anggaran.judulRekening}
                     onChange={(e) => setAnggaran({ ...anggaran, judulRekening: e.target.value })}
                     placeholder="Judul Rekening..."
-                    className="text-xs min-h-15 rounded-lg bg-white resize-none"
+                    className="text-xs min-h-15 rounded-lg bg-white resize-none shadow-none"
                   />
                 </div>
 
@@ -463,7 +466,7 @@ export default function KuitansiForm({
                         value={anggaran.judulKegiatan}
                         onChange={(e) => setAnggaran({ ...anggaran, judulKegiatan: e.target.value })}
                         placeholder="Masukkan judul kegiatan..."
-                        className="text-xs min-h-15 rounded-lg bg-white resize-none"
+                        className="text-xs min-h-15 rounded-lg bg-white resize-none shadow-none"
                       />
                     </div>
 
@@ -485,7 +488,7 @@ export default function KuitansiForm({
                         value={anggaran.judulSubKegiatan}
                         onChange={(e) => setAnggaran({ ...anggaran, judulSubKegiatan: e.target.value })}
                         placeholder="Masukkan judul sub kegiatan..."
-                        className="text-xs min-h-15 rounded-lg bg-white resize-none"
+                        className="text-xs min-h-15 rounded-lg bg-white resize-none shadow-none"
                       />
                     </div>
                   </div>

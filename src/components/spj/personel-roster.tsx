@@ -182,7 +182,7 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
                   if (!open) setOpen(true)
                 }}
                 placeholder="Cari berdasarkan Nama, NIP, atau Jabatan..."
-                className="pl-9 pr-12 rounded-md border-border/50 bg-background/50 focus-visible:ring-1 shadow-sm h-10"
+                className="pl-9 pr-12 rounded-md border-border/50 bg-background/50 focus-visible:ring-1 shadow-none h-10"
               />
               {q && (
                 <button
@@ -195,7 +195,7 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
           </PopoverTrigger>
 
           <PopoverContent
-            className="w-[var(--radix-popover-trigger-width)] p-0 rounded-md border-border/50 shadow-xl"
+            className="w-(--radix-popover-trigger-width) p-0 rounded-md border-border/50 shadow-xl"
             align="start"
             sideOffset={8}>
             <Command shouldFilter={false} className="bg-popover">
@@ -205,7 +205,7 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
                 placeholder="Ketik nama pegawai..."
                 className="h-10 border-none focus:ring-0"
               />
-              <CommandList className="max-h-[300px]">
+              <CommandList className="max-h-75">
                 {loadingSearch ? (
                   <div className="flex items-center justify-center p-6 text-xs text-muted-foreground gap-2">
                     <Loader2 className="h-3 w-3 animate-spin" /> Mencari data...
@@ -301,7 +301,7 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
                       <TableCell className="py-3">
                         {it.role === 'KEPALA_JALAN' ? (
                           <Badge className="bg-foreground text-background hover:bg-foreground h-5 text-[9px] uppercase tracking-tighter rounded-sm border-none">
-                            <Crown className="w-2.5 h-2.5 mr-1" /> Kepala
+                            <Crown className="w-2.5 h-2.5 mr-1" /> Kepala Jalan
                           </Badge>
                         ) : (
                           <Badge

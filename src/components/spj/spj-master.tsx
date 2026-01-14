@@ -208,7 +208,7 @@ export default function SpjMaster({
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
       {/* 1. Header & Quick Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-muted/20 p-5 rounded-xl border border-border/50 backdrop-blur-md shadow-sm">
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-muted/20 p-5 rounded-xl border border-border/50 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div>
             <h2 className="text-lg font-semibold tracking-tight leading-none">Master File</h2>
@@ -224,7 +224,7 @@ export default function SpjMaster({
               key={item.key}
               variant="outline"
               size="sm"
-              className="h-9 border-border/60 hover:bg-background shadow-xs text-xs font-medium cursor-pointer"
+              className="h-9 border-border/60 hover:bg-background shadow-none text-xs font-medium cursor-pointer"
               onClick={() => openPdf(item.key)}>
               <FileDown className="w-3.5 h-3.5 mr-2 opacity-60" />
               {item.label}
@@ -247,7 +247,7 @@ export default function SpjMaster({
                 <Button
                   variant="ghost"
                   size="sm"
-                  className="h-8 text-destructive hover:text-destructive hover:bg-destructive/10 border border-transparent hover:border-destructive/20"
+                  className="h-8 text-destructive text-sm hover:text-destructive hover:bg-destructive/10 border border-transparent hover:border-destructive/20"
                   onClick={() => setOpen('DELETE')}>
                   <Trash2 className="w-4 h-4 mr-2" />
                   Hapus SPJ
@@ -255,7 +255,7 @@ export default function SpjMaster({
                 <Button
                   size="sm"
                   variant="outline"
-                  className="h-8 border-border/60 text-xs shadow-sm"
+                  className="h-8 border-border/60 text-sm shadow-none"
                   onClick={() => setOpen('META')}>
                   <Edit3 className="w-3.5 h-3.5 mr-2" /> Edit Data
                 </Button>
@@ -351,7 +351,9 @@ export default function SpjMaster({
             <CardContent className="p-5 space-y-3">
               {kepala && (
                 <div className="group relative p-3 rounded-lg border border-primary/20 bg-primary/5 transition-all">
-                  <Badge className="absolute -top-2 right-2 h-4 text-[9px] bg-primary hover:bg-primary">Ketua</Badge>
+                  <Badge className="absolute -top-2 right-2 h-4 text-[9px] bg-primary hover:bg-primary">
+                    Kepala Jalan
+                  </Badge>
                   <p className="text-xs font-bold leading-tight">{kepala.nama}</p>
                   <p className="text-[10px] text-muted-foreground mt-1 truncate">{kepala.jabatan}</p>
                 </div>
@@ -378,7 +380,9 @@ export default function SpjMaster({
             </CardHeader>
             <CardContent className="p-5 space-y-4">
               {signers.length === 0 ? (
-                <p className="text-[11px] text-muted-foreground italic text-center py-4">Belum ada signer diatur.</p>
+                <p className="text-[11px] text-muted-foreground italic text-center py-4">
+                  Belum ada penandatangan diatur.
+                </p>
               ) : (
                 Array.from(signerMap.entries())
                   .slice(0, 3)
@@ -463,9 +467,9 @@ export default function SpjMaster({
       <Dialog open={open === 'SIGNERS'} onOpenChange={(v) => !v && close()}>
         <DialogContent className="w-[96vw] max-w-4xl max-h-[85vh] overflow-y-auto border-border/40 p-0 gap-0">
           <DialogHeader className="px-6 py-4 border-b bg-muted/20">
-            <DialogTitle>Daftar Penandatangan (Signers)</DialogTitle>
+            <DialogTitle>Daftar Penandatangan</DialogTitle>
             <DialogDescription className="text-xs">
-              Ringkasan record penandatangan untuk setiap jenis dokumen.
+              Ringkasan penandatangan untuk setiap jenis dokumen
             </DialogDescription>
           </DialogHeader>
           <div className="p-6 space-y-4">
@@ -473,7 +477,7 @@ export default function SpjMaster({
               <div key={docType} className="rounded-lg border border-border/50 overflow-hidden">
                 <div className="bg-muted/30 px-3 py-2 text-[10px] font-bold uppercase tracking-widest border-b border-border/50 flex justify-between">
                   <span>{docType}</span>
-                  <span className="text-muted-foreground">{arr.length} Signers</span>
+                  <span className="text-muted-foreground">{arr.length} Penandatangan</span>
                 </div>
                 <div className="divide-y divide-border/30">
                   {arr.map((s) => (

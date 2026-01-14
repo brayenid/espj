@@ -18,7 +18,6 @@ import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, Command
 
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import {
-  ChevronRight,
   ClipboardCheck,
   FileSignature,
   Hash,
@@ -28,8 +27,10 @@ import {
   Save,
   Search,
   UserPlus,
+  Users,
   X
 } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 const schema = z.object({
   noSpd: z.string().optional().nullable(),
@@ -191,7 +192,7 @@ export default function SpdForm({
     }
   }
 
-  const currentSignerId = form.watch('signerPegawaiId')
+  // const currentSignerId = form.watch('signerPegawaiId')
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20">
@@ -208,31 +209,45 @@ export default function SpdForm({
             </div>
           </div>
         </CardHeader>
-        <CardContent className="p-6">
+        <CardContent className="p-4 sm:p-6">
           {rosterSorted.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-6 border border-dashed rounded-xl border-border/60">
-              <p className="text-xs text-muted-foreground italic">Roster kosong. Lengkapi personel di menu utama.</p>
+            <div className="flex flex-col items-center justify-center py-8 border border-dashed rounded-2xl border-border/60 bg-muted/5">
+              <Users className="w-5 h-5 text-muted-foreground/40 mb-2" />
+              <p className="text-[11px] text-muted-foreground italic font-medium">
+                Roster kosong. Lengkapi personel di menu utama.
+              </p>
             </div>
           ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
+            /* Perbaikan: Gunakan min-w-0 pada grid agar truncate berfungsi */
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-2">
               {rosterSorted.map((r) => (
                 <div
                   key={r.id}
-                  className="flex items-center justify-between p-3 rounded-xl border border-border/40 bg-background/50 group hover:border-primary/20 transition-all">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold truncate leading-none">{r.nama}</span>
+                  className="flex items-center justify-between p-3.5 rounded-xl border border-border/40 bg-background/50 group hover:border-primary/30 hover:bg-white hover:shadow-sm transition-all min-w-0">
+                  {/* min-w-0 di sini krusial agar kontainer flex bisa mengecil */}
+                  <div className="flex-1 min-w-0 pr-2">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="text-sm font-bold truncate text-zinc-800 leading-tight">{r.nama}</span>
                       <Badge
                         variant={r.role === 'KEPALA_JALAN' ? 'default' : 'secondary'}
-                        className="h-4 px-1.5 text-[8px] font-bold uppercase tracking-tighter">
+                        className={cn(
+                          'h-4 px-1.5 text-[8px] font-black uppercase tracking-tighter shrink-0',
+                          r.role === 'KEPALA_JALAN' ? 'bg-zinc-900 text-white' : 'bg-zinc-100 text-zinc-600'
+                        )}>
                         {r.role === 'KEPALA_JALAN' ? 'Kepala' : 'Pengikut'}
                       </Badge>
                     </div>
-                    <div className="text-[10px] text-muted-foreground truncate mt-1.5 uppercase tracking-wide">
-                      {r.jabatan}
+
+                    {/* Jabatan dengan truncate yang aman */}
+                    <div className="text-[10px] text-muted-foreground truncate uppercase tracking-widest font-medium opacity-80">
+                      {r.jabatan || 'Tanpa Jabatan'}
                     </div>
                   </div>
-                  <ChevronRight className="w-3 h-3 text-muted-foreground/30 group-hover:text-primary/50 transition-colors" />
+
+                  {/* Icon tambahan sebagai visual cue (Linear Style) */}
+                  <div className="shrink-0 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="w-1.5 h-1.5 rounded-full bg-primary/40" />
+                  </div>
                 </div>
               ))}
             </div>
@@ -274,7 +289,7 @@ export default function SpdForm({
                         <Input
                           {...field}
                           value={field.value ?? ''}
-                          className="h-11 rounded-xl bg-muted/10 border-border/40 font-mono text-sm px-4"
+                          className="h-11 rounded-xl bg-muted/10 border-border/40 font-mono text-sm px-4 shadow-none"
                           placeholder="Contoh: 094/002/ORG-TU.P/I/2026"
                         />
                       </FormControl>
@@ -300,7 +315,7 @@ export default function SpdForm({
                       <FormControl>
                         <Input
                           {...field}
-                          className="h-11 rounded-xl bg-muted/10 border-border/40 text-sm px-4"
+                          className="h-11 rounded-xl bg-muted/10 border-border/40 text-sm px-4 shadow-none"
                           placeholder="Nama Kota..."
                         />
                       </FormControl>
@@ -336,14 +351,14 @@ export default function SpdForm({
                                       if (selected) setSelected(null)
                                     }}
                                     placeholder="Cari Pejabat..."
-                                    className="h-11 pl-10 rounded-xl bg-muted/10 border-border/40 text-sm"
+                                    className="h-11 pl-10 rounded-xl bg-muted/10 border-border/40 text-sm shadow-none"
                                   />
                                 </div>
                                 <Button
                                   type="button"
                                   variant="outline"
                                   size="icon"
-                                  className="h-11 w-11 rounded-xl border-border/40 shrink-0"
+                                  className="h-11 w-11 rounded-xl border-border/40 shrink-0 shadow-none"
                                   onClick={() => {
                                     setSelected(null)
                                     setQ('')
@@ -354,7 +369,7 @@ export default function SpdForm({
                               </div>
                             </PopoverTrigger>
 
-                            <PopoverContent className="w-[340px] p-0" align="start">
+                            <PopoverContent className="w-85 p-0" align="start">
                               <Command shouldFilter={false}>
                                 <CommandInput
                                   value={q}

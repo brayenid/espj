@@ -29,7 +29,6 @@ import {
   Search,
   Trash2,
   UserCircle,
-  Users,
   X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
@@ -144,7 +143,7 @@ function SignerCombobox({
           <div
             className={cn(
               'group flex flex-col items-start p-4 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-sm',
-              value && 'border-primary/20 bg-primary/[0.02]'
+              value && 'border-primary/20 bg-primary/2'
             )}>
             {value ? (
               <div className="w-full text-left">
@@ -162,7 +161,7 @@ function SignerCombobox({
           </div>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[340px] p-0" align="start">
+        <PopoverContent className="w-85 p-0" align="start">
           <Command shouldFilter={false}>
             <CommandInput value={q} onValueChange={setQ} placeholder="Nama/NIP Pejabat..." className="h-10" />
             <CommandList>
@@ -286,7 +285,7 @@ function ItemEditorSheet({
                 value={draft.uraian}
                 onChange={(e) => setDraft({ ...draft, uraian: e.target.value })}
                 placeholder="Contoh: Transportasi darat dari Sendawar ke Balikpapan (PP)..."
-                className="rounded-lg bg-muted/20 border-border/40 text-sm min-h-[100px] resize-none"
+                className="rounded-lg bg-muted/20 border-border/40 text-sm min-h-25 resize-none"
               />
             </div>
           </div>
@@ -513,7 +512,7 @@ export default function DopdForm({
   return (
     <div className="space-y-6 pb-20 animate-in fade-in duration-500">
       {/* 1. STICKY TOP BAR: Summary & Main Actions */}
-      <div className="sticky top-0 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/40 shadow-sm sm:mx-0 sm:px-0 sm:rounded-xl sm:border sm:px-6">
+      <div className="sticky top-0 z-30 -mx-4 py-3 bg-background/80 backdrop-blur-md border-b border-border/40 sm:mx-0 px-6 sm:rounded-xl sm:border">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-4">
             <div className="p-2.5 bg-primary/10 rounded-lg">
@@ -526,36 +525,39 @@ export default function DopdForm({
               <div className="text-xl font-mono font-bold tracking-tighter">Rp {rupiah(grandTotal)}</div>
             </div>
           </div>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-4">
             <Button
               variant="outline"
               size="sm"
-              className="rounded-lg h-9 font-bold text-[11px] border-border/60"
+              className="rounded-lg h-9 font-semibold text-sm shadow-none border-border/60"
               onClick={() => window.open(`/spj/${spjId}/dopd/print`, '_blank')}>
-              <Printer className="w-3.5 h-3.5 mr-2" /> PREVIEW PDF
+              <Printer className="w-3.5 h-3.5 mr-2" /> Preview PDF
             </Button>
             <Button
               size="sm"
-              className="rounded-lg h-9 px-6 font-bold text-[11px] shadow-sm"
+              className="rounded-lg h-9 px-6 font-semibold text-sm shadow-none"
               onClick={onSaveAll}
               disabled={saving}>
               {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Save className="w-3.5 h-3.5 mr-2" />}
-              SIMPAN DOPD
+              Simpan DOPD
             </Button>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-6 lg:grid-cols-12">
+      <div className="grid gap-6 lg:grid-cols-12 w-full items-start">
         {/* 2. SIDEBAR: Penandatangan */}
-        <div className="lg:col-span-4 space-y-6">
-          <Card className="rounded-xl border-border/40 shadow-none bg-card/50">
+        {/* Perbaikan: Gunakan min-w-0 agar grid child tidak melebihi alokasi kolomnya */}
+        <div className="lg:col-span-4 space-y-6 w-full min-w-0">
+          {/* Perbaikan: Hapus w-max, gunakan w-full agar Card patuh pada lebar grid sidebar */}
+          <Card className="rounded-xl border-border/40 shadow-none bg-card/50 w-full overflow-hidden">
             <CardHeader className="pb-4">
               <CardTitle className="text-sm font-bold flex items-center gap-2">
                 <FileText className="w-4 h-4 text-primary" /> Otorisasi Dokumen
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-6">
+              {/* SignerCombobox sudah dioptimasi di internalnya untuk wrapping teks */}
               <SignerCombobox label="Kuasa Pengguna Anggaran (KPA)" value={kpa} onChange={setKpa} />
               <Separator className="bg-border/40" />
               <SignerCombobox label="Bendahara Pengeluaran Pembantu" value={bpp} onChange={setBpp} />
@@ -564,14 +566,16 @@ export default function DopdForm({
         </div>
 
         {/* 3. MAIN AREA: Rincian Biaya per Roster */}
-        <div className="lg:col-span-8 space-y-6">
+        {/* Perbaikan: min-w-0 di sini krusial agar area rincian tidak mendorong sidebar keluar layar saat tabel discroll */}
+        <div className="lg:col-span-8 space-y-6 w-full min-w-0">
           <Card className="rounded-xl border-border/40 shadow-none overflow-hidden">
-            <div className="bg-muted/10 px-6 py-4 border-b border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex justify-center items-center gap-3 w-full sm:w-auto">
+            {/* Personnel Header: Responsive Padding & Navigation */}
+            <div className="bg-muted/10 px-4 sm:px-6 py-4 border-b border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div className="flex justify-center items-center gap-4 sm:gap-6 w-full sm:w-auto">
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-full bg-background border border-border/40 shadow-sm"
+                  className="h-8 w-8 rounded-full bg-background border border-border/40 shrink-0"
                   onClick={goPrev}
                   disabled={currentIndex === 0}>
                   <ChevronLeft className="w-4 h-4" />
@@ -585,15 +589,15 @@ export default function DopdForm({
                 <Button
                   variant="ghost"
                   size="icon"
-                  className="h-8 w-8 rounded-full bg-background border border-border/40 shadow-sm"
+                  className="h-8 w-8 rounded-full bg-background border border-border/40 shrink-0"
                   onClick={goNext}
                   disabled={currentIndex === rosterSorted.length - 1}>
                   <ChevronRight className="w-4 h-4" />
                 </Button>
               </div>
 
-              <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end">
-                <div className="text-right">
+              <div className="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-none pt-3 sm:pt-0">
+                <div className="text-left sm:text-right">
                   <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest leading-none mb-1">
                     Subtotal
                   </div>
@@ -603,7 +607,7 @@ export default function DopdForm({
                 </div>
                 <Button
                   size="sm"
-                  className="rounded-lg h-8 px-4 text-[10px] font-bold uppercase tracking-tighter"
+                  className="rounded-lg h-8 px-4 text-[10px] font-bold uppercase tracking-tighter shadow-sm"
                   onClick={() => {
                     const newItem = {
                       id: crypto.randomUUID(),
@@ -626,28 +630,28 @@ export default function DopdForm({
             </div>
 
             <CardContent className="p-0">
-              <div className="overflow-x-auto">
-                <Table>
+              {/* PERBAIKAN UTAMA: Scroll X Auto dengan pembatasan lebar tabel */}
+              <div className="w-full overflow-x-auto overflow-y-hidden bg-white scrollbar-thin scrollbar-thumb-zinc-200 scrollbar-track-transparent">
+                {/* min-w-[700px] menjaga desain linear tetap sejajar saat discroll di mobile */}
+                <Table className="min-w-187.5 w-full">
                   <TableHeader className="bg-muted/5">
                     <TableRow className="border-border/40 hover:bg-transparent">
-                      <TableHead className="w-[150px] text-[10px] font-bold uppercase">Kategori</TableHead>
+                      <TableHead className="w-35 text-[10px] font-bold uppercase pl-6">Kategori</TableHead>
                       <TableHead className="text-[10px] font-bold uppercase">Rincian Uraian</TableHead>
-                      <TableHead className="w-[120px] text-right text-[10px] font-bold uppercase">
-                        Harga Satuan
-                      </TableHead>
-                      <TableHead className="w-[140px] text-right text-[10px] font-bold uppercase">
+                      <TableHead className="w-32.5 text-right text-[10px] font-bold uppercase">Harga Satuan</TableHead>
+                      <TableHead className="w-37.5 text-right text-[10px] font-bold uppercase pr-4">
                         Total Akhir
                       </TableHead>
-                      <TableHead className="w-[60px]"></TableHead>
+                      <TableHead className="w-12.5"></TableHead>
                     </TableRow>
                   </TableHeader>
                   <TableBody>
                     {items.filter((it) => it.rosterItemId === activeRosterId).length === 0 ? (
                       <TableRow>
                         <TableCell colSpan={5} className="h-40 text-center py-12">
-                          <div className="flex flex-col items-center gap-2 text-muted-foreground">
-                            <CreditCard className="w-8 h-8 opacity-20" />
-                            <p className="text-xs italic">Belum ada rincian biaya untuk {activeRoster?.nama}</p>
+                          <div className="flex flex-col items-center gap-2 text-muted-foreground opacity-40">
+                            <CreditCard className="w-8 h-8" />
+                            <p className="text-xs italic">Belum ada rincian biaya.</p>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -659,43 +663,43 @@ export default function DopdForm({
                           return (
                             <TableRow
                               key={it.id}
-                              className="border-border/40 hover:bg-muted/10 transition-colors group cursor-pointer"
+                              className="border-border/40 hover:bg-slate-50 transition-colors group cursor-pointer"
                               onClick={() => {
                                 setEditingItemId(it.id)
                                 setEditorOpen(true)
                               }}>
-                              <TableCell className="align-top py-4">
+                              <TableCell className="align-top py-4 pl-6">
                                 <Badge
                                   variant="outline"
-                                  className="text-[9px] font-bold uppercase tracking-tighter bg-background border-border/60">
+                                  className="text-[9px] font-bold uppercase tracking-tighter bg-white whitespace-nowrap">
                                   {it.kategori || 'BIAYA'}
                                 </Badge>
                               </TableCell>
-                              <TableCell className="align-top py-4">
-                                <div className="text-sm font-medium leading-relaxed">
+                              <TableCell className="align-top py-4 min-w-70">
+                                <div className="text-sm font-medium leading-relaxed text-zinc-800">
                                   {it.uraian || 'Tanpa uraian...'}
                                 </div>
-                                <div className="flex items-center gap-1.5 mt-2 overflow-hidden">
+                                <div className="flex items-center gap-1.5 mt-2.5">
                                   {it.factors.map((f) => (
                                     <div
                                       key={f.id}
-                                      className="text-[9px] font-mono text-muted-foreground bg-muted/30 px-1.5 py-0.5 rounded border border-border/20">
+                                      className="text-[9px] font-mono text-muted-foreground bg-muted/50 px-1.5 py-0.5 rounded border border-border/20 whitespace-nowrap">
                                       {f.qty} {f.label}
                                     </div>
                                   ))}
                                 </div>
                               </TableCell>
-                              <TableCell className="text-right align-top py-4 font-mono text-xs text-muted-foreground whitespace-nowrap">
+                              <TableCell className="text-right align-top py-4 font-mono text-sm text-zinc-500 whitespace-nowrap">
                                 {rupiah(it.hargaSatuan)}
                               </TableCell>
-                              <TableCell className="text-right align-top py-4 font-mono text-sm font-bold tracking-tight whitespace-nowrap">
+                              <TableCell className="text-right align-top py-4 font-mono text-sm font-bold text-zinc-900 pr-4 whitespace-nowrap">
                                 {rupiah(subTotal)}
                               </TableCell>
-                              <TableCell className="text-right py-4 pr-6">
+                              <TableCell className="text-right py-4 pr-6 align-top">
                                 <Button
                                   variant="ghost"
                                   size="icon"
-                                  className="h-8 w-8 text-muted-foreground group-hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                                  className="h-8 w-8 text-zinc-300 hover:text-destructive group-hover:text-destructive transition-colors"
                                   onClick={(e) => {
                                     e.stopPropagation()
                                     setItems(items.filter((x) => x.id !== it.id))
@@ -712,16 +716,6 @@ export default function DopdForm({
               </div>
             </CardContent>
           </Card>
-
-          <div className="p-4 bg-primary/[0.03] border border-primary/10 rounded-xl">
-            <div className="flex items-center gap-3 text-primary">
-              <Users className="w-4 h-4" />
-              <p className="text-[11px] font-medium leading-relaxed">
-                Navigasi <strong>Prev / Next</strong> untuk menginput biaya personil lain secara berurutan. Semua data
-                disimpan sementara di browser sebelum Anda menekan tombol <strong>Simpan DOPD</strong>.
-              </p>
-            </div>
-          </div>
         </div>
       </div>
 

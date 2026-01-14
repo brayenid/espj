@@ -23,7 +23,7 @@ export default async function SpjLayout({
   if (!spj) notFound()
 
   return (
-    <div className="mx-auto w-full max-w-7xl space-y-6 p-4">
+    <div className="mx-auto w-full max-w-7xl space-y-6 p-2">
       <div className="space-y-3">
         <div className="flex flex-row gap-4 flex-wrap items-start justify-between">
           <p className="text-sm uppercase tracking-wider font-semibold">
