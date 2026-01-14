@@ -32,7 +32,6 @@ import {
   ChevronRight,
   LayoutDashboard,
   Clock,
-  MapPin,
   Landmark,
   Link2,
   Trash2,
@@ -80,6 +79,7 @@ type SpjLite = {
   tempatBerangkat: string
   tempatTujuan: string
   maksudDinas: string
+  pencairan: boolean
   alatAngkut: string
   tahunAnggaran: string | null
   kodeKegiatan: string | null

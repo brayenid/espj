@@ -12,11 +12,12 @@ import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
 import { Loader2, Save, Link2, Landmark, ClipboardList, CalendarDays } from 'lucide-react'
+import { Checkbox } from '@/components/ui/checkbox'
 
 // QA: Validasi Cross-Field untuk rentang tanggal
 const schema = z
@@ -38,6 +39,7 @@ const schema = z
     maksudDinas: z.string().trim().nullable(),
     tingkatPerjalanan: z.optional(z.string().trim().nullable()),
     tempatTujuan: z.string(),
+    pencairan: z.boolean(),
     // Field Baru
     tglBerangkat: z.date({ error: 'Tanggal berangkat wajib diisi' }),
     tglKembali: z.date({ error: 'Tanggal kembali wajib diisi' })
@@ -73,6 +75,7 @@ export default function SpjMetaForm({
     maksudDinas: string
     tingkatPerjalanan: string | null
     tempatTujuan: string
+    pencairan: boolean
     // Tambahan initial data
     tglBerangkat: Date | string
     tglKembali: Date | string
@@ -98,6 +101,7 @@ export default function SpjMetaForm({
       maksudDinas: initial.maksudDinas ?? null,
       tingkatPerjalanan: initial.tingkatPerjalanan ?? null,
       tempatTujuan: initial.tempatTujuan ?? null,
+      pencairan: initial.pencairan ?? false,
       // Init dates
       tglBerangkat: new Date(initial.tglBerangkat),
       tglKembali: new Date(initial.tglKembali)
@@ -552,6 +556,31 @@ export default function SpjMetaForm({
                     placeholder="Melakukan Konsultasi dan Koordinasi..."
                   />
                 </FormControl>
+                <FormMessage className="text-[11px]" />
+              </FormItem>
+            )}
+          />
+
+          <FormField
+            control={form.control}
+            name="pencairan"
+            render={({ field }) => (
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border border-border/50 bg-background/50 p-4 shadow-sm transition-colors hover:bg-muted/20">
+                <FormControl>
+                  <Checkbox
+                    checked={field.value}
+                    onCheckedChange={field.onChange}
+                    className="h-5 w-5 rounded-md border-border/50 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                  />
+                </FormControl>
+                <div className="space-y-1 leading-none">
+                  <FormLabel className="text-[13px] font-bold uppercase tracking-wider text-foreground cursor-pointer">
+                    Status Pencairan
+                  </FormLabel>
+                  <FormDescription className="text-[11px] text-muted-foreground">
+                    Centang jika dana SPJ ini sudah dicairkan oleh bendahara.
+                  </FormDescription>
+                </div>
                 <FormMessage className="text-[11px]" />
               </FormItem>
             )}

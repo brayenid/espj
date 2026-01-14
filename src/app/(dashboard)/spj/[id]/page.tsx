@@ -58,6 +58,7 @@ export default async function SpjMasterPage(props: PageProps) {
           tempatBerangkat: spj.tempatBerangkat,
           tempatTujuan: spj.tempatTujuan,
           maksudDinas: spj.maksudDinas,
+          pencairan: spj.pencairan,
           alatAngkut: spj.alatAngkut,
           tahunAnggaran: spj.tahunAnggaran ?? null,
           kodeKegiatan: spj.kodeKegiatan ?? null,

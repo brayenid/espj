@@ -20,6 +20,7 @@ const schema = z
     akunAnggaran: z.string().trim().nullable().optional(),
     buktiDukungUrl: z.string().trim().nullable().optional(),
     maksudDinas: z.string().trim().nullable().optional(),
+    pencairan: z.boolean(),
     tingkatPerjalanan: z.string().trim().nullable().optional(),
     tempatTujuan: z.string(),
     // Tambahkan field tanggal dengan pre-processing ke objek Date
@@ -77,6 +78,7 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
         akunAnggaran: data.akunAnggaran,
         buktiDukungUrl: data.buktiDukungUrl,
         maksudDinas: data.maksudDinas ?? undefined,
+        pencairan: data.pencairan,
         tingkatPerjalanan: data.tingkatPerjalanan,
         tempatTujuan: data.tempatTujuan,
         // Simpan tanggal dan hasil hitung durasi
