@@ -35,7 +35,6 @@ export default async function SpjLayout({
           </Link>
         </div>
 
-        {/* ✅ modern nav */}
         <SpjNav spjId={spj.id} />
       </div>
 

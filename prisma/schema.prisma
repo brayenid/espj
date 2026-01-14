@@ -113,6 +113,8 @@ model Spj {
   // Data DOPD
   tingkatPerjalanan String?
 
+  pencairan Boolean @default(false)
+
   // Relasi pusat
   roster  SpjRosterItem[]
   rincian RincianBiayaItem[]

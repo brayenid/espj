@@ -10,6 +10,7 @@ import SpjSearchBar from '@/components/spj/spj-search-bar'
 import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus } from 'lucide-react'
 import SpjDuplicateButton from '@/components/spj/spj-duplicate-button'
 import { fmtDateId } from '@/lib/utils'
+import SpjExportModal from '@/components/spj/spj-export-modal'
 
 function fmtDateTime(d: Date) {
   return new Date(d).toLocaleDateString('id-ID', {
@@ -83,11 +84,12 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
         <div className="space-y-1">
           <h1 className="text-xl font-medium tracking-tight text-foreground flex items-center gap-2">
             <FileText className="w-5 h-5 text-muted-foreground" />
-            Surat Perjalanan Dinas
+            SPJ Perjalanan Dinas
           </h1>
-          <p className="text-sm text-muted-foreground/80">Manajemen dan monitoring pembuatan dokumen SPJ Anda.</p>
+          <p className="text-sm text-muted-foreground/80">Arsip dan pembuatan dokumen SPJ Perjadin.</p>
         </div>
         <div className="flex items-center gap-2">
+          <SpjExportModal />
           <Button asChild size="sm" className="h-9 bg-foreground text-background hover:bg-foreground/90 shadow-sm">
             <Link href="/spj/new">
               <Plus className="mr-2 h-4 w-4" />
