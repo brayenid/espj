@@ -1,7 +1,7 @@
 import { notFound } from 'next/navigation'
 import { prisma } from '@/lib/prisma'
 import SpjMaster from '@/components/spj/spj-master'
-import { ChevronRight, Home, Banknote, CheckCircle2, AlertCircle, Info } from 'lucide-react'
+import { ChevronRight, Home, CheckCircle2, AlertCircle, Info } from 'lucide-react'
 import Link from 'next/link'
 
 type PageProps = {
