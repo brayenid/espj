@@ -17,21 +17,7 @@ import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, For
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import {
-  Briefcase,
-  Crown,
-  FileEdit,
-  FileText,
-  Hash,
-  Loader2,
-  Printer,
-  Save,
-  Search,
-  UserCheck,
-  Users,
-  X
-} from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { Briefcase, Crown, FileEdit, Hash, Loader2, Printer, Save, Search, UserCheck, Users, X } from 'lucide-react'
 
 const schema = z.object({
   nomor: z.string().optional().nullable(),
@@ -70,7 +56,6 @@ type Spj = {
 }
 
 type Initial = {
-  nomor: string | null
   untuk: string
   signerPegawaiId: string | null
 } | null
@@ -120,7 +105,7 @@ export default function SuratTugasForm({
 
   const defaultValues = useMemo<FormValues>(
     () => ({
-      nomor: initial?.nomor ?? spj.noSuratTugas ?? '',
+      nomor: spj.noSuratTugas ?? '',
       untuk: initial?.untuk ?? spj.maksudDinas ?? '',
       signerPegawaiId: initial?.signerPegawaiId ?? '__none__'
     }),
@@ -197,8 +182,6 @@ export default function SuratTugasForm({
       setSaving(false)
     }
   }
-
-  const signerValue = form.watch('signerPegawaiId')
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20">
@@ -449,7 +432,7 @@ export default function SuratTugasForm({
                   <Button
                     type="submit"
                     disabled={saving || rosterSorted.length === 0}
-                    className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all">
+                    className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all w-full">
                     {saving ? (
                       <>
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menyimpan...

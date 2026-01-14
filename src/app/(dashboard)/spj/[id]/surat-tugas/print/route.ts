@@ -17,7 +17,6 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
 
   // jika belum ada, bikin “virtual” dari spj biar tetap bisa preview
   const st = result.suratTugas ?? {
-    nomor: result.spj.noSuratTugas ?? null,
     untuk: result.spj.maksudDinas,
     assignedRosterItemId: result.roster.find((r) => r.role === 'KEPALA_JALAN')?.id ?? result.roster[0]?.id ?? null,
     signerNama: '-',
@@ -41,7 +40,8 @@ export async function GET(req: Request, ctx: { params: Promise<{ id: string }> }
       akunAnggaran: result.spj.akunAnggaran ?? null,
       tglBerangkat: result.spj.tglBerangkat,
       tglKembali: result.spj.tglKembali,
-      tglSuratTugas: result.spj.tglSuratTugas
+      tglSuratTugas: result.spj.tglSuratTugas,
+      noSuratTugas: result.spj.noSuratTugas
     },
     suratTugas: st,
     roster: rosterSorted

@@ -20,7 +20,6 @@ export async function getSuratTugasForCurrentUser(spjId: string) {
       where: { spjId },
       select: {
         id: true,
-        nomor: true,
         untuk: true,
         assignedRosterItemId: true,
         signerPegawaiId: true,
@@ -124,40 +123,55 @@ export async function upsertSuratTugasForCurrentUser(spjId: string, input: unkno
     }
   }
 
-  // Default “untuk” kalau dokumen belum ada: ambil dari maksudDinas (lebih masuk akal daripada perihal)
+  // Default “untuk” kalau dokumen belum ada
   const defaultUntuk = access.spj.maksudDinas
 
-  const saved = await prisma.spjSuratTugas.upsert({
-    where: { spjId },
-    create: {
-      spjId,
-      nomor: data.nomor ?? null,
-      untuk: data.untuk || defaultUntuk,
-      assignedRosterItemId: data.assignedRosterItemId ?? null,
+  try {
+    // Membungkus dalam Interactive Transaction
+    const result = await prisma.$transaction(async (tx) => {
+      // 1. Upsert data Surat Tugas
+      const saved = await tx.spjSuratTugas.upsert({
+        where: { spjId },
+        create: {
+          spjId,
+          untuk: data.untuk || defaultUntuk,
+          assignedRosterItemId: data.assignedRosterItemId ?? null,
 
-      signerPegawaiId: signerSnapshot?.signerPegawaiId ?? null,
-      signerNama: signerSnapshot?.signerNama ?? '-',
-      signerNip: signerSnapshot?.signerNip ?? null,
-      signerJabatan: signerSnapshot?.signerJabatan ?? '-',
-      signerPangkatGolongan: signerSnapshot?.signerPangkatGolongan ?? null
-    },
-    update: {
-      nomor: data.nomor ?? null,
-      untuk: data.untuk,
-      assignedRosterItemId: data.assignedRosterItemId ?? null,
+          signerPegawaiId: signerSnapshot?.signerPegawaiId ?? null,
+          signerNama: signerSnapshot?.signerNama ?? '-',
+          signerNip: signerSnapshot?.signerNip ?? null,
+          signerJabatan: signerSnapshot?.signerJabatan ?? '-',
+          signerPangkatGolongan: signerSnapshot?.signerPangkatGolongan ?? null
+        },
+        update: {
+          untuk: data.untuk,
+          assignedRosterItemId: data.assignedRosterItemId ?? null,
 
-      ...(signerSnapshot
-        ? {
-            signerPegawaiId: signerSnapshot.signerPegawaiId,
-            signerNama: signerSnapshot.signerNama,
-            signerNip: signerSnapshot.signerNip,
-            signerJabatan: signerSnapshot.signerJabatan,
-            signerPangkatGolongan: signerSnapshot.signerPangkatGolongan
-          }
-        : {})
-    },
-    select: { id: true }
-  })
+          ...(signerSnapshot
+            ? {
+                signerPegawaiId: signerSnapshot.signerPegawaiId,
+                signerNama: signerSnapshot.signerNama,
+                signerNip: signerSnapshot.signerNip,
+                signerJabatan: signerSnapshot.signerJabatan,
+                signerPangkatGolongan: signerSnapshot.signerPangkatGolongan
+              }
+            : {})
+        },
+        select: { id: true }
+      })
 
-  return { status: 'OK' as const, id: saved.id }
+      // 2. Denormalisasi nomor surat ke tabel utama SPJ
+      await tx.spj.update({
+        where: { id: spjId },
+        data: { noSuratTugas: data.nomor }
+      })
+
+      return saved
+    })
+
+    return { status: 'OK' as const, id: result.id }
+  } catch (error) {
+    console.error('TRANSACTION_ERROR [upsertSuratTugas]:', error)
+    return { status: 'ERROR' as const, message: 'Gagal memproses transaksi database.' }
+  }
 }

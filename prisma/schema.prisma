@@ -275,8 +275,7 @@ model SpjSuratTugas {
   spjId String @unique
   spj   Spj    @relation(fields: [spjId], references: [id], onDelete: Cascade)
 
-  nomor String? // nomor surat tugas (kalau kosong, bisa ambil dari spj.noSuratTugas)
-  untuk String  @db.Text
+  untuk String @db.Text
 
   // siapa yang ditugaskan (ambil dari roster)
   assignedRosterItemId String?

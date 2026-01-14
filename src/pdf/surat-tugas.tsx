@@ -23,10 +23,10 @@ type Spj = {
   tglBerangkat: Date
   tglKembali: Date
   tglSuratTugas: Date
+  noSuratTugas: string | null
 }
 
 type SuratTugas = {
-  nomor: string | null
   untuk: string
   assignedRosterItemId: string | null
 
@@ -127,7 +127,7 @@ export function buildSuratTugasDocument(props: SuratTugasPdfProps): React.ReactE
         <View style={styles.blockCenter}>
           <Text style={styles.title}>SURAT TUGAS</Text>
           <Text style={styles.nomor}>
-            NOMOR : {suratTugas.nomor || '.......................................................'}
+            NOMOR : {spj.noSuratTugas || '.......................................................'}
           </Text>
         </View>
 

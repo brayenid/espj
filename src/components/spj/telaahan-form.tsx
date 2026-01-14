@@ -41,7 +41,6 @@ import {
   Calendar as CalendarIcon
 } from 'lucide-react'
 
-// QA: Ubah tglTelaahan menjadi Date object agar kompatibel dengan Calendar Shadcn
 const schema = z.object({
   kepada: z.string().optional().nullable(),
   sifat: z.string().optional().nullable(),
@@ -109,13 +108,13 @@ function PresetPicker({
 }) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent className="max-w-2xl max-h-[85vh] overflow-hidden rounded-lg border-border/50 p-0 shadow-2xl">
+      <DialogContent className="max-w-2xl max-h-[90vh] sm:max-h-[85vh] overflow-hidden rounded-t-xl sm:rounded-lg border-border/50 p-0 shadow-2xl">
         <DialogHeader className="px-6 py-4 border-b border-border/40 bg-muted/20">
           <DialogTitle className="text-sm font-semibold tracking-tight">{title}</DialogTitle>
           {description ? <DialogDescription className="text-[12px] mt-1">{description}</DialogDescription> : null}
         </DialogHeader>
 
-        <ScrollArea className="max-h-[60vh]">
+        <ScrollArea className="max-h-[70vh] sm:max-h-[60vh]">
           <div className="grid gap-2 p-4">
             {items.length === 0 ? (
               <div className="p-8 text-center text-xs text-muted-foreground border border-dashed rounded-md">
@@ -126,20 +125,20 @@ function PresetPicker({
                 <button
                   key={p.id}
                   type="button"
-                  className="group w-full rounded-md border border-border/40 bg-background p-4 text-left transition-all hover:bg-muted/30 hover:border-border focus:ring-1 focus:ring-ring"
+                  className="group w-full rounded-md border border-border/40 bg-background p-4 text-left transition-all hover:bg-muted/30 hover:border-border focus:ring-1 focus:ring-ring active:scale-[0.98]"
                   onClick={() => onPick(p.text)}>
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">
                         {p.title}
                       </div>
-                      <div className="mt-1 text-[12px] text-muted-foreground leading-relaxed line-clamp-2">
+                      <div className="mt-1 text-[12px] text-muted-foreground leading-relaxed line-clamp-3 sm:line-clamp-2">
                         {normalizePreview(p.text, 180)}
                       </div>
                     </div>
                     <Badge
                       variant="outline"
-                      className="h-6 text-[9px] uppercase tracking-tighter opacity-50 group-hover:opacity-100 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
+                      className="h-6 text-[9px] uppercase tracking-tighter opacity-100 sm:opacity-50 sm:group-hover:opacity-100 group-hover:bg-primary group-hover:text-primary-foreground transition-all">
                       Pilih
                     </Badge>
                   </div>
@@ -180,7 +179,6 @@ export default function TelaahanForm({
       analisis: initial?.analisis ?? '',
       kesimpulan: initial?.kesimpulan ?? '',
       saran: initial?.saran ?? '',
-      // Konversi string dari DB ke Objek Date untuk DatePicker
       tglTelaahan: initial?.tglTelaahan ? new Date(initial.tglTelaahan) : new Date()
     }
   }, [initial, initialSpj])
@@ -209,7 +207,6 @@ export default function TelaahanForm({
     try {
       const payload = {
         ...values,
-        // QA: Kirim tanggal dalam format ISO agar API tetap menerima string
         tglTelaahan: values.tglTelaahan?.toISOString(),
         praAnggapan: values.praAnggapan.map((x) => x.value.trim()).filter(Boolean),
         fakta: values.fakta.map((x) => x.value.trim()).filter(Boolean)
@@ -237,9 +234,9 @@ export default function TelaahanForm({
   }
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-500">
+    <div className="space-y-4 sm:space-y-8 animate-in fade-in duration-500">
       <Card className="rounded-lg border-border/50 bg-card/40 shadow-none overflow-hidden">
-        <CardHeader className="border-b border-border/40 bg-muted/10 px-6 py-5">
+        <CardHeader className="border-b border-border/40 bg-muted/10 px-4 py-4 sm:px-6 sm:py-5">
           <div className="flex items-center gap-3">
             <div className="p-2 bg-background rounded-md border border-border/50 shadow-xs">
               <FileText className="w-4 h-4 text-muted-foreground" />
@@ -253,11 +250,10 @@ export default function TelaahanForm({
           </div>
         </CardHeader>
 
-        <CardContent className="p-8">
+        <CardContent className="p-4 sm:p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-12">
-              <div className="grid gap-6 md:grid-cols-4 bg-muted/10 p-5 rounded-lg border border-border/30">
-                {/* DATE PICKER SHADCN */}
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 sm:space-y-12">
+              <div className="grid gap-4 sm:gap-6 grid-cols-1 md:grid-cols-4 bg-muted/10 p-4 sm:p-5 rounded-lg border border-border/30">
                 <FormField
                   control={form.control}
                   name="tglTelaahan"
@@ -358,7 +354,7 @@ export default function TelaahanForm({
                       <Textarea
                         {...field}
                         value={field.value ?? ''}
-                        rows={2}
+                        rows={3}
                         className="rounded-md border-border/50 bg-background shadow-xs text-[13px] font-medium resize-none focus-visible:ring-1"
                       />
                     </FormControl>
@@ -369,13 +365,14 @@ export default function TelaahanForm({
 
               <Separator className="bg-border/40" />
 
+              {/* I. DASAR */}
               <div className="space-y-4">
                 <FormField
                   control={form.control}
                   name="dasar"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
                           <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">
@@ -386,7 +383,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
+                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
                           onClick={() => setPresetOpen('dasar')}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -406,20 +403,21 @@ export default function TelaahanForm({
                 />
               </div>
 
+              {/* II. PRA-ANGGAPAN */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <ListChecks className="w-3.5 h-3.5 text-muted-foreground" />
                     <div className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">
                       II. PRA-ANGGAPAN
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
+                      className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
                       onClick={() => setPresetOpen('praAnggapan' as any)}>
                       <Zap className="w-3 h-3 mr-1.5" /> Preset
                     </Button>
@@ -427,7 +425,7 @@ export default function TelaahanForm({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-7 rounded-md text-[10px] border-border/60 shadow-xs px-3"
+                      className="h-8 sm:h-7 rounded-md text-[10px] border-border/60 shadow-xs px-3 w-full sm:w-auto"
                       onClick={() => pra.append({ value: '' })}>
                       <Plus className="w-3 h-3 mr-1.5" /> Tambah Poin
                     </Button>
@@ -451,7 +449,7 @@ export default function TelaahanForm({
                               <div className="h-9 w-9 shrink-0 flex items-center justify-center text-[10px] font-mono border border-border/40 rounded-md bg-muted/20 text-muted-foreground">
                                 {idx + 1}
                               </div>
-                              <FormControl>
+                              <FormControl className="flex-1">
                                 <Textarea
                                   {...field}
                                   className="min-h-15 rounded-md border-border/50 bg-background shadow-xs text-[13px] py-2 resize-y"
@@ -461,7 +459,7 @@ export default function TelaahanForm({
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                                className="h-9 w-9 shrink-0 text-muted-foreground hover:text-destructive opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all border sm:border-none"
                                 onClick={() => pra.remove(idx)}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
@@ -475,20 +473,21 @@ export default function TelaahanForm({
                 </div>
               </div>
 
+              {/* III. FAKTA */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div className="flex items-center gap-2">
                     <ListChecks className="w-3.5 h-3.5 text-muted-foreground" />
                     <div className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">
                       III. FAKTA YANG MEMENGARUHI
                     </div>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto">
                     <Button
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
+                      className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
                       onClick={() => setPresetOpen('fakta' as any)}>
                       <Zap className="w-3 h-3 mr-1.5" /> Preset
                     </Button>
@@ -496,7 +495,7 @@ export default function TelaahanForm({
                       type="button"
                       size="sm"
                       variant="outline"
-                      className="h-7 rounded-md text-[10px] border-border/60 shadow-xs px-3"
+                      className="h-8 sm:h-7 rounded-md text-[10px] border-border/60 shadow-xs px-3 w-full sm:w-auto"
                       onClick={() => fak.append({ value: '' })}>
                       <Plus className="w-3 h-3 mr-1.5" /> Tambah Poin
                     </Button>
@@ -520,7 +519,7 @@ export default function TelaahanForm({
                               <div className="h-9 w-9 shrink-0 flex items-center justify-center text-[10px] font-mono border border-border/40 rounded-md bg-muted/20 text-muted-foreground">
                                 {idx + 1}
                               </div>
-                              <FormControl>
+                              <FormControl className="flex-1">
                                 <Textarea
                                   {...field}
                                   className="min-h-15 rounded-md border-border/50 bg-background shadow-xs text-[13px] py-2 resize-y"
@@ -530,7 +529,7 @@ export default function TelaahanForm({
                                 type="button"
                                 variant="ghost"
                                 size="icon"
-                                className="h-9 w-9 flex-shrink-0 text-muted-foreground hover:text-destructive opacity-0 group-hover:opacity-100 transition-all"
+                                className="h-9 w-9 flex-shrink-0 text-muted-foreground hover:text-destructive opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-all border sm:border-none"
                                 onClick={() => fak.remove(idx)}>
                                 <Trash2 className="w-3.5 h-3.5" />
                               </Button>
@@ -546,13 +545,14 @@ export default function TelaahanForm({
 
               <Separator className="bg-border/40" />
 
-              <div className="grid gap-8 md:grid-cols-2 items-start">
+              {/* IV & V: ANALISIS & KESIMPULAN */}
+              <div className="grid gap-8 grid-cols-1 md:grid-cols-2 items-start">
                 <FormField
                   control={form.control}
                   name="analisis"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <MessageSquareText className="w-3.5 h-3.5 text-muted-foreground" />
                           <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">
@@ -563,7 +563,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
+                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
                           onClick={() => setPresetOpen('analisis' as any)}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -587,7 +587,7 @@ export default function TelaahanForm({
                   name="kesimpulan"
                   render={({ field }) => (
                     <FormItem className="space-y-3">
-                      <div className="flex items-center justify-between">
+                      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                         <div className="flex items-center gap-2">
                           <MessageSquareText className="w-3.5 h-3.5 text-muted-foreground" />
                           <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">
@@ -598,7 +598,7 @@ export default function TelaahanForm({
                           type="button"
                           size="sm"
                           variant="outline"
-                          className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
+                          className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
                           onClick={() => setPresetOpen('kesimpulan' as any)}>
                           <Zap className="w-3 h-3 mr-1.5" /> Preset
                         </Button>
@@ -618,12 +618,13 @@ export default function TelaahanForm({
                 />
               </div>
 
+              {/* VI. SARAN */}
               <FormField
                 control={form.control}
                 name="saran"
                 render={({ field }) => (
                   <FormItem className="space-y-3">
-                    <div className="flex items-center justify-between">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                       <div className="flex items-center gap-2">
                         <MessageSquareText className="w-3.5 h-3.5 text-muted-foreground" />
                         <FormLabel className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">
@@ -634,7 +635,7 @@ export default function TelaahanForm({
                         type="button"
                         size="sm"
                         variant="outline"
-                        className="h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3"
+                        className="h-8 sm:h-7 rounded-md text-[10px] font-bold border-primary/20 hover:border-sky-500 text-primary bg-white px-3 w-full sm:w-auto"
                         onClick={() => setPresetOpen('saran' as any)}>
                         <Zap className="w-3 h-3 mr-1.5" /> Preset
                       </Button>
@@ -656,7 +657,7 @@ export default function TelaahanForm({
                 )}
               />
 
-              <div className="bg-muted/10 border border-border/30 rounded-lg p-6">
+              <div className="bg-muted/10 border border-border/30 rounded-lg p-4 sm:p-6">
                 <div className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest mb-4 flex items-center gap-2">
                   <Users className="w-3.5 h-3.5" /> Personel Terkait Dokumen
                 </div>
@@ -668,7 +669,7 @@ export default function TelaahanForm({
                       <Badge
                         key={r.id}
                         variant="secondary"
-                        className="bg-background tracking-wider border-border/50 text-sm font-medium py-1 px-3">
+                        className="bg-background tracking-wider border-border/50 text-xs sm:text-sm font-medium py-1 px-3">
                         {r.nama}{' '}
                         {r.role === 'KEPALA_JALAN' && <Crown className="w-3 h-3 ml-2 text-primary fill-primary/10" />}
                       </Badge>
@@ -677,12 +678,13 @@ export default function TelaahanForm({
                 )}
               </div>
 
-              <div className="flex items-center justify-end gap-4 pt-8 border-t border-border/40">
+              {/* ACTION BUTTONS */}
+              <div className="flex flex-col sm:flex-row items-center justify-end gap-3 sm:gap-4 pt-8 border-t border-border/40">
                 <Button
                   variant="outline"
                   size="sm"
                   type="button"
-                  className="h-10 font-medium text-muted-foreground hover:text-foreground"
+                  className="h-10 font-medium text-muted-foreground hover:text-foreground w-full sm:w-auto "
                   onClick={() => window.open(`/spj/${spjId}/telaahan/print`, '_blank')}>
                   <Printer className="w-3.5 h-3.5 mr-2" /> Preview PDF
                 </Button>
@@ -690,7 +692,7 @@ export default function TelaahanForm({
                 <Button
                   type="submit"
                   disabled={saving}
-                  className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all">
+                  className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all w-full sm:w-auto">
                   {saving ? (
                     <>
                       <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menyimpan...
@@ -707,56 +709,22 @@ export default function TelaahanForm({
         </CardContent>
       </Card>
 
-      <PresetPicker
-        open={presetOpen === 'dasar'}
-        onOpenChange={(v) => setPresetOpen(v ? 'dasar' : null)}
-        title="Preset Dasar"
-        description="Pilih template rujukan regulasi/dasar untuk telaahan Anda."
-        items={[...PRESETS.dasar]}
-        onPick={(text) => applyPreset('dasar', text)}
-      />
-
-      <PresetPicker
-        open={presetOpen === 'analisis'}
-        onOpenChange={(v) => setPresetOpen(v ? 'analisis' : null)}
-        title="Preset Analisis Staf"
-        items={[...PRESETS.analisis]}
-        onPick={(text) => applyPreset('analisis', text)}
-      />
-
-      <PresetPicker
-        open={presetOpen === 'kesimpulan'}
-        onOpenChange={(v) => setPresetOpen(v ? 'kesimpulan' : null)}
-        title="Preset Kesimpulan Akhir"
-        items={[...PRESETS.kesimpulan]}
-        onPick={(text) => applyPreset('kesimpulan', text)}
-      />
-
-      <PresetPicker
-        open={presetOpen === 'saran'}
-        onOpenChange={(v) => setPresetOpen(v ? 'saran' : null)}
-        title="Preset Saran & Tindakan"
-        items={[...PRESETS.saran]}
-        onPick={(text) => applyPreset('saran', text)}
-      />
-
-      <PresetPicker
-        open={presetOpen === ('praAnggapan' as any)}
-        onOpenChange={(v) => setPresetOpen(v ? ('praAnggapan' as any) : null)}
-        title="Preset Pra-anggapan"
-        description="Pilih poin untuk ditambahkan ke daftar Pra-anggapan."
-        items={PRESETS['praAnggapan' as keyof typeof PRESETS] || []}
-        onPick={(text) => appendPresetToArray(pra, text)}
-      />
-
-      <PresetPicker
-        open={presetOpen === ('fakta' as any)}
-        onOpenChange={(v) => setPresetOpen(v ? ('fakta' as any) : null)}
-        title="Preset Fakta"
-        description="Pilih poin untuk ditambahkan ke daftar Fakta."
-        items={PRESETS['fakta' as keyof typeof PRESETS] || []}
-        onPick={(text) => appendPresetToArray(fak, text)}
-      />
+      {/* RENDER SEMUA MODAL PRESET PICKER */}
+      {(['dasar', 'analisis', 'kesimpulan', 'saran', 'praAnggapan', 'fakta'] as const).map((key) => (
+        <PresetPicker
+          key={key}
+          open={presetOpen === key}
+          onOpenChange={(v) => setPresetOpen(v ? key : null)}
+          title={`Preset ${key.charAt(0).toUpperCase() + key.slice(1)}`}
+          description={key === 'dasar' ? 'Pilih template rujukan regulasi/dasar untuk telaahan Anda.' : undefined}
+          items={[...(PRESETS[key as PresetKey] || [])]}
+          onPick={(text) =>
+            key === 'praAnggapan' || key === 'fakta'
+              ? appendPresetToArray(key === 'praAnggapan' ? pra : fak, text)
+              : applyPreset(key, text)
+          }
+        />
+      ))}
     </div>
   )
 }

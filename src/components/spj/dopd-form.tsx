@@ -567,7 +567,7 @@ export default function DopdForm({
         <div className="lg:col-span-8 space-y-6">
           <Card className="rounded-xl border-border/40 shadow-none overflow-hidden">
             <div className="bg-muted/10 px-6 py-4 border-b border-border/40 flex flex-col sm:flex-row items-center justify-between gap-4">
-              <div className="flex items-center gap-3 w-full sm:w-auto">
+              <div className="flex justify-center items-center gap-3 w-full sm:w-auto">
                 <Button
                   variant="ghost"
                   size="icon"
@@ -576,11 +576,11 @@ export default function DopdForm({
                   disabled={currentIndex === 0}>
                   <ChevronLeft className="w-4 h-4" />
                 </Button>
-                <div className="text-center sm:text-left min-w-[140px]">
+                <div className="text-center sm:text-left min-w-35 px-4 py-2">
                   <div className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest leading-none mb-1">
                     Personel Ke-{currentIndex + 1}
                   </div>
-                  <div className="text-sm font-bold truncate max-w-[200px]">{activeRoster?.nama}</div>
+                  <div className="text-sm font-bold truncate max-w-50">{activeRoster?.nama}</div>
                 </div>
                 <Button
                   variant="ghost"

@@ -240,7 +240,7 @@ export default function SpjMaster({
         {/* LEFT COLUMN */}
         <div className="lg:col-span-8 space-y-6">
           <Card className="rounded-xl border-border/40 bg-card/40 shadow-none overflow-hidden">
-            <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 bg-muted/10 px-6 py-4">
+            <CardHeader className="flex flex-col sm:flex-row sm:items-center gap-4 justify-between border-b border-border/40 bg-muted/10 px-6 py-4">
               <div className="flex items-center gap-2">
                 <Info className="w-4 h-4 text-muted-foreground" />
                 <CardTitle className="text-sm font-medium">Data Perjalanan & Anggaran</CardTitle>

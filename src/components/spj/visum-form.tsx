@@ -90,7 +90,7 @@ export default function VisumForm({ spjId, initialStageCount }: { spjId: string;
                         ref={field.ref}
                         onBlur={field.onBlur}
                         inputMode="numeric"
-                        className="rounded-2xl w-40"
+                        className="rounded-2xl w-full sm:w-40"
                         placeholder="Contoh: 3"
                         value={field.value == null ? '' : String(field.value)}
                         onChange={(e) => field.onChange(e.target.value)} // ✅ biar coerce jalan
@@ -107,8 +107,8 @@ export default function VisumForm({ spjId, initialStageCount }: { spjId: string;
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end border-t border-border/40 pt-6">
                 <Button
                   type="button"
-                  variant="ghost"
-                  className="h-10 font-medium text-muted-foreground hover:text-foreground"
+                  variant="outline"
+                  className="h-10 font-medium text-muted-foreground hover:text-foreground w-full sm:w-auto"
                   onClick={() => window.open(`/spj/${spjId}/visum/print`, '_blank')}>
                   <Printer className="w-4 h-4 mr-2" /> Preview PDF
                 </Button>

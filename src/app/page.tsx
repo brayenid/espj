@@ -39,12 +39,12 @@ export default async function HomePage() {
         {/* Simple Top Nav */}
         <header className="flex items-center justify-between border-b border-border/40 pb-6">
           <div className="flex items-center gap-3">
-            <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-foreground shadow-sm">
+            <div className="h-10 w-10 items-center justify-center rounded-xl bg-foreground shadow-sm hidden sm:flex">
               <FileStack className="h-5 w-5 text-background" />
             </div>
             <div>
               <div className="text-sm font-bold tracking-tight uppercase">E-SPJ SYSTEM</div>
-              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-none mt-1">
+              <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-none mt-1 hidden sm:block">
                 Digitalisasi Administrasi Perjalanan Dinas
               </div>
             </div>
@@ -105,13 +105,6 @@ export default async function HomePage() {
                 </Link>
               </Button>
             )}
-            <Button
-              asChild
-              variant="outline"
-              size="lg"
-              className="rounded-xl px-10 font-bold text-[11px] uppercase tracking-widest border-border/60 h-12 bg-white">
-              <Link href="/pegawai">DATABASE PEGAWAI</Link>
-            </Button>
           </div>
         </section>
 
