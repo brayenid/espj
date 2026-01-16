@@ -262,7 +262,7 @@ function ItemEditorSheet({
                   value={draft.kategori}
                   onChange={(e) => setDraft({ ...draft, kategori: e.target.value })}
                   placeholder="Uang Harian / Transport"
-                  className="rounded-lg bg-muted/20 border-border/40 text-sm h-10"
+                  className="rounded-lg bg-muted/20 border-border/40 text-sm h-10 shadow-none"
                 />
               </div>
               <div className="space-y-2">
@@ -273,7 +273,7 @@ function ItemEditorSheet({
                     type="number"
                     value={draft.hargaSatuan}
                     onChange={(e) => setDraft({ ...draft, hargaSatuan: Math.floor(Number(e.target.value)) })}
-                    className="pl-9 rounded-lg bg-muted/20 border-border/40 text-sm h-10 font-mono text-right"
+                    className="pl-9 rounded-lg bg-muted/20 border-border/40 text-sm h-10 font-mono text-right shadow-none"
                   />
                 </div>
               </div>
@@ -285,7 +285,7 @@ function ItemEditorSheet({
                 value={draft.uraian}
                 onChange={(e) => setDraft({ ...draft, uraian: e.target.value })}
                 placeholder="Contoh: Transportasi darat dari Sendawar ke Balikpapan (PP)..."
-                className="rounded-lg bg-muted/20 border-border/40 text-sm min-h-25 resize-none"
+                className="rounded-lg bg-muted/20 border-border/40 text-sm min-h-25 resize-none shadow-none"
               />
             </div>
           </div>
@@ -300,7 +300,7 @@ function ItemEditorSheet({
               <Button
                 variant="outline"
                 size="sm"
-                className="h-7 text-[10px] font-bold rounded-md px-2 border-primary/20 bg-primary/5 text-primary"
+                className="h-7 text-[10px] font-bold rounded-md px-2 border-primary/20 bg-primary/5 text-primary shadow-none"
                 onClick={() =>
                   setDraft({
                     ...draft,
@@ -310,7 +310,7 @@ function ItemEditorSheet({
                     ]
                   })
                 }>
-                <Plus className="w-3 h-3 mr-1" /> TAMBAH FAKTOR
+                <Plus className="w-3 h-3 mr-1" /> Tambah Faktor
               </Button>
             </div>
 
@@ -343,7 +343,7 @@ function ItemEditorSheet({
                           factors: draft.factors.map((x) => (x.id === f.id ? { ...x, qty: Number(e.target.value) } : x))
                         })
                       }
-                      className="w-16 h-9 rounded-md bg-background text-right font-mono text-xs"
+                      className="w-16 h-9 rounded-md bg-background text-right font-mono text-xs shadow-none"
                     />
                     <Button
                       variant="ghost"
@@ -373,35 +373,39 @@ function ItemEditorSheet({
             </div>
           </div>
 
-          <div className="flex items-center justify-between gap-4 pt-2">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 w-full border-t border-border/50">
+            {/* Tombol Hapus: Menggunakan order-last di mobile agar tidak mengganggu fokus utama */}
             {onDelete ? (
               <Button
                 variant="ghost"
-                className="text-xs text-destructive hover:bg-destructive/10"
+                className="order-last sm:order-first w-full sm:w-auto text-xs text-destructive hover:bg-destructive/10 hover:text-destructive h-10 sm:h-9 shadow-none"
                 onClick={() => {
                   onDelete(draft.id)
                   onOpenChange(false)
                 }}>
+                <Trash2 className="w-3.5 h-3.5 mr-2 sm:hidden" />{' '}
+                {/* Ikon hanya muncul di mobile untuk memperjelas aksi */}
                 Hapus Item Ini
               </Button>
             ) : (
-              <div />
+              <div className="hidden sm:block" />
             )}
 
-            <div className="flex items-center gap-3">
+            {/* Group Tombol Batal & Simpan */}
+            <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-3 w-full sm:w-auto">
               <Button
                 variant="outline"
-                className="rounded-lg h-10 px-6 text-xs font-bold"
+                className="order-2 sm:order-1 w-full sm:w-24 rounded-xl h-10 sm:h-9 text-[11px] font-bold uppercase tracking-wider shadow-none"
                 onClick={() => onOpenChange(false)}>
-                BATAL
+                Batal
               </Button>
               <Button
-                className="rounded-lg h-10 px-8 text-xs font-bold shadow-sm"
+                className="order-1 sm:order-2 w-full sm:w-32 rounded-xl h-10 sm:h-9 text-[11px] font-bold uppercase tracking-wider shadow-none"
                 onClick={() => {
                   onSave(draft)
                   onOpenChange(false)
                 }}>
-                SIMPAN RINCIAN
+                Simpan
               </Button>
             </div>
           </div>

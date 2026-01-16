@@ -30,8 +30,8 @@ export default async function SpjLayout({
             {spj.tempatBerangkat} → {spj.tempatTujuan}
           </p>
 
-          <Link href="/spj" className="text-sm font-semibold hover:text-foreground">
-            Kembali ke daftar
+          <Link href="/spj" className="text-sm font-semibold hover:text-foreground hover:underline">
+            Kembali
           </Link>
         </div>
 
