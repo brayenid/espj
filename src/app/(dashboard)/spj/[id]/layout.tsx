@@ -1,7 +1,6 @@
 // src/app/(dashboard)/spj/[id]/layout.tsx
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-
 import { getSpjDetailForCurrentUser } from '@/server/spj/queries'
 import ForbiddenCard from '@/components/shared/forbidden'
 import SpjNav from '@/components/spj/spj-nav'
