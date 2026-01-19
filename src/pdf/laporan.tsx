@@ -136,8 +136,8 @@ export function buildLaporanDocument(props: LaporanPdfProps): React.ReactElement
     pembukaManual.length > 0 && !manualIsSameAsAuto
       ? pembukaManual
       : hasilMode === 'POINTS'
-      ? pembukaAuto
-      : pembukaManual
+        ? pembukaAuto
+        : pembukaManual
 
   const signerNama = safeText(laporan?.signerNama, '')
   const signerNip = safeText(laporan?.signerNip, '')
@@ -229,11 +229,11 @@ export default function LaporanPdf(props: LaporanPdfProps) {
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 28,
-    paddingBottom: 32,
-    paddingHorizontal: 40,
-    fontSize: 10,
-    lineHeight: 1.25,
+    paddingTop: 40,
+    paddingBottom: 40,
+    paddingHorizontal: 50,
+    fontSize: 11,
+    lineHeight: 1.35,
     fontFamily: 'Helvetica'
   },
 
@@ -283,7 +283,7 @@ const styles = StyleSheet.create({
   },
 
   bodyText: {
-    fontSize: 10,
+    fontSize: 11,
     lineHeight: 1.5
   },
 
@@ -316,7 +316,7 @@ const styles = StyleSheet.create({
     width: '55%'
   },
   signLabel: {
-    fontSize: 10
+    fontSize: 11
   },
   signSpace: {
     height: 44

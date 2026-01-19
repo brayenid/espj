@@ -1,4 +1,3 @@
-import React from 'react'
 import { Image, StyleSheet, Text, View } from '@react-pdf/renderer'
 
 export type KopSuratProps = {
@@ -24,10 +23,10 @@ const styles = StyleSheet.create({
 
   headerText: { flex: 1, alignItems: 'center', justifyContent: 'center' },
 
-  instansi1: { fontSize: 12, fontWeight: 700, textTransform: 'uppercase' },
-  instansi2: { fontSize: 16, fontWeight: 700, textTransform: 'uppercase', marginTop: 2 },
+  instansi1: { fontSize: 14, fontWeight: 700, textTransform: 'uppercase' },
+  instansi2: { fontSize: 18, fontWeight: 700, textTransform: 'uppercase', marginTop: 2 },
 
-  alamat: { fontSize: 8.5, marginTop: 4, textAlign: 'center', whiteSpace: 'pre-line' },
+  alamat: { fontSize: 8.5, marginTop: 8, textAlign: 'center', whiteSpace: 'pre-line' },
 
   line: { marginTop: 8, borderBottomWidth: 1.2, borderBottomColor: '#000' },
 
