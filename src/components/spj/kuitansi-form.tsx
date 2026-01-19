@@ -28,6 +28,7 @@ import {
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Textarea } from '../ui/textarea'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 type PegawaiResult = {
   id: string
@@ -246,6 +247,11 @@ export default function KuitansiForm({
     }
   }
 
+  const REKENING_OPTIONS = [
+    { kode: '5.1.02.04.001.00001', judul: 'Belanja Perjalanan Dinas Biasa' },
+    { kode: '5.1.02.04.001.00003', judul: 'Belanja Perjalanan Dinas Dalam Kota' }
+  ]
+
   return (
     <div className="space-y-6 animate-in fade-in duration-500 pb-20">
       {/* 1. TOP SUMMARY BAR */}
@@ -357,7 +363,7 @@ export default function KuitansiForm({
                     </div>
                   </div>
                 </div>
-                <div className="flex items-start gap-2 p-3 bg-primary/[0.03] rounded-lg border border-primary/10">
+                <div className="flex items-start gap-2 p-3 bg-primary/3 rounded-lg border border-primary/10">
                   <Info className="w-3.5 h-3.5 text-primary mt-0.5" />
                   <p className="text-[12px] text-primary/80 leading-relaxed">
                     Rincian ini dikelompokkan berdasarkan kategori biaya pada DOPD. Jika ingin mengubah angka, silakan
@@ -426,71 +432,42 @@ export default function KuitansiForm({
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
-                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Rekening Belanja</label>
+                    <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">
+                      Rekening Belanja
+                    </label>
                   </div>
-                  <Input
+
+                  <Select
                     value={anggaran.kodeRekening}
-                    onChange={(e) => setAnggaran({ ...anggaran, kodeRekening: e.target.value })}
-                    placeholder="Kode Rekening..."
-                    className="h-9 rounded-lg text-xs bg-white shadow-none"
-                  />
-                  <Textarea
-                    value={anggaran.judulRekening}
-                    onChange={(e) => setAnggaran({ ...anggaran, judulRekening: e.target.value })}
-                    placeholder="Judul Rekening..."
-                    className="text-xs min-h-15 rounded-lg bg-white resize-none shadow-none"
-                  />
-                </div>
-
-                <div className="space-y-4">
-                  <label className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">
-                    Program & Kegiatan
-                  </label>
-
-                  <div className="grid gap-4">
-                    {/* Kelompok Kegiatan */}
-                    <div className="group space-y-2 p-3 rounded-xl border border-border/40 bg-background/50 focus-within:border-primary/30 focus-within:bg-primary/1 transition-all">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <Badge
-                            variant="outline"
-                            className="h-4 text-[8px] font-mono px-1.5 border-primary/20 text-primary">
-                            KEGIATAN
-                          </Badge>
-                          <span className="text-[10px] font-mono font-bold text-muted-foreground">
-                            {anggaran.kodeKegiatan}
-                          </span>
-                        </div>
+                    onValueChange={(val) => {
+                      // Logika cerdas: Update kode dan judul sekaligus berdasarkan pilihan
+                      const selected = REKENING_OPTIONS.find((opt) => opt.kode === val)
+                      setAnggaran({
+                        ...anggaran,
+                        kodeRekening: val,
+                        judulRekening: selected?.judul || ''
+                      })
+                    }}>
+                    <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50 overflow-hidden">
+                      <div className="truncate text-left">
+                        <SelectValue placeholder="Pilih Kode Rekening..." />
                       </div>
-                      <Textarea
-                        value={anggaran.judulKegiatan}
-                        onChange={(e) => setAnggaran({ ...anggaran, judulKegiatan: e.target.value })}
-                        placeholder="Masukkan judul kegiatan..."
-                        className="text-xs min-h-15 rounded-lg bg-white resize-none shadow-none"
-                      />
-                    </div>
+                    </SelectTrigger>
+                    <SelectContent className="z-[100] rounded-xl border-border/50 shadow-xl max-w-(--radix-select-trigger-width)">
+                      {REKENING_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.kode} value={opt.kode} className="text-xs">
+                          <span className="font-bold">{opt.kode}</span>
+                          <p className="text-[10px] text-muted-foreground truncate opacity-70">{opt.judul}</p>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
 
-                    {/* Kelompok Sub Kegiatan */}
-                    <div className="group space-y-2 p-3 rounded-xl border border-border/40 bg-background/50 focus-within:border-primary/30 focus-within:bg-primary/1 transition-all">
-                      <div className="flex items-center justify-between">
-                        <div className="flex items-center gap-1.5">
-                          <Badge
-                            variant="outline"
-                            className="h-4 text-[8px] font-mono px-1.5 border-primary/20 text-primary">
-                            SUB KEGIATAN
-                          </Badge>
-                          <span className="text-[10px] font-mono font-bold text-muted-foreground">
-                            {anggaran.kodeSubKegiatan}
-                          </span>
-                        </div>
-                      </div>
-                      <Textarea
-                        value={anggaran.judulSubKegiatan}
-                        onChange={(e) => setAnggaran({ ...anggaran, judulSubKegiatan: e.target.value })}
-                        placeholder="Masukkan judul sub kegiatan..."
-                        className="text-xs min-h-15 rounded-lg bg-white resize-none shadow-none"
-                      />
-                    </div>
+                  {/* Deskripsi otomatis muncul di sini (Read-only atau tetap bisa edit) */}
+                  <div className="rounded-lg bg-muted/30 p-3 border border-dashed border-border/50">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                      {anggaran.judulRekening || 'Judul rekening akan muncul otomatis setelah kode dipilih.'}
+                    </p>
                   </div>
                 </div>
               </div>

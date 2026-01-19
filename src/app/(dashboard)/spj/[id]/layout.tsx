@@ -1,4 +1,3 @@
-// src/app/(dashboard)/spj/[id]/layout.tsx
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getSpjDetailForCurrentUser } from '@/server/spj/queries'

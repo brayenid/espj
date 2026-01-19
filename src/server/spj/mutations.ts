@@ -4,6 +4,7 @@ import { auth } from '@/auth'
 import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createSpjDraftSchema } from './schemas'
+import { SpjNumberGenerator } from '@/lib/utils'
 
 function toDate(value: string) {
   // value from <input type="date"> => "YYYY-MM-DD"
@@ -66,9 +67,9 @@ export async function createSpjDraft(input: unknown) {
       tglSuratTugas,
       tglSpd,
 
-      noSuratTugas: data.noSuratTugas || null,
-      noSpd: data.noSpd || null,
-      noTelaahan: data.noTelaahan || null
+      noSuratTugas: SpjNumberGenerator.generateSuratTugas(),
+      noSpd: SpjNumberGenerator.generateSpd(),
+      noTelaahan: SpjNumberGenerator.generateTelaahan()
     },
     select: { id: true }
   })

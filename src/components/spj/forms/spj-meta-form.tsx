@@ -18,6 +18,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { cn } from '@/lib/utils'
 import { Loader2, Save, Link2, Landmark, ClipboardList, CalendarDays } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
 
 // QA: Validasi Cross-Field untuk rentang tanggal
 const schema = z
@@ -141,6 +142,24 @@ export default function SpjMetaForm({
       setSaving(false)
     }
   }
+
+  const MASTER_KEGIATAN = [
+    { kode: '4.01.01.2.13', judul: 'Penataan Organisasi' },
+    { kode: '4.01.01.2.06', judul: 'Administrasi Kepegawaian' }
+  ]
+
+  const MASTER_SUB_KEGIATAN = [
+    { kode: '4.01.01.2.13.0002', judul: 'Fasilitasi Pelayanan Publik dan Tata Laksana' },
+    {
+      kode: '4.01.01.2.13.0004',
+      judul: 'Monitoring, Evaluasi, dan Pengendalian Kualitas Pelayanan Publik dan Tata Laksana'
+    }
+  ]
+
+  const REKENING_OPTIONS = [
+    { kode: '5.1.02.04.001.00001', judul: 'Belanja Perjalanan Dinas Biasa' },
+    { kode: '5.1.02.04.001.00003', judul: 'Belanja Perjalanan Dinas Dalam Kota' }
+  ]
 
   return (
     <Form {...form}>
@@ -338,84 +357,110 @@ export default function SpjMetaForm({
             />
           </div>
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="kodeKegiatan"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[13px] text-muted-foreground">Kode Kegiatan</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
-                      {...field}
-                      value={field.value ?? ''}
-                      placeholder="Contoh: 4.01.01.2.13"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[11px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="judulKegiatan"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[13px] text-muted-foreground">Judul Kegiatan</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
-                      {...field}
-                      value={field.value ?? ''}
-                      placeholder="Contoh: Penataan Organisasi"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[11px]" />
-                </FormItem>
-              )}
-            />
-          </div>
+          <div className="space-y-6">
+            {/* BARIS KEGIATAN */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="kodeKegiatan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[13px] text-muted-foreground">Kode Kegiatan</FormLabel>
+                    <Select
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        // OTOMATISASI: Cari judul berdasarkan kode yang dipilih
+                        const matched = MASTER_KEGIATAN.find((k) => k.kode === val)
+                        if (matched) form.setValue('judulKegiatan', matched.judul)
+                      }}
+                      defaultValue={field.value ?? undefined}>
+                      <FormControl>
+                        <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden">
+                          <SelectValue placeholder="Pilih Kode Kegiatan" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="max-w-(--radix-select-trigger-width)">
+                        {MASTER_KEGIATAN.map((k) => (
+                          <SelectItem key={k.kode} value={k.kode} className="text-[13px]">
+                            {k.kode} - {k.judul}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-[11px]" />
+                  </FormItem>
+                )}
+              />
 
-          <div className="grid gap-4 md:grid-cols-2">
-            <FormField
-              control={form.control}
-              name="kodeSubKegiatan"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[13px] text-muted-foreground">Kode Sub Kegiatan</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
-                      {...field}
-                      value={field.value ?? ''}
-                      placeholder="Contoh: 4.01.01.2.13.0001"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[11px]" />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="judulSubKegiatan"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="text-[13px] text-muted-foreground">Judul Sub Kegiatan</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
-                      {...field}
-                      value={field.value ?? ''}
-                      placeholder="Contoh: Pengelolaan Tata Laksana"
-                    />
-                  </FormControl>
-                  <FormMessage className="text-[11px]" />
-                </FormItem>
-              )}
-            />
-          </div>
+              {/* Judul Kegiatan menjadi Read-only atau Informatif */}
+              <FormField
+                control={form.control}
+                name="judulKegiatan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[13px] text-muted-foreground">Judul Kegiatan</FormLabel>
+                    <FormControl>
+                      <div className="flex h-9 w-full items-center rounded-md border border-border/50 bg-muted/30 px-3 py-1 text-[13px] text-muted-foreground truncate">
+                        {field.value || 'Pilih kode untuk mengisi judul...'}
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[11px]" />
+                  </FormItem>
+                )}
+              />
+            </div>
 
+            {/* BARIS SUB KEGIATAN */}
+            <div className="grid gap-4 md:grid-cols-2">
+              <FormField
+                control={form.control}
+                name="kodeSubKegiatan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[13px] text-muted-foreground">Kode Sub Kegiatan</FormLabel>
+                    <Select
+                      onValueChange={(val) => {
+                        field.onChange(val)
+                        // OTOMATISASI: Cari judul sub-kegiatan
+                        const matched = MASTER_SUB_KEGIATAN.find((sk) => sk.kode === val)
+                        if (matched) form.setValue('judulSubKegiatan', matched.judul)
+                      }}
+                      defaultValue={field.value ?? undefined}>
+                      <FormControl>
+                        <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden">
+                          <SelectValue placeholder="Pilih Kode Sub Kegiatan" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className="max-w-(--radix-select-trigger-width)">
+                        {MASTER_SUB_KEGIATAN.map((sk) => (
+                          <SelectItem key={sk.kode} value={sk.kode} className="text-[13px]">
+                            {sk.kode} - {sk.judul}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-[11px]" />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="judulSubKegiatan"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-[13px] text-muted-foreground">Judul Sub Kegiatan</FormLabel>
+                    <FormControl>
+                      <div className="flex h-9 w-full items-center rounded-md border border-border/50 bg-muted/30 px-3 py-1 text-[13px] text-muted-foreground truncate">
+                        {field.value || 'Pilih kode sub-kegiatan...'}
+                      </div>
+                    </FormControl>
+                    <FormMessage className="text-[11px]" />
+                  </FormItem>
+                )}
+              />
+            </div>
+          </div>
           <div className="grid gap-4 md:grid-cols-3">
             <FormField
               control={form.control}
@@ -457,16 +502,34 @@ export default function SpjMetaForm({
               control={form.control}
               name="kodeRekening"
               render={({ field }) => (
-                <FormItem>
+                <FormItem className="w-full">
                   <FormLabel className="text-[13px] text-muted-foreground">Kode Rekening</FormLabel>
-                  <FormControl>
-                    <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
-                      {...field}
-                      value={field.value ?? ''}
-                      placeholder="Contoh: 5.1.02.04.01.0001"
-                    />
-                  </FormControl>
+                  <Select
+                    onValueChange={(val) => {
+                      field.onChange(val)
+                      // Automatisasi: Update judulRekening saat kode dipilih
+                      const matched = REKENING_OPTIONS.find((opt) => opt.kode === val)
+                      if (matched) form.setValue('judulRekening', matched.judul)
+                    }}
+                    defaultValue={field.value ?? undefined}>
+                    <FormControl>
+                      <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden focus:ring-1">
+                        <div className="truncate text-left">
+                          <SelectValue placeholder="Pilih Kode Rekening" />
+                        </div>
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent className="z-[100] rounded-xl border-border/50 shadow-xl bg-background max-w-(--radix-select-trigger-width)">
+                      {REKENING_OPTIONS.map((opt) => (
+                        <SelectItem key={opt.kode} value={opt.kode} className="py-2">
+                          <div className="flex flex-col gap-0.5">
+                            <span className="font-bold text-[12px] text-foreground leading-none">{opt.kode}</span>
+                            <span className="text-[10px] text-muted-foreground truncate opacity-80">{opt.judul}</span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                   <FormMessage className="text-[11px]" />
                 </FormItem>
               )}
@@ -477,15 +540,13 @@ export default function SpjMetaForm({
             control={form.control}
             name="judulRekening"
             render={({ field }) => (
-              <FormItem>
+              <FormItem className="w-full">
                 <FormLabel className="text-[13px] text-muted-foreground">Judul Rekening</FormLabel>
                 <FormControl>
-                  <Input
-                    className="rounded-md border-border/50 bg-background/50 h-9"
-                    {...field}
-                    value={field.value ?? ''}
-                    placeholder="Contoh: Belanja Perjalanan Dinas Biasa"
-                  />
+                  {/* Tampilan Read-only yang konsisten dengan desain modern Anda */}
+                  <div className="flex h-9 w-full items-center rounded-md border border-border/50 bg-muted/30 px-3 py-1 text-[13px] text-muted-foreground truncate">
+                    {field.value || 'Judul akan terisi otomatis...'}
+                  </div>
                 </FormControl>
                 <FormMessage className="text-[11px]" />
               </FormItem>

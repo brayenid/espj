@@ -85,3 +85,51 @@ export function fmtDateId(d: Date | string) {
     return ''
   }
 }
+
+/**
+ * Helpers untuk standarisasi format nomor dokumen SPJ
+ * Lokasi: @/lib/number-generators.ts (atau sesuai struktur Anda)
+ */
+
+/**
+ * Mengonversi angka bulan (0-11) menjadi Angka Romawi
+ */
+function getRomanMonth(monthIndex: number): string {
+  const romans = ['I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII', 'IX', 'X', 'XI', 'XII']
+  return romans[monthIndex] ?? 'I'
+}
+
+export const SpjNumberGenerator = {
+  /**
+   * Format: 000.8 /         /Org-TU.P/I/2026
+   */
+  generateTelaahan: () => {
+    const now = new Date()
+    const month = getRomanMonth(now.getMonth())
+    const year = now.getFullYear()
+
+    return `000.8 /         /Org-TU.P/${month}/${year}`
+  },
+
+  /**
+   * Format: 800.1.11.1/        /Org-Tu.P/I/2026
+   */
+  generateSuratTugas: () => {
+    const now = new Date()
+    const month = getRomanMonth(now.getMonth())
+    const year = now.getFullYear()
+
+    return `800.1.11.1/        /Org-Tu.P/${month}/${year}`
+  },
+
+  /**
+   * Format: 000.1.2.3/           /SPPD/I/2026
+   */
+  generateSpd: () => {
+    const now = new Date()
+    const month = getRomanMonth(now.getMonth())
+    const year = now.getFullYear()
+
+    return `000.1.2.3/           /SPPD/${month}/${year}`
+  }
+}

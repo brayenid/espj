@@ -535,7 +535,7 @@ function Row({ label, value }: { label: string; value: string | null | number })
   return (
     <div className="flex justify-between items-center text-xs py-1.5 border-b border-border/5 last:border-0 hover:bg-muted/5 px-1 transition-colors">
       <span className="text-muted-foreground">{label}</span>
-      <span className="font-medium text-foreground tabular-nums text-right max-w-[200px] truncate">
+      <span className="font-medium text-foreground tabular-nums text-right max-w-50 truncate">
         {safe(String(value))}
       </span>
     </div>
