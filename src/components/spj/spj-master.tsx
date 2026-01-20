@@ -211,7 +211,7 @@ export default function SpjMaster({
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-muted/20 p-5 rounded-xl border border-border/50 backdrop-blur-md">
         <div className="flex items-center gap-4">
           <div>
-            <h2 className="text-lg font-semibold tracking-tight leading-none">Master File</h2>
+            <h2 className="text-lg font-semibold tracking-tight leading-none">Lihat Cepat</h2>
             <p className="text-xs font-mono text-muted-foreground mt-1.5 flex items-center gap-1.5">
               <span className="bg-muted px-1.5 py-0.5 rounded text-[10px]">ID</span>{' '}
               <span className="max-w-40 truncate">{spj.id}</span>

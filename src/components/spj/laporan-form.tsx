@@ -16,10 +16,17 @@ import { Label } from '@/components/ui/label'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
+
+// Import Dialog & ScrollArea untuk Preset Picker
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+
+// Import JSON Preset Laporan
+import PRESETS_LAPORAN from '@/data/laporan-preset.json'
+
 import {
   ClipboardCheck,
   FileText,
-  LayoutList,
   Loader2,
   Plus,
   Printer,
@@ -27,7 +34,8 @@ import {
   Search,
   Trash2,
   UserCheck,
-  Users
+  Users,
+  Zap
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -82,6 +90,9 @@ type InitialLaporan = {
   hasilNarasi: string | null
 } | null
 
+type PresetKey = keyof typeof PRESETS_LAPORAN
+type PresetItem = (typeof PRESETS_LAPORAN)[PresetKey][number]
+
 function useDebouncedValue<T>(value: T, delayMs: number) {
   const [debounced, setDebounced] = useState(value)
   useEffect(() => {
@@ -104,6 +115,62 @@ function fmtDateId(d: Date) {
   } catch {
     return ''
   }
+}
+
+function normalizePreview(s: any, max = 120) {
+  const text = Array.isArray(s) ? s.join(' ') : String(s)
+  const t = text.replace(/\s+/g, ' ').trim()
+  if (t.length <= max) return t
+  return `${t.slice(0, max)}…`
+}
+
+function PresetPicker({
+  open,
+  onOpenChange,
+  title,
+  items,
+  onPick
+}: {
+  open: boolean
+  onOpenChange: (v: boolean) => void
+  title: string
+  items: PresetItem[]
+  onPick: (text: any) => void
+}) {
+  return (
+    <Dialog open={open} onOpenChange={onOpenChange}>
+      <DialogContent className="max-w-2xl max-h-[90vh] overflow-hidden rounded-xl border-border/50 p-0 shadow-2xl text-left">
+        <DialogHeader className="px-6 py-4 border-b bg-muted/20">
+          <DialogTitle className="text-sm font-bold uppercase tracking-tight">{title}</DialogTitle>
+        </DialogHeader>
+        <ScrollArea className="max-h-[60vh]">
+          <div className="grid gap-2 p-4">
+            {items.map((p) => (
+              <button
+                key={p.id}
+                type="button"
+                className="group w-full rounded-lg border border-border/40 bg-background p-4 text-left transition-all hover:bg-muted/50 active:scale-[0.98]"
+                onClick={() => onPick(p.text)}>
+                <div className="flex items-start justify-between gap-4">
+                  <div className="flex-1 min-w-0">
+                    <div className="text-[13px] font-bold text-foreground group-hover:text-primary transition-colors">
+                      {p.title}
+                    </div>
+                    <div className="mt-1 text-[11px] text-muted-foreground leading-relaxed line-clamp-2">
+                      {normalizePreview(p.text)}
+                    </div>
+                  </div>
+                  <Badge variant="outline" className="h-6 text-[9px] uppercase">
+                    Pilih
+                  </Badge>
+                </div>
+              </button>
+            ))}
+          </div>
+        </ScrollArea>
+      </DialogContent>
+    </Dialog>
+  )
 }
 
 function SignerCombobox({
@@ -248,6 +315,9 @@ export default function LaporanForm({
   const [hasilNarasi, setHasilNarasi] = useState(initial?.hasilNarasi ?? '')
   const [hasilPoin, setHasilPoin] = useState<string[]>(() => (initial?.hasilPoin?.length ? initial.hasilPoin : ['']))
 
+  const [presetOpen, setPresetOpen] = useState<null | PresetKey>(null)
+  const [activePoinIndex, setActivePoinIndex] = useState<number | null>(null) // Melacak butir mana yang diisi
+
   useEffect(() => {
     if (!initial?.signerPegawaiId) return
     setSigner({
@@ -287,6 +357,7 @@ export default function LaporanForm({
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload)
       })
+
       if (!res.ok) throw new Error()
       toast.success('Laporan tersimpan.')
       router.refresh()
@@ -297,9 +368,32 @@ export default function LaporanForm({
     }
   }
 
+  const handlePickPreset = (val: string) => {
+    if (presetOpen === 'hasilPembuka') {
+      setHasilPembuka(val)
+    } else if (presetOpen === 'hasilNarasi') {
+      setHasilNarasi(val)
+    } else if (presetOpen === 'hasilPoin') {
+      if (activePoinIndex !== null) {
+        // Update butir yang sedang aktif
+        updatePoin(activePoinIndex, val)
+      } else {
+        // Tambah butir baru di paling bawah
+        setHasilPoin((prev) => {
+          const last = prev[prev.length - 1]
+          if (last === '') {
+            return [...prev.slice(0, -1), val]
+          }
+          return [...prev, val]
+        })
+      }
+    }
+    setPresetOpen(null)
+    setActivePoinIndex(null)
+  }
+
   return (
-    <div className="space-y-6 pb-20 animate-in fade-in duration-500">
-      {/* 1. Header Bar */}
+    <div className="space-y-6 pb-20 animate-in fade-in duration-500 text-left">
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border border-border/40 p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div className="flex items-center gap-4">
           <div className="p-2.5 bg-primary/10 rounded-lg">
@@ -332,7 +426,6 @@ export default function LaporanForm({
       </div>
 
       <div className="grid gap-6 lg:grid-cols-12">
-        {/* 2. Side Panel */}
         <div className="lg:col-span-4 space-y-6">
           <Card className="rounded-xl border-border/40 shadow-none bg-card/50">
             <CardHeader className="pb-4">
@@ -350,7 +443,7 @@ export default function LaporanForm({
                   value={signerJabatanTampil}
                   onChange={(e) => setSignerJabatanTampil(e.target.value)}
                   placeholder="Contoh: KEPALA BAGIAN..."
-                  className="h-10 rounded-lg text-sm shadow-none shadow-none"
+                  className="h-10 rounded-lg text-sm shadow-none text-left"
                 />
               </div>
             </CardContent>
@@ -381,7 +474,6 @@ export default function LaporanForm({
           </Card>
         </div>
 
-        {/* 3. Main Form Area */}
         <div className="lg:col-span-8">
           <Card className="rounded-xl border-border/40 shadow-none">
             <CardHeader className="bg-muted/10 border-b border-border/40 px-6 py-4">
@@ -396,7 +488,7 @@ export default function LaporanForm({
                   <Input
                     value={dasarLaporan}
                     onChange={(e) => setDasarLaporan(e.target.value)}
-                    className="h-10 rounded-lg text-sm shadow-none"
+                    className="h-10 rounded-lg text-sm shadow-none text-left"
                   />
                 </div>
                 <div className="space-y-2">
@@ -404,7 +496,7 @@ export default function LaporanForm({
                   <Input
                     value={waktu}
                     onChange={(e) => setWaktu(e.target.value)}
-                    className="h-10 rounded-lg text-sm shadow-none"
+                    className="h-10 rounded-lg text-sm shadow-none text-left"
                   />
                 </div>
                 <div className="space-y-2">
@@ -412,7 +504,7 @@ export default function LaporanForm({
                   <Input
                     value={lokasi}
                     onChange={(e) => setLokasi(e.target.value)}
-                    className="h-10 rounded-lg text-sm shadow-none"
+                    className="h-10 rounded-lg text-sm shadow-none text-left"
                   />
                 </div>
                 <div className="space-y-2">
@@ -420,7 +512,7 @@ export default function LaporanForm({
                   <Input
                     value={tujuan}
                     onChange={(e) => setTujuan(e.target.value)}
-                    className="h-10 rounded-lg text-sm shadow-none"
+                    className="h-10 rounded-lg text-sm shadow-none text-left"
                   />
                 </div>
               </div>
@@ -431,7 +523,7 @@ export default function LaporanForm({
                   value={kegiatan}
                   onChange={(e) => setKegiatan(e.target.value)}
                   rows={3}
-                  className="rounded-lg text-sm resize-none shadow-none"
+                  className="rounded-lg text-sm resize-none shadow-none text-left"
                 />
               </div>
 
@@ -469,12 +561,22 @@ export default function LaporanForm({
 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase text-muted-foreground">Pembuka</label>
+                    <div className="flex items-center justify-between">
+                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Pembuka</label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        className="h-7 text-[10px] font-bold text-primary border-primary/20 bg-primary/5 shadow-none"
+                        onClick={() => setPresetOpen('hasilPembuka')}>
+                        <Zap className="w-3 h-3 mr-1.5" /> Preset
+                      </Button>
+                    </div>
                     <Textarea
                       value={hasilPembuka}
                       onChange={(e) => setHasilPembuka(e.target.value)}
                       rows={2}
-                      className="rounded-lg text-sm border-dashed shadow-none"
+                      className="rounded-lg text-sm border-dashed shadow-none text-left"
                       placeholder="Setelah melakukan kegiatan..."
                     />
                   </div>
@@ -483,22 +585,49 @@ export default function LaporanForm({
                     <div className="space-y-3">
                       <div className="flex items-center justify-between pb-2 border-b">
                         <span className="text-[10px] font-bold uppercase">Butir Hasil</span>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="h-6 text-[9px] font-bold rounded-md px-2"
-                          onClick={addPoin}>
-                          <Plus className="w-3 h-3 mr-1" /> TAMBAH
-                        </Button>
+                        <div className="flex gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            className="h-7 text-[10px] font-bold text-primary border-primary/20 bg-primary/5 shadow-none"
+                            onClick={() => {
+                              setActivePoinIndex(null)
+                              setPresetOpen('hasilPoin')
+                            }}>
+                            <Zap className="w-3 h-3 mr-1.5" /> Preset Poin
+                          </Button>
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="h-6 text-[9px] font-bold rounded-md px-2 shadow-none"
+                            onClick={addPoin}>
+                            <Plus className="w-3 h-3 mr-1" /> TAMBAH
+                          </Button>
+                        </div>
                       </div>
                       {hasilPoin.map((p, idx) => (
                         <div key={idx} className="flex gap-2 group items-start">
+                          <div className="h-10 w-10 flex flex-col gap-1 items-center justify-center shrink-0">
+                            <div className="text-[10px] font-mono text-muted-foreground">#{idx + 1}</div>
+                            <Button
+                              type="button"
+                              variant="ghost"
+                              size="icon"
+                              className="h-6 w-6 rounded-md hover:bg-primary/10 hover:text-primary transition-colors"
+                              onClick={() => {
+                                setActivePoinIndex(idx)
+                                setPresetOpen('hasilPoin')
+                              }}>
+                              <Zap className="w-3 h-3" />
+                            </Button>
+                          </div>
                           <Textarea
                             value={p}
                             onChange={(e) => updatePoin(idx, e.target.value)}
                             placeholder={`Poin ${idx + 1}`}
                             rows={2}
-                            className="min-h-10 text-sm rounded-lg resize-none shadow-none"
+                            className="min-h-10 text-sm rounded-lg resize-none shadow-none text-left flex-1"
                           />
                           <Button
                             variant="ghost"
@@ -513,12 +642,22 @@ export default function LaporanForm({
                     </div>
                   ) : (
                     <div className="space-y-2">
-                      <label className="text-[10px] font-bold uppercase text-muted-foreground">Narasi</label>
+                      <div className="flex items-center justify-between">
+                        <label className="text-[10px] font-bold uppercase text-muted-foreground">Narasi</label>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          className="h-7 text-[10px] font-bold text-primary border-primary/20 bg-primary/5 shadow-none"
+                          onClick={() => setPresetOpen('hasilNarasi')}>
+                          <Zap className="w-3 h-3 mr-1.5" /> Preset Narasi
+                        </Button>
+                      </div>
                       <Textarea
                         value={hasilNarasi}
                         onChange={(e) => setHasilNarasi(e.target.value)}
                         rows={12}
-                        className="rounded-lg text-sm p-4 leading-relaxed"
+                        className="rounded-lg text-sm p-4 leading-relaxed text-left shadow-none"
                       />
                     </div>
                   )}
@@ -528,6 +667,22 @@ export default function LaporanForm({
           </Card>
         </div>
       </div>
+
+      {(['hasilPembuka', 'hasilPoin', 'hasilNarasi'] as const).map((key) => (
+        <PresetPicker
+          key={key}
+          open={presetOpen === key}
+          onOpenChange={(v) => {
+            setPresetOpen(v ? key : null)
+            if (!v) setActivePoinIndex(null)
+          }}
+          title={`Pilih Preset ${
+            key === 'hasilPembuka' ? 'Pembuka' : key === 'hasilPoin' ? 'Hasil (Butir)' : 'Hasil (Narasi)'
+          }`}
+          items={(PRESETS_LAPORAN[key as PresetKey] || []) as any}
+          onPick={handlePickPreset}
+        />
+      ))}
     </div>
   )
 }

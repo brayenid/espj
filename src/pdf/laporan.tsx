@@ -1,4 +1,4 @@
-// src/pdf/laporan.tsx
+/* eslint-disable jsx-a11y/alt-text */
 import React from 'react'
 import { Document, Page, StyleSheet, Text, View, type DocumentProps } from '@react-pdf/renderer'
 import KopSurat from '@/pdf/components/kop-surat'
@@ -122,15 +122,12 @@ export function buildLaporanDocument(props: LaporanPdfProps): React.ReactElement
   const hasilMode = laporan?.hasilMode ?? 'POINTS'
   const hasilNarasi = normalizeMultiline(safeText(laporan?.hasilNarasi, ''))
 
-  // ===== FIX: pembuka jangan dobel
   const pembukaManual = normalizeMultiline(safeText(laporan?.hasilPembuka, ''))
   const pembukaAuto =
     kegiatanRaw.length > 0
       ? `Setelah melakukan kegiatan ${kegiatanRaw}, maka dapat disimpulkan sebagai berikut:`
       : `Setelah melakukan kegiatan, maka dapat disimpulkan sebagai berikut:`
 
-  // kalau manual kosong -> pakai auto
-  // kalau manual ada tapi sama dengan auto -> pakai auto (biar tidak dobel “makadapat…”)
   const manualIsSameAsAuto = normalizeOneLine(pembukaManual) === normalizeOneLine(pembukaAuto)
   const pembukaFinal =
     pembukaManual.length > 0 && !manualIsSameAsAuto
@@ -139,9 +136,11 @@ export function buildLaporanDocument(props: LaporanPdfProps): React.ReactElement
         ? pembukaAuto
         : pembukaManual
 
+  // Penandatangan (Signer) logic
   const signerNama = safeText(laporan?.signerNama, '')
   const signerNip = safeText(laporan?.signerNip, '')
-  const signerJabatanRaw = (laporan?.signerJabatanTampil ?? laporan?.signerJabatan ?? '').trim()
+  // Gunakan jabatan tampil jika ada, jika tidak gunakan jabatan asli dari pegawai
+  const signerJabatanRaw = (laporan?.signerJabatanTampil || laporan?.signerJabatan || '').trim()
   const signerJabatanLabel = signerJabatanRaw ? `${signerJabatanRaw},` : ''
   const signerPangkatGol = fmtPangkatGol(laporan?.signerPangkat ?? null, laporan?.signerGolongan ?? null)
 
@@ -167,11 +166,8 @@ export function buildLaporanDocument(props: LaporanPdfProps): React.ReactElement
           <Text style={styles.metaColon}>:</Text>
 
           <View style={styles.sectionValue}>
-            {/* ✅ hanya satu pembuka */}
             {pembukaFinal ? <Text style={styles.bodyText}>{pembukaFinal}</Text> : null}
-
             {hasilMode === 'POINTS' ? <PointsBlock points={laporan?.hasilPoin ?? []} /> : null}
-
             {hasilMode === 'NARRATIVE' ? (
               <Text style={[styles.bodyText, { marginTop: pembukaFinal ? 6 : 0 }]}>{hasilNarasi || '-'}</Text>
             ) : null}
@@ -185,11 +181,12 @@ export function buildLaporanDocument(props: LaporanPdfProps): React.ReactElement
           </Text>
         </View>
 
-        {/* ===== Signatures */}
-        <View style={styles.signWrap}>
-          {/* Left signer */}
+        {/* ===== Signatures Area ===== */}
+        <View style={styles.signWrap} wrap={false}>
+          {/* Sisi Kiri: Pejabat Penandatangan / Mengetahui */}
           <View style={styles.signColLeft}>
-            <Text style={styles.signLabel}>{signerJabatanLabel || ''}</Text>
+            <Text style={styles.signLabel}>Mengetahui,</Text>
+            <Text style={styles.signLabel}>{signerJabatanLabel}</Text>
             <View style={styles.signSpace} />
             <Text style={styles.signName}>{signerNama}</Text>
             {signerPangkatGol ? <Text style={styles.signSub}>{signerPangkatGol}</Text> : null}
@@ -198,18 +195,20 @@ export function buildLaporanDocument(props: LaporanPdfProps): React.ReactElement
 
           {/* Right roster executor */}
           <View style={styles.signColRight}>
-            <Text style={styles.signLabel}>Yang Melaksanakan Tugas</Text>
+            <Text style={styles.rosterLabel}>Yang Melaksanakan Tugas,</Text>
 
             <View style={{ marginTop: 8 }}>
               {rosterSorted.map((r, idx) => (
                 <View key={r.id} style={styles.execRow}>
-                  <Text style={styles.execNo}>{idx + 1}</Text>
+                  {/* Nomor urut */}
+                  <Text style={styles.execNo}>{idx + 1}.</Text>
 
-                  <Text style={styles.execName}>{safeText(r.nama, '-')}</Text>
+                  {/* Container untuk Nama dan Titik-titik */}
+                  <View style={styles.execContent}>
+                    <Text style={styles.execName}>{safeText(r.nama, '-')}</Text>
 
-                  {/* zig-zag hanya titik */}
-                  <View style={styles.execDotsArea}>
-                    <View style={[styles.execDotsInner, idx % 2 === 0 ? styles.execDotsLeft : styles.execDotsRight]}>
+                    {/* Titik-titik zig-zag */}
+                    <View style={[styles.execDotsWrapper, idx % 2 === 0 ? styles.execDotsLeft : styles.execDotsRight]}>
                       <Text style={styles.execDotsText}>: {dots(14)}</Text>
                     </View>
                   </View>
@@ -229,31 +228,23 @@ export default function LaporanPdf(props: LaporanPdfProps) {
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 40,
-    paddingBottom: 40,
-    paddingHorizontal: 50,
+    paddingTop: 28,
+    paddingBottom: 32,
+    paddingHorizontal: 40,
     fontSize: 11,
     lineHeight: 1.35,
     fontFamily: 'Helvetica'
   },
-
-  hr: {
-    marginTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#000'
-  },
-
   titleWrap: {
-    marginTop: 10,
+    marginTop: 2,
     alignItems: 'center',
-    marginBottom: 10
+    marginBottom: 2
   },
   title: {
     fontSize: 11,
     fontWeight: 700,
     textTransform: 'uppercase'
   },
-
   metaWrap: {
     marginTop: 10
   },
@@ -272,7 +263,6 @@ const styles = StyleSheet.create({
   metaValue: {
     flex: 1
   },
-
   sectionRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -281,17 +271,14 @@ const styles = StyleSheet.create({
   sectionValue: {
     flex: 1
   },
-
   bodyText: {
     fontSize: 11,
     lineHeight: 1.5
   },
-
   paragraph: {
     textAlign: 'justify',
-    textIndent: 22
+    textIndent: 28
   },
-
   pointRow: {
     flexDirection: 'row',
     alignItems: 'flex-start',
@@ -303,54 +290,78 @@ const styles = StyleSheet.create({
   pointText: {
     flex: 1
   },
-
   signWrap: {
-    marginTop: 28,
+    marginTop: 40,
     flexDirection: 'row',
-    justifyContent: 'space-between'
+    justifyContent: 'space-between',
+    // Mencegah tanda tangan terpotong ganti halaman yang berbeda
+    break: false
   },
   signColLeft: {
     width: '45%'
   },
   signColRight: {
-    width: '55%'
+    width: '50%'
   },
   signLabel: {
-    fontSize: 11
+    fontSize: 11,
+    minHeight: 14
+  },
+  rosterLabel: {
+    fontSize: 11,
+    minHeight: 14,
+    marginLeft: -40
   },
   signSpace: {
-    height: 44
+    height: 50
   },
   signName: {
     fontWeight: 700,
     textDecoration: 'underline'
   },
   signSub: {
-    marginTop: 2
+    marginTop: 2,
+    fontSize: 10
   },
-
   execRow: {
     flexDirection: 'row',
-    alignItems: 'baseline',
-    marginBottom: 10
+    marginBottom: 10,
+    minHeight: 20, // Memberi ruang vertikal agar antar nama tidak terlalu rapat
+    alignItems: 'center'
   },
 
-  execNo: { width: 14 },
+  execNo: {
+    width: 15,
+    fontSize: 10,
+    marginLeft: -40
+  },
 
-  // fixed supaya ":" sejajar dan "titik" gak nabrak nama
-  execName: { width: 240 },
+  execContent: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between' // Memastikan nama di kiri, titik di kanan,
+  },
 
-  execColon: { width: 10, textAlign: 'center' },
+  execName: {
+    fontSize: 10,
+    maxWidth: 160, // Batasi lebar nama agar tidak menabrak titik-titik
+    overflow: 'hidden'
+  },
 
-  // area setelah ":" (sisa lebar kolom kanan)
-  execDotsArea: { flex: 1, marginLeft: -70 },
+  execDotsWrapper: {
+    width: 100 // Lebar tetap untuk area titik-titik
+  },
 
-  // inner wrapper biar kita bisa “geser kanan” tapi tetap ada batas
-  execDotsInner: { width: 140 }, // BUKAN flex
+  execDotsLeft: {
+    paddingLeft: 0
+  },
 
-  execDotsLeft: { alignItems: 'flex-start' },
-  execDotsRight: { alignItems: 'flex-end' },
+  execDotsRight: {
+    paddingLeft: 50 // Geser ke kanan untuk pola zig-zag (1, 3 di kiri; 2, 4 di kanan)
+  },
 
-  // panjang garis titik
-  execDotsText: { width: 90 }
+  execDotsText: {
+    fontSize: 10
+  }
 })

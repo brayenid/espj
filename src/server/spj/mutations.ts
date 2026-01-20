@@ -45,7 +45,6 @@ export async function createSpjDraft(input: unknown) {
   const tglBerangkat = toDate(data.tglBerangkat)
   const tglKembali = toDate(data.tglKembali)
 
-  // ✅ default tanggal surat tugas & spd ke tglBerangkat kalau belum diisi
   const tglSuratTugas = data.tglSuratTugas ? toDate(data.tglSuratTugas) : tglBerangkat
   const tglSpd = data.tglSpd ? toDate(data.tglSpd) : tglBerangkat
 
@@ -168,10 +167,10 @@ export async function duplicateSpj(originalId: string) {
           judulRekening: source.judulRekening,
           akunAnggaran: source.akunAnggaran,
           tingkatPerjalanan: source.tingkatPerjalanan,
-          // NOMOR SURAT (KOSONGKAN karena harus baru)
-          noTelaahan: null,
-          noSuratTugas: null,
-          noSpd: null
+          // NOMOR SURAT Bisa dibuat null
+          noTelaahan: source.noTelaahan,
+          noSuratTugas: source.noSuratTugas,
+          noSpd: source.noSpd
         }
       })
 

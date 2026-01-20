@@ -185,7 +185,7 @@ export default function SpjMetaForm({
                         <Button
                           variant={'outline'}
                           className={cn(
-                            'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50',
+                            'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50 shadow-none',
                             !field.value && 'text-muted-foreground'
                           )}>
                           {field.value ? format(field.value, 'PPP', { locale: localeId }) : <span>Pilih tanggal</span>}
@@ -213,7 +213,7 @@ export default function SpjMetaForm({
                         <Button
                           variant={'outline'}
                           className={cn(
-                            'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50',
+                            'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50 shadow-none',
                             !field.value && 'text-muted-foreground'
                           )}>
                           {field.value ? format(field.value, 'PPP', { locale: localeId }) : <span>Pilih tanggal</span>}
@@ -240,7 +240,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">Tempat Tujuan</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="Misal: Samarinda"
@@ -261,7 +261,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">No Telaahan</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="800.1.1/............./I/2026"
@@ -279,7 +279,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">No Surat Tugas</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="800.1.1/............./I/2026"
@@ -297,7 +297,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">No SPD</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="800.1.1/............./I/2026"
@@ -327,7 +327,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">Tahun Anggaran</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="Contoh: 2025"
@@ -345,7 +345,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">Akun Anggaran</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="Contoh: DPA SKPD Bagian Organisasi 2026"
@@ -375,7 +375,7 @@ export default function SpjMetaForm({
                       }}
                       defaultValue={field.value ?? undefined}>
                       <FormControl>
-                        <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden">
+                        <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden shadow-none">
                           <SelectValue placeholder="Pilih Kode Kegiatan" />
                         </SelectTrigger>
                       </FormControl>
@@ -427,7 +427,7 @@ export default function SpjMetaForm({
                       }}
                       defaultValue={field.value ?? undefined}>
                       <FormControl>
-                        <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden">
+                        <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden shadow-none">
                           <SelectValue placeholder="Pilih Kode Sub Kegiatan" />
                         </SelectTrigger>
                       </FormControl>
@@ -461,7 +461,7 @@ export default function SpjMetaForm({
               />
             </div>
           </div>
-          <div className="grid gap-4 md:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="upGu"
@@ -470,7 +470,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">UP/GU</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="UP / GU"
@@ -488,7 +488,7 @@ export default function SpjMetaForm({
                   <FormLabel className="text-[13px] text-muted-foreground">Nomor BKU</FormLabel>
                   <FormControl>
                     <Input
-                      className="rounded-md border-border/50 bg-background/50 h-9"
+                      className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                       {...field}
                       value={field.value ?? ''}
                       placeholder="Nomor BKU"
@@ -498,6 +498,8 @@ export default function SpjMetaForm({
                 </FormItem>
               )}
             />
+          </div>
+          <div className="grid gap-4 md:grid-cols-2">
             <FormField
               control={form.control}
               name="kodeRekening"
@@ -513,13 +515,13 @@ export default function SpjMetaForm({
                     }}
                     defaultValue={field.value ?? undefined}>
                     <FormControl>
-                      <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden focus:ring-1">
+                      <SelectTrigger className="w-full rounded-md border-border/50 bg-background/50 h-9 text-[14px] overflow-hidden focus:ring-1 shadow-none">
                         <div className="truncate text-left">
                           <SelectValue placeholder="Pilih Kode Rekening" />
                         </div>
                       </SelectTrigger>
                     </FormControl>
-                    <SelectContent className="z-[100] rounded-xl border-border/50 shadow-xl bg-background max-w-(--radix-select-trigger-width)">
+                    <SelectContent className="z-100 rounded-xl border-border/50 shadow-xl bg-background max-w-(--radix-select-trigger-width)">
                       {REKENING_OPTIONS.map((opt) => (
                         <SelectItem key={opt.kode} value={opt.kode} className="py-2">
                           <div className="flex flex-col gap-0.5">
@@ -534,24 +536,23 @@ export default function SpjMetaForm({
                 </FormItem>
               )}
             />
+            <FormField
+              control={form.control}
+              name="judulRekening"
+              render={({ field }) => (
+                <FormItem className="w-full">
+                  <FormLabel className="text-[13px] text-muted-foreground">Judul Rekening</FormLabel>
+                  <FormControl>
+                    {/* Tampilan Read-only yang konsisten dengan desain modern Anda */}
+                    <div className="flex h-9 w-full items-center rounded-md border border-border/50 bg-muted/30 px-3 py-1 text-[13px] text-muted-foreground truncate">
+                      {field.value || 'Judul akan terisi otomatis...'}
+                    </div>
+                  </FormControl>
+                  <FormMessage className="text-[11px]" />
+                </FormItem>
+              )}
+            />
           </div>
-
-          <FormField
-            control={form.control}
-            name="judulRekening"
-            render={({ field }) => (
-              <FormItem className="w-full">
-                <FormLabel className="text-[13px] text-muted-foreground">Judul Rekening</FormLabel>
-                <FormControl>
-                  {/* Tampilan Read-only yang konsisten dengan desain modern Anda */}
-                  <div className="flex h-9 w-full items-center rounded-md border border-border/50 bg-muted/30 px-3 py-1 text-[13px] text-muted-foreground truncate">
-                    {field.value || 'Judul akan terisi otomatis...'}
-                  </div>
-                </FormControl>
-                <FormMessage className="text-[11px]" />
-              </FormItem>
-            )}
-          />
 
           <FormField
             control={form.control}
@@ -561,7 +562,7 @@ export default function SpjMetaForm({
                 <FormLabel className="text-[13px] text-muted-foreground">Tingkat Perjalanan</FormLabel>
                 <FormControl>
                   <Input
-                    className="rounded-md border-border/50 bg-background/50 h-9"
+                    className="rounded-md border-border/50 bg-background/50 h-9 shadow-none"
                     {...field}
                     value={field.value ?? ''}
                     placeholder="Tingkat Perjalanan Menurut Peraturan (PMK)"
@@ -591,7 +592,7 @@ export default function SpjMetaForm({
                 </FormLabel>
                 <FormControl>
                   <Input
-                    className="rounded-md border-border/50 bg-background/50 h-9 font-mono text-[12px]"
+                    className="rounded-md border-border/50 bg-background/50 h-9 font-mono text-[12px] shadow-none"
                     {...field}
                     value={field.value ?? ''}
                     placeholder="https://..."
@@ -610,7 +611,7 @@ export default function SpjMetaForm({
                 <FormLabel className="text-[13px] text-muted-foreground">Maksud Dinas</FormLabel>
                 <FormControl>
                   <Textarea
-                    className="rounded-md border-border/50 bg-background/50 min-h-[100px] resize-none text-[14px]"
+                    className="rounded-md border-border/50 bg-background/50 min-h-25 resize-none text-[14px] shadow-none"
                     rows={4}
                     {...field}
                     value={field.value ?? ''}
@@ -626,7 +627,7 @@ export default function SpjMetaForm({
             control={form.control}
             name="pencairan"
             render={({ field }) => (
-              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border border-border/50 bg-background/50 p-4 shadow-sm transition-colors hover:bg-muted/20">
+              <FormItem className="flex flex-row items-start space-x-3 space-y-0 rounded-xl border border-border/50 bg-background/50 p-4 shadow-none transition-colors hover:bg-muted/20">
                 <FormControl>
                   <Checkbox
                     checked={field.value}

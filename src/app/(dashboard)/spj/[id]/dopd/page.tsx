@@ -15,6 +15,8 @@ export default async function DopdPage(ctx: { params: Promise<{ id: string }> })
     select: {
       id: true,
       createdById: true,
+      tempatBerangkat: true,
+      tempatTujuan: true,
       roster: {
         orderBy: { order: 'asc' },
         select: {
@@ -57,9 +59,22 @@ export default async function DopdPage(ctx: { params: Promise<{ id: string }> })
 
   if (!spj) return notFound()
 
+  // Keamanan: Pastikan hanya pemilik atau Super Admin yang bisa akses
   const isOwner = spj.createdById === session.user.id
   const isSuperAdmin = session.user.role === 'SUPER_ADMIN'
   if (!isOwner && !isSuperAdmin) return notFound()
 
-  return <DopdForm spjId={spjId} roster={spj.roster} initialItems={spj.rincian} initialSigners={spj.signers} />
+  return (
+    <DopdForm
+      spjId={spjId}
+      // Mengirim meta data tempatBerangkat dan tempatTujuan untuk Auto-Suggest
+      spj={{
+        asal: spj.tempatBerangkat ?? '',
+        tujuan: spj.tempatTujuan ?? ''
+      }}
+      roster={spj.roster}
+      initialItems={spj.rincian}
+      initialSigners={spj.signers}
+    />
+  )
 }

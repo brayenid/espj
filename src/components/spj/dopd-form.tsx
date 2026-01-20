@@ -32,6 +32,8 @@ import {
   X
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
+import { KategoriBiayaSelect } from './biaya-selector'
+import { UraianPresetPicker } from './uraian-preset'
 
 type RosterItem = {
   id: string
@@ -219,7 +221,9 @@ function ItemEditorSheet({
   rosterLabel,
   item,
   onSave,
-  onDelete
+  onDelete,
+  asal,
+  tujuan
 }: {
   open: boolean
   onOpenChange: (v: boolean) => void
@@ -227,6 +231,8 @@ function ItemEditorSheet({
   item: DraftItem | null
   onSave: (next: DraftItem) => void
   onDelete?: (id: string) => void
+  asal: string
+  tujuan: string
 }) {
   const [draft, setDraft] = useState<DraftItem | null>(item)
   useEffect(() => {
@@ -256,15 +262,7 @@ function ItemEditorSheet({
             </div>
 
             <div className="grid gap-6 sm:grid-cols-2">
-              <div className="space-y-2">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase">Kategori Biaya</label>
-                <Input
-                  value={draft.kategori}
-                  onChange={(e) => setDraft({ ...draft, kategori: e.target.value })}
-                  placeholder="Uang Harian / Transport"
-                  className="rounded-lg bg-muted/20 border-border/40 text-sm h-10 shadow-none"
-                />
-              </div>
+              <KategoriBiayaSelect value={draft.kategori} onChange={(val) => setDraft({ ...draft, kategori: val })} />
               <div className="space-y-2">
                 <label className="text-[11px] font-bold text-muted-foreground uppercase">Harga Satuan (Rp)</label>
                 <div className="relative">
@@ -280,7 +278,11 @@ function ItemEditorSheet({
             </div>
 
             <div className="space-y-2">
-              <label className="text-[11px] font-bold text-muted-foreground uppercase">Uraian Detail</label>
+              <div className="flex items-center justify-between">
+                <label className="text-[11px] font-bold text-muted-foreground uppercase">Uraian Detail</label>
+                {/* Penambahan Preset Picker */}
+                <UraianPresetPicker onPick={(val) => setDraft({ ...draft, uraian: val })} asal={asal} tujuan={tujuan} />
+              </div>
               <Textarea
                 value={draft.uraian}
                 onChange={(e) => setDraft({ ...draft, uraian: e.target.value })}
@@ -419,12 +421,14 @@ function ItemEditorSheet({
 
 export default function DopdForm({
   spjId,
+  spj,
   roster,
   initialItems,
   initialSigners
 }: {
   spjId: string
   roster: RosterItem[]
+  spj: { asal: string; tujuan: string }
   initialItems: BiayaItem[]
   initialSigners: { order: number; pegawaiId: string | null; nama: string; nip: string | null }[]
 }) {
@@ -731,6 +735,8 @@ export default function DopdForm({
         item={editingItem}
         onSave={(next) => setItems(items.map((x) => (x.id === next.id ? next : x)))}
         onDelete={(id) => setItems(items.filter((x) => x.id !== id))}
+        asal={spj.asal}
+        tujuan={spj.tujuan}
       />
     </div>
   )

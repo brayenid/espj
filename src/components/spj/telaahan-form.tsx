@@ -26,7 +26,6 @@ import { Badge } from '@/components/ui/badge'
 import PRESETS from '@/data/telaahan-presets.json'
 import {
   BookOpen,
-  CalendarDays,
   Crown,
   FileText,
   ListChecks,

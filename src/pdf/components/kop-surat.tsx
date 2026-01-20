@@ -1,3 +1,4 @@
+/* eslint-disable jsx-a11y/alt-text */
 import { Image, StyleSheet, Text, View } from '@react-pdf/renderer'
 
 export type KopSuratProps = {
@@ -19,9 +20,9 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center'
   },
-  logo: { width: 59, height: 59, objectFit: 'contain' },
+  logo: { width: 65, height: 65, objectFit: 'contain' },
 
-  headerText: { flex: 1, alignItems: 'center', justifyContent: 'center' },
+  headerText: { flex: 1, alignItems: 'center', justifyContent: 'center', marginLeft: 30 },
 
   instansi1: { fontSize: 14, fontWeight: 700, textTransform: 'uppercase' },
   instansi2: { fontSize: 18, fontWeight: 700, textTransform: 'uppercase', marginTop: 2 },

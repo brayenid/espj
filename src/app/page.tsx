@@ -6,19 +6,19 @@ import { Button } from '@/components/ui/button'
 import { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'E-SPJ - Bagian Organisasi',
+  title: 'SIPADIN - Bagian Organisasi',
   description:
     'Sistem Digitalisasi Administrasi dan Dokumen Perjalanan Dinas Bagian Organisasi Sekretariat Daerah Kabupaten Kutai Barat.',
   openGraph: {
-    title: 'E-SPJ System',
+    title: 'SIPADIN System',
     description: 'Digitalisasi Dokumen Perjalanan Dinas Bagian Organisasi.',
-    siteName: 'E-SPJ Organisasi',
+    siteName: 'SIPADIN Organisasi',
     locale: 'id_ID',
     type: 'website'
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'E-SPJ System',
+    title: 'SIPADIN System',
     description: 'Digitalisasi Dokumen Perjalanan Dinas.'
   }
 }
@@ -43,9 +43,9 @@ export default async function HomePage() {
               <FileStack className="h-5 w-5 text-background" />
             </div>
             <div>
-              <div className="text-sm font-bold tracking-tight uppercase">E-SPJ SYSTEM</div>
+              <div className="text-sm font-bold tracking-tight uppercase">Sipadin</div>
               <div className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground leading-none mt-1 hidden sm:block">
-                Digitalisasi Administrasi Perjalanan Dinas
+                Si Paling Dinas
               </div>
             </div>
           </div>
@@ -73,16 +73,15 @@ export default async function HomePage() {
         {/* Hero Section */}
         <section className="mt-24 max-w-4xl">
           <div className="inline-flex items-center gap-2 rounded-lg border border-border/60 bg-white px-3 py-1.5 text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-sm">
-            <Database className="h-3 w-3" /> Data Personel & Dokumen Terpusat
+            <Database className="h-3 w-3" /> Generator Berkas dan Pengarsipan
           </div>
 
           <h1 className="mt-6 text-4xl font-bold tracking-tighter text-foreground md:text-5xl lg:text-6xl leading-[1.1]">
-            Digitalisasi Dokumen <br /> Perjalanan Dinas.
+            Sipadin <br /> <span className="font-medium">Si Paling Dinas.</span>
           </h1>
 
           <p className="mt-8 text-base leading-relaxed text-muted-foreground md:text-lg max-w-2xl">
-            Platform internal untuk mendigitalkan proses penyusunan SPJ. Kelola data personel, rincian biaya, dan cetak
-            dokumen sesuai standar administrasi.
+            Platform internal untuk generasi berkasi SPJ Perjalanan Dinas Bagian Organisasi Kutai Barat.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-3">

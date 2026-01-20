@@ -58,9 +58,9 @@ export type TelaahanStafPdfProps = {
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 40,
-    paddingBottom: 40,
-    paddingHorizontal: 50,
+    paddingTop: 28,
+    paddingBottom: 32,
+    paddingHorizontal: 40,
     fontSize: 11,
     lineHeight: 1.35,
     fontFamily: 'Helvetica'
@@ -391,7 +391,7 @@ export function buildTelaahanStafDocument(props: TelaahanStafPdfProps): React.Re
           {telaahan.fakta?.length ? (
             <>
               <View wrap={false}>
-                <Text style={styles.sectionTitle}>B. Fakta – Fakta yang Mempengaruhi</Text>
+                <Text style={styles.sectionTitle}>B. Fakta - Fakta yang Memengaruhi</Text>
                 <View style={styles.listItem}>
                   <Text style={styles.listNo}>1.</Text>
                   <Text style={styles.listText}>{telaahan.fakta[0]}</Text>

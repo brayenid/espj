@@ -36,7 +36,7 @@ export default async function DashboardLayout({ children }: { children: React.Re
               <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center transition-transform group-hover:scale-95 shadow-sm">
                 <FileStack className="w-4 h-4 text-background" />
               </div>
-              <span className="font-bold tracking-tighter text-lg">E-SPJ</span>
+              <span className="font-bold tracking-tighter text-lg">Sipadin</span>
             </Link>
 
             <Separator orientation="vertical" className="h-6 bg-border/40 hidden md:block" />

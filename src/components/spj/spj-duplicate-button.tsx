@@ -67,8 +67,7 @@ export default function SpjDuplicateButton({ id, className }: { id: string; clas
             </AlertDialogTitle>
           </div>
           <AlertDialogDescription className="text-sm leading-relaxed text-muted-foreground">
-            Seluruh metadata, personil (roster), rincian biaya, dan isi laporan akan diduplikasi ke draf baru. Nomor
-            surat akan dikosongkan secara otomatis.
+            Seluruh metadata, personil, rincian biaya, dan isi laporan akan diduplikasi ke draf baru.
           </AlertDialogDescription>
         </AlertDialogHeader>
 
