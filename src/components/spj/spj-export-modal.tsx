@@ -59,6 +59,7 @@ export default function SpjExportModal() {
       a.click()
       a.remove()
       toast.success('Excel berhasil diunduh.')
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
     } catch (error) {
       toast.error('Gagal mengekspor data.')
     } finally {
@@ -70,7 +71,7 @@ export default function SpjExportModal() {
     <Dialog>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="h-9 gap-2 cursor-pointer shadow-none!">
-          <FileSpreadsheet className="w-4 h-4 text-green-600" />
+          <FileSpreadsheet className="w-4 h-4" />
           Ekspor Excel
         </Button>
       </DialogTrigger>

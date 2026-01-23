@@ -216,6 +216,14 @@ model SpjTelaahanStaf {
   analisis   String? @db.Text
   kesimpulan String? @db.Text
   saran      String? @db.Text
+
+  signerPegawaiId     String?
+  signerNama          String?
+  signerNip           String?
+  signerJabatan       String?
+  signerPangkat       String?
+  signerGolongan      String?
+  signerJabatanTampil String? // Untuk override jabatan seperti "Plt." atau "a.n"
 }
 
 //

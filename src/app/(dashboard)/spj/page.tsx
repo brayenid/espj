@@ -103,7 +103,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
           </h1>
           <p className="text-sm text-muted-foreground/80">Arsip dan pembuatan dokumen SPJ Perjadin.</p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <SpjExportModal />
           <Button asChild size="sm" className="h-9 bg-foreground text-background hover:bg-foreground/90">
             <Link href="/spj/new">

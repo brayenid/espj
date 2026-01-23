@@ -125,7 +125,7 @@ function SignerCombobox({
         <PopoverTrigger asChild>
           <div
             className={cn(
-              'group flex flex-col items-start p-4 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-sm',
+              'group flex flex-col items-start p-4 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-none',
               value && 'border-primary/20 bg-primary/2'
             )}>
             {value ? (
@@ -329,7 +329,7 @@ export default function KuitansiForm({
                     type="date"
                     value={tanggal}
                     onChange={(e) => setTanggal(e.target.value)}
-                    className="rounded-lg h-10 text-sm font-mono border-border/40 bg-background"
+                    className="rounded-lg h-10 text-sm font-mono border-border/40 bg-background shadow-none"
                   />
                   <p className="text-[10px] text-muted-foreground italic leading-relaxed">
                     *Kosongkan jika ingin mencetak tanpa tanggal (tulis tangan).
