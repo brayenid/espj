@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Check, ChevronsUpDown, Zap } from 'lucide-react'
+import { Check, ChevronsUpDown } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Button } from '@/components/ui/button'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
@@ -28,12 +28,12 @@ export function KategoriBiayaSelect({ value, onChange }: { value: string; onChan
             variant="outline"
             role="combobox"
             aria-expanded={open}
-            className="w-full justify-between rounded-lg bg-muted/20 border-border/40 text-sm h-10 shadow-none font-normal">
+            className="w-full justify-between rounded-lg bg-muted/20 border-border/40 text-sm h-10 shadow-none font-normal mt-4">
             {value ? value : 'Pilih atau ketik kategori...'}
             <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
           </Button>
         </PopoverTrigger>
-        <PopoverContent className="w-[300px] p-0 shadow-xl border-border/40" align="start">
+        <PopoverContent className="w-75 p-0 shadow-xl border-border/40" align="start">
           <Command>
             <CommandInput
               placeholder="Cari atau ketik kategori baru..."

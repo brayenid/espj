@@ -34,6 +34,7 @@ import {
 import { cn } from '@/lib/utils'
 import { KategoriBiayaSelect } from './biaya-selector'
 import { UraianPresetPicker } from './uraian-preset'
+import { HargaPresetPicker } from './harga-preset'
 
 type RosterItem = {
   id: string
@@ -264,7 +265,13 @@ function ItemEditorSheet({
             <div className="grid gap-6 sm:grid-cols-2">
               <KategoriBiayaSelect value={draft.kategori} onChange={(val) => setDraft({ ...draft, kategori: val })} />
               <div className="space-y-2">
-                <label className="text-[11px] font-bold text-muted-foreground uppercase">Harga Satuan (Rp)</label>
+                <div className="flex items-center justify-between">
+                  <label className="text-[11px] font-bold text-muted-foreground uppercase">Harga Satuan (Rp)</label>
+
+                  {/* Pasang Picker di sini */}
+                  <HargaPresetPicker onPick={(nominal) => setDraft({ ...draft, hargaSatuan: nominal })} />
+                </div>
+
                 <div className="relative">
                   <span className="absolute left-3 top-2.5 text-xs text-muted-foreground font-mono">Rp</span>
                   <Input
@@ -362,16 +369,13 @@ function ItemEditorSheet({
         </div>
 
         {/* Footer with Calculation Preview */}
-        <div className="p-8 border-t border-border/40 bg-muted/10 space-y-4">
+        <div className="p-8 py-4 border-t border-border/40 bg-muted/10 space-y-4">
           <div className="flex items-center justify-between">
             <span className="text-[10px] font-bold uppercase text-muted-foreground tracking-widest">
               Simulasi Total Item
             </span>
             <div className="text-right">
-              <div className="text-2xl font-mono font-bold tracking-tighter">Rp {rupiah(total)}</div>
-              <p className="text-[10px] text-muted-foreground mt-1 italic">
-                Hasil kali harga satuan dengan seluruh faktor.
-              </p>
+              <div className="text-xl font-mono font-bold tracking-tighter">Rp {rupiah(total)}</div>
             </div>
           </div>
 
@@ -615,7 +619,7 @@ export default function DopdForm({
                 </div>
                 <Button
                   size="sm"
-                  className="rounded-lg h-8 px-4 text-[10px] font-bold uppercase tracking-tighter shadow-sm"
+                  className="rounded-lg h-8 px-4 text-[10px] font-bold uppercase tracking-tighter shadow-sm cursor-pointer"
                   onClick={() => {
                     const newItem = {
                       id: crypto.randomUUID(),
@@ -659,7 +663,7 @@ export default function DopdForm({
                         <TableCell colSpan={5} className="h-40 text-center py-12">
                           <div className="flex flex-col items-center gap-2 text-muted-foreground opacity-40">
                             <CreditCard className="w-8 h-8" />
-                            <p className="text-xs italic">Belum ada rincian biaya.</p>
+                            <p className="text-xs">Belum ada rincian biaya.</p>
                           </div>
                         </TableCell>
                       </TableRow>

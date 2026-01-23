@@ -81,7 +81,7 @@ export default async function HomePage() {
           </h1>
 
           <p className="mt-8 text-base leading-relaxed text-muted-foreground md:text-lg max-w-2xl">
-            Platform internal untuk generasi berkasi SPJ Perjalanan Dinas Bagian Organisasi Kutai Barat.
+            Platform internal untuk generasi berkas SPJ Perjalanan Dinas Bagian Organisasi Kutai Barat.
           </p>
 
           <div className="mt-10 flex flex-wrap gap-3">

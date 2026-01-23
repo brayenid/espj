@@ -68,6 +68,21 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
     const pengikutCount = roster.filter((r) => r.role === 'PENGIKUT').length
     return pengikutCount > 0 ? `${kepala.nama} + ${pengikutCount} orang` : kepala.nama
   }
+  const rosterView = (roster: { nama: string; role: string }[]) => {
+    const firstNames = roster.map((data) => {
+      // 1. Ambil kata pertama setelah trim spasi
+      const firstNameRaw = data.nama.trim().split(/\s+/)[0]
+
+      // 2. Sanitasi: Hanya ambil karakter huruf dan angka
+      // Menghapus simbol seperti . , ( ) [ ] dll.
+      const sanitizedName = firstNameRaw.replace(/[^a-zA-Z0-9]/g, '')
+
+      return sanitizedName
+    })
+
+    // 3. Gabungkan dengan koma, filter jika ada string kosong
+    return firstNames.filter(Boolean).join(', ')
+  }
 
   const prevHref = buildQueryString({ q: qRaw, page: String(Math.max(1, pageNum - 1)) })
   const nextHref = buildQueryString({ q: qRaw, page: String(Math.min(totalPages, pageNum + 1)) })
@@ -150,7 +165,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                   </TableCell>
 
                   <TableCell className="table-cell py-4 pointer-events-none">
-                    <span className="text-sm text-muted-foreground/90">{getRosterPreview(spj.roster)}</span>
+                    <span className="text-sm text-muted-foreground/90">{rosterView(spj.roster)}</span>
                   </TableCell>
 
                   <TableCell className="py-4 tabular-nums text-sm pointer-events-none">

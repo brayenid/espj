@@ -168,9 +168,9 @@ export async function duplicateSpj(originalId: string) {
           akunAnggaran: source.akunAnggaran,
           tingkatPerjalanan: source.tingkatPerjalanan,
           // NOMOR SURAT Bisa dibuat null
-          noTelaahan: source.noTelaahan,
-          noSuratTugas: source.noSuratTugas,
-          noSpd: source.noSpd
+          noTelaahan: SpjNumberGenerator.generateTelaahan(),
+          noSuratTugas: SpjNumberGenerator.generateSuratTugas(),
+          noSpd: SpjNumberGenerator.generateSpd()
         }
       })
 
