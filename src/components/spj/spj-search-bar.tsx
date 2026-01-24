@@ -29,7 +29,7 @@ export default function SpjSearchBar({ initialQ }: { initialQ?: string }) {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="Cari berdasarkan tujuan, nomor surat, nama pelaksana..."
-          className="pl-9 h-9 border-border/50 bg-background/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 rounded-md"
+          className="pl-10 h-10 border-border/80 bg-background/50 focus-visible:ring-1 focus-visible:ring-ring focus-visible:ring-offset-0 rounded-md shadow-none"
         />
         {q && (
           <Button

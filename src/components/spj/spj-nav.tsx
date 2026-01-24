@@ -32,11 +32,10 @@ export default function SpjNav({ spjId }: { spjId: string }) {
   }
 
   return (
-    <div className="mt-2">
-      {/* Outer shell (Linear-ish) */}
-      <div className="rounded-2xl border border-border/60 bg-background/40 p-1">
-        {/* Scroll row */}
-        <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap px-1 py-1 [-ms-overflow-style:none] [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <nav className="w-full">
+      <div className="relative rounded-2xl border border-border/50 bg-muted/30 p-1.5 overflow-hidden">
+        {/* Kontainer Scrollable */}
+        <div className="flex items-center gap-1 overflow-x-auto whitespace-nowrap scrollbar-hide">
           {items.map((it) => {
             const active = isActive(it)
             return (
@@ -44,18 +43,19 @@ export default function SpjNav({ spjId }: { spjId: string }) {
                 key={it.href}
                 href={it.href}
                 className={cn(
-                  'inline-flex h-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition',
-                  'focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2',
+                  'relative inline-flex h-9 items-center justify-center rounded-xl px-4 text-[13px] font-bold transition-all duration-200',
                   active
-                    ? 'bg-background text-foreground shadow-sm'
-                    : 'text-muted-foreground hover:bg-background/70 hover:text-foreground'
+                    ? 'bg-background text-primary ring-1 ring-border/20'
+                    : 'text-muted-foreground hover:text-foreground hover:bg-background/40'
                 )}>
                 {it.label}
+                {/* Underline aktif minimalis */}
+                {active && <span className="absolute bottom-1 w-6 h-1 rounded-full bg-slate-400" />}
               </Link>
             )
           })}
         </div>
       </div>
-    </div>
+    </nav>
   )
 }

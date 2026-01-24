@@ -97,7 +97,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
     <div className="mx-auto w-full max-w-7xl space-y-8 p-4">
       <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="space-y-1">
-          <h1 className="text-xl font-medium tracking-tight text-foreground flex items-center gap-2">
+          <h1 className="text-xl font-bold tracking-tight text-foreground flex items-center gap-2">
             <FileText className="w-5 h-5 text-muted-foreground" />
             SPJ Perjalanan Dinas
           </h1>
