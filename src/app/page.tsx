@@ -48,7 +48,7 @@ export default async function HomePage() {
             {isLoggedIn ? (
               <Button asChild className="rounded-lg text-[10px] font-bold uppercase tracking-wider h-9 px-5 shadow-sm">
                 <Link href="/spj">
-                  <LayoutDashboard className="w-3.5 h-3.5 mr-2" /> Workspace
+                  <LayoutDashboard className="w-3.5 h-3.5 mr-2" /> Ruang Kerja
                 </Link>
               </Button>
             ) : (
