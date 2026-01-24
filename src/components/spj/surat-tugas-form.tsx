@@ -12,12 +12,26 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Separator } from '@/components/ui/separator'
-import { Badge } from '@/components/ui/badge'
 import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
-import { Briefcase, Crown, FileEdit, Hash, Loader2, Printer, Save, Search, UserCheck, Users, X } from 'lucide-react'
+import {
+  Briefcase,
+  Crown,
+  FileEdit,
+  Hash,
+  Loader2,
+  Printer,
+  Save,
+  Search,
+  UserCheck,
+  Users,
+  AlertCircle
+} from 'lucide-react'
+import { cn } from '@/lib/utils'
+
+// --- SCHEMAS & TYPES ---
 
 const schema = z.object({
   nomor: z.string().optional().nullable(),
@@ -69,6 +83,8 @@ type PegawaiResult = {
   pangkat: string | null
 }
 
+// --- HELPERS ---
+
 function useDebouncedValue<T>(value: T, delayMs: number) {
   const [debounced, setDebounced] = useState(value)
   useEffect(() => {
@@ -77,6 +93,8 @@ function useDebouncedValue<T>(value: T, delayMs: number) {
   }, [value, delayMs])
   return debounced
 }
+
+// --- MAIN COMPONENT ---
 
 export default function SuratTugasForm({
   spjId,
@@ -118,6 +136,7 @@ export default function SuratTugasForm({
     mode: 'onBlur'
   })
 
+  // Signer Selection Logic
   const [open, setOpen] = useState(false)
   const [q, setQ] = useState('')
   const debouncedQ = useDebouncedValue(q, 300)
@@ -184,276 +203,230 @@ export default function SuratTugasForm({
   }
 
   return (
-    <div className="space-y-6 animate-in fade-in duration-500 pb-20">
-      {/* 1. SECTION: ROSTER DISPLAY */}
-      <Card className="rounded-xl border-border/40 shadow-none bg-card/50 overflow-hidden">
-        <CardHeader className="bg-muted/10 border-b border-border/40 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <Users className="w-4 h-4 text-primary" />
-            <div>
-              <CardTitle className="text-sm font-bold uppercase tracking-tight">Personel yang Ditugaskan</CardTitle>
-              <p className="text-[11px] text-muted-foreground font-medium uppercase mt-0.5">
-                Ditarik otomatis dari Roster SPJ
-              </p>
+    <div className="space-y-4 sm:space-y-8 animate-in fade-in duration-500 text-left">
+      {/* HEADER CARD */}
+      <Card className="rounded-lg border-border/50 bg-card/40 shadow-none overflow-hidden">
+        <CardHeader className="border-b border-border/40 bg-muted/10 px-4 py-4 sm:px-6 sm:py-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-3">
+              <div className="p-2 bg-background rounded-md border border-border/50 shadow-xs">
+                <FileEdit className="w-4 h-4 text-muted-foreground" />
+              </div>
+              <div>
+                <CardTitle className="text-sm font-semibold tracking-tight uppercase">Surat Tugas Perjalanan</CardTitle>
+                <p className="text-[11px] text-muted-foreground mt-0.5 font-medium uppercase tracking-wider">
+                  Pengelolaan Redaksi & Otoritas
+                </p>
+              </div>
             </div>
-          </div>
-        </CardHeader>
-        <CardContent className="p-6">
-          {rosterSorted.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-8 text-center border border-dashed rounded-xl border-border/60">
-              <Users className="w-8 h-8 text-muted-foreground/20 mb-2" />
-              <p className="text-xs text-muted-foreground italic">
-                Belum ada personel. Harap isi roster terlebih dahulu.
-              </p>
-            </div>
-          ) : (
-            <div className="grid gap-3 sm:grid-cols-2">
-              {rosterSorted.map((r) => (
-                <div
-                  key={r.id}
-                  className="group flex items-center justify-between p-3 rounded-xl border border-border/50 bg-background hover:border-primary/20 transition-all">
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <span className="text-sm font-semibold truncate">{r.nama}</span>
-                      {r.role === 'KEPALA_JALAN' && (
-                        <Badge
-                          variant="outline"
-                          className="h-4 px-1.5 text-[8px] font-bold border-primary/20 text-primary bg-primary/5">
-                          <Crown className="w-2 h-2 mr-1" /> KEPALA
-                        </Badge>
-                      )}
-                    </div>
-                    <div className="text-[11px] text-muted-foreground truncate mt-0.5">{r.jabatan}</div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* 2. SECTION: SURAT TUGAS FORM */}
-      <Card className="rounded-xl border-border/40 shadow-none overflow-hidden">
-        <CardHeader className="border-b border-border/40 px-6 py-5 bg-muted/10">
-          <div className="flex items-center gap-3">
-            <FileEdit className="w-5 h-5 text-primary" />
-            <div>
-              <CardTitle className="text-base font-bold tracking-tight">Detail Surat Tugas</CardTitle>
-              <p className="text-[11px] text-muted-foreground font-medium uppercase mt-0.5 tracking-wider">
-                Penyusunan Redaksi & Otoritas
-              </p>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-lg h-9 font-semibold text-xs border-border/60 shadow-none"
+                onClick={() => window.open(`/spj/${spjId}/surat-tugas/print`, '_blank')}
+                disabled={rosterSorted.length === 0}>
+                <Printer className="w-3.5 h-3.5 mr-2" /> Preview PDF
+              </Button>
+              <Button
+                size="sm"
+                className="rounded-lg h-9 px-6 font-semibold text-xs shadow-none"
+                onClick={form.handleSubmit(onSubmit)}
+                disabled={saving || rosterSorted.length === 0}>
+                {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Save className="w-3.5 h-3.5 mr-2" />}
+                Simpan
+              </Button>
             </div>
           </div>
         </CardHeader>
 
-        <CardContent className="p-8">
+        <CardContent className="p-4 sm:p-8">
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-10">
-              <div className="grid gap-8 md:grid-cols-2 items-start">
-                {/* NOMOR SURAT */}
-                <FormField
-                  control={form.control}
-                  name="nomor"
-                  render={({ field }) => (
-                    <FormItem className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <Hash className="w-3.5 h-3.5 text-muted-foreground" />
-                        <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-                          Nomor Surat Tugas
-                        </FormLabel>
-                      </div>
-                      <FormControl>
-                        <Input
-                          {...field}
-                          value={field.value ?? ''}
-                          className="h-11 rounded-xl bg-muted/20 border-border/40 font-mono text-sm px-4 focus-visible:ring-1 shadow-none"
-                          placeholder="Contoh: 090/001/ORG-TU.P/I/2026"
-                        />
-                      </FormControl>
-                      <FormDescription className="text-[10px] italic">
-                        Biarkan kosong jika nomor belum diterbitkan (draft).
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-
-                {/* SIGNER COMBOBOX */}
-                <FormField
-                  control={form.control}
-                  name="signerPegawaiId"
-                  render={({ field }) => (
-                    <FormItem className="space-y-3">
-                      <div className="flex items-center gap-2">
-                        <UserCheck className="w-3.5 h-3.5 text-muted-foreground" />
-                        <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-                          Pejabat Penandatangan
-                        </FormLabel>
-                      </div>
-                      <FormControl>
-                        <div className="space-y-3">
-                          <Popover open={open} onOpenChange={setOpen}>
-                            <PopoverTrigger asChild>
-                              <div className="flex gap-2">
-                                <div className="relative flex-1">
-                                  <Search className="absolute left-3 top-3 w-4 h-4 text-muted-foreground" />
-                                  <Input
-                                    value={q}
-                                    onChange={(e) => {
-                                      setQ(e.target.value)
-                                      if (!open) setOpen(true)
-                                      if (selected) setSelected(null)
-                                    }}
-                                    placeholder="Cari Nama / NIP / Jabatan..."
-                                    className="h-11 pl-10 rounded-xl bg-muted/20 border-border/40 text-sm shadow-none"
-                                  />
-                                </div>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="icon"
-                                  className="h-11 w-11 rounded-xl border-border/40"
-                                  onClick={() => {
-                                    setSelected(null)
-                                    setQ('')
-                                    field.onChange('__none__')
-                                  }}>
-                                  <X className="w-4 h-4" />
-                                </Button>
-                              </div>
-                            </PopoverTrigger>
-
-                            <PopoverContent className="w-85 p-0" align="start">
-                              <Command shouldFilter={false}>
-                                <CommandInput value={q} onValueChange={setQ} placeholder="Ketik nama pejabat..." />
-                                <CommandList>
-                                  {loadingSearch ? (
-                                    <div className="p-4 flex justify-center">
-                                      <Loader2 className="w-4 h-4 animate-spin text-muted-foreground" />
+            <form className="space-y-8 sm:space-y-12">
+              <div className="grid gap-8 lg:grid-cols-12">
+                {/* SIDEBAR: SIGNER & PERSONEL (Kiri) */}
+                <div className="lg:col-span-4 space-y-6">
+                  {/* Signer Selection */}
+                  <Card className="rounded-xl border-border/40 shadow-none bg-muted/5 p-5">
+                    <FormField
+                      control={form.control}
+                      name="signerPegawaiId"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <UserCheck className="w-3.5 h-3.5 text-muted-foreground" />
+                            <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                              Penandatangan
+                            </FormLabel>
+                          </div>
+                          <FormControl>
+                            <Popover open={open} onOpenChange={setOpen}>
+                              <PopoverTrigger asChild>
+                                <div
+                                  className={cn(
+                                    'group flex flex-col items-start p-3 w-full rounded-lg border border-border/50 bg-background hover:border-primary/30 transition-all cursor-pointer shadow-none',
+                                    selected && 'border-primary/20 bg-primary/2'
+                                  )}>
+                                  {selected ? (
+                                    <div className="w-full text-left">
+                                      <div className="text-[12px] font-bold leading-tight">{selected.nama}</div>
+                                      <div className="text-[9px] text-muted-foreground mt-1 uppercase tracking-tight truncate">
+                                        {selected.jabatan}
+                                      </div>
                                     </div>
                                   ) : (
-                                    <>
-                                      <CommandEmpty className="text-xs p-4 text-muted-foreground">
-                                        Minimal 2 karakter untuk mencari.
-                                      </CommandEmpty>
-                                      <CommandGroup heading="Hasil Pencarian">
-                                        {results.map((p) => (
-                                          <CommandItem
-                                            key={p.id}
-                                            onSelect={() => {
-                                              setSelected(p)
-                                              setQ(p.nama)
-                                              field.onChange(p.id)
-                                              setOpen(false)
-                                            }}
-                                            className="p-3">
-                                            <div className="flex flex-col">
-                                              <span className="font-semibold text-sm">{p.nama}</span>
-                                              <span className="text-[10px] text-muted-foreground mt-0.5">
-                                                {p.nip} • {p.jabatan}
-                                              </span>
-                                            </div>
-                                          </CommandItem>
-                                        ))}
-                                      </CommandGroup>
-                                    </>
+                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                      <Search className="w-3.5 h-3.5" />
+                                      <span>Pilih Pejabat...</span>
+                                    </div>
                                   )}
-                                </CommandList>
-                              </Command>
-                            </PopoverContent>
-                          </Popover>
-
-                          {/* {signerValue && signerValue !== '__none__' && (
-                            <div className="p-4 rounded-xl border border-primary/20 bg-primary/[0.02] animate-in slide-in-from-top-1 duration-300">
-                              <div className="flex items-center gap-3">
-                                <div className="p-2 bg-background rounded-lg border border-border/40 shadow-sm">
-                                  <UserCheck className="w-4 h-4 text-primary" />
                                 </div>
-                                <div>
-                                  <div className="text-sm font-bold">{selected?.nama ?? 'Loading...'}</div>
-                                  <div className="text-[10px] text-muted-foreground mt-0.5 uppercase tracking-wider">
-                                    {selected?.jabatan}
-                                  </div>
-                                </div>
-                              </div>
-                            </div>
-                          )} */}
-                        </div>
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-              </div>
+                              </PopoverTrigger>
+                              <PopoverContent className="w-85 p-0 shadow-2xl" align="start">
+                                <Command shouldFilter={false}>
+                                  <CommandInput value={q} onValueChange={setQ} placeholder="Ketik nama/jabatan..." />
+                                  <CommandList>
+                                    {loadingSearch ? (
+                                      <div className="p-4 flex justify-center">
+                                        <Loader2 className="w-4 h-4 animate-spin" />
+                                      </div>
+                                    ) : (
+                                      <>
+                                        <CommandEmpty className="p-4 text-xs text-muted-foreground">
+                                          Minimal 2 karakter.
+                                        </CommandEmpty>
+                                        <CommandGroup>
+                                          {results.map((p) => (
+                                            <CommandItem
+                                              key={p.id}
+                                              onSelect={() => {
+                                                setSelected(p)
+                                                setQ(p.nama)
+                                                field.onChange(p.id)
+                                                setOpen(false)
+                                              }}
+                                              className="p-3">
+                                              <div className="flex flex-col">
+                                                <span className="font-semibold text-sm">{p.nama}</span>
+                                                <span className="text-[10px] text-muted-foreground">
+                                                  {p.nip} • {p.jabatan}
+                                                </span>
+                                              </div>
+                                            </CommandItem>
+                                          ))}
+                                        </CommandGroup>
+                                      </>
+                                    )}
+                                  </CommandList>
+                                </Command>
+                              </PopoverContent>
+                            </Popover>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </Card>
 
-              {/* URAIAN UNTUK */}
-              <FormField
-                control={form.control}
-                name="untuk"
-                render={({ field }) => (
-                  <FormItem className="space-y-3">
+                  {/* Personel List */}
+                  <Card className="rounded-xl border-border/40 shadow-none bg-muted/5 p-5">
+                    <div className="text-[10px] font-bold uppercase text-muted-foreground mb-4 flex items-center gap-2">
+                      <Users className="w-3.5 h-3.5" /> Personel
+                    </div>
+                    {rosterSorted.length === 0 ? (
+                      <div className="text-[11px] text-muted-foreground italic p-4 text-center border border-dashed rounded-lg">
+                        Roster kosong.
+                      </div>
+                    ) : (
+                      <div className="space-y-2">
+                        {rosterSorted.map((r, i) => (
+                          <div
+                            key={r.id}
+                            className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 bg-background text-[11px] font-semibold">
+                            <span className="truncate pr-2">
+                              {i + 1}. {r.nama}
+                            </span>
+                            {r.role === 'KEPALA_JALAN' && <Crown className="w-3 h-3 text-primary shrink-0" />}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </Card>
+                </div>
+
+                {/* MAIN FORM AREA (Kanan) */}
+                <div className="lg:col-span-8 space-y-8">
+                  {/* Row: Nomor Surat */}
+                  <div className="bg-muted/10 p-4 sm:p-6 rounded-lg border border-border/30">
+                    <FormField
+                      control={form.control}
+                      name="nomor"
+                      render={({ field }) => (
+                        <FormItem className="max-w-md space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Hash className="w-3.5 h-3.5 text-muted-foreground" />
+                            <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                              Nomor Surat Tugas
+                            </FormLabel>
+                          </div>
+                          <FormControl>
+                            <Input
+                              {...field}
+                              value={field.value ?? ''}
+                              placeholder="090/001/ORG-TU.P/I/2026"
+                              className="h-10 rounded-md border-border/50 bg-background shadow-none font-mono text-xs"
+                            />
+                          </FormControl>
+                          <FormDescription className="text-[10px]">
+                            Biarkan kosong jika belum ada nomor (Draft).
+                          </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+
+                  {/* Row: Uraian Tugas */}
+                  <div className="space-y-4">
                     <div className="flex items-center gap-2">
                       <Briefcase className="w-3.5 h-3.5 text-muted-foreground" />
-                      <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                      <label className="text-[11px] font-bold uppercase text-muted-foreground tracking-widest">
                         Uraian Tugas (UNTUK)
-                      </FormLabel>
+                      </label>
                     </div>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        rows={6}
-                        className="rounded-xl bg-muted/20 border-border/40 text-sm p-4 leading-relaxed focus-visible:ring-1 shadow-none"
-                        placeholder="Masukkan maksud perjalanan dinas secara lengkap..."
-                      />
-                    </FormControl>
-                    <FormDescription className="text-[11px]">
-                      Redaksi ini akan muncul pada kolom UNTUK di dokumen fisik Surat Tugas.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+                    <FormField
+                      control={form.control}
+                      name="untuk"
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormControl>
+                            <Textarea
+                              {...field}
+                              rows={8}
+                              placeholder="Masukkan maksud perjalanan dinas secara lengkap..."
+                              className="rounded-md border-border/50 bg-background shadow-none text-[13px] p-4 leading-relaxed focus-visible:ring-1"
+                            />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
 
-              <Separator className="bg-border/40" />
+                  <Separator />
 
-              {/* ACTION FOOTER */}
-              <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-end pt-4">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  type="button"
-                  className="h-10 font-medium text-muted-foreground hover:text-foreground"
-                  onClick={() => window.open(`/spj/${spjId}/surat-tugas/print`, '_blank')}
-                  disabled={rosterSorted.length === 0}>
-                  <Printer className="w-4 h-4 mr-2" /> Preview PDF
-                </Button>
-
-                <div className="flex items-center gap-3">
-                  <Button
-                    type="submit"
-                    disabled={saving || rosterSorted.length === 0}
-                    className="h-10 px-8 rounded-md bg-foreground text-background hover:bg-foreground/90 shadow-sm transition-all w-full">
-                    {saving ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Menyimpan...
-                      </>
-                    ) : (
-                      <>
-                        <Save className="w-4 h-4 mr-2" /> Simpan Surat Tugas
-                      </>
-                    )}
-                  </Button>
+                  {/* Empty State Warning */}
+                  {rosterSorted.length === 0 && (
+                    <div className="p-4 bg-destructive/5 border border-destructive/10 rounded-xl flex items-center gap-3">
+                      <AlertCircle className="w-5 h-5 text-destructive shrink-0" />
+                      <p className="text-[11px] font-bold text-destructive uppercase tracking-wider">
+                        Data personel belum tersedia. Harap isi Roster SPJ terlebih dahulu untuk mengaktifkan tombol
+                        simpan & cetak.
+                      </p>
+                    </div>
+                  )}
                 </div>
               </div>
-
-              {rosterSorted.length === 0 && (
-                <div className="p-4 bg-destructive/5 border border-destructive/10 rounded-xl flex items-center gap-3">
-                  <X className="w-4 h-4 text-destructive" />
-                  <p className="text-[10px] font-bold text-destructive uppercase tracking-wider">
-                    Tombol simpan & cetak dinonaktifkan karena data personel belum tersedia.
-                  </p>
-                </div>
-              )}
             </form>
           </Form>
         </CardContent>

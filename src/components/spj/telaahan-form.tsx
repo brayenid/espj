@@ -19,7 +19,7 @@ import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage, FormDescription } from '@/components/ui/form'
+import { Form, FormControl, FormField, FormItem, FormLabel } from '@/components/ui/form'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
@@ -197,7 +197,7 @@ function SignerCombobox({
           </div>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[340px] p-0" align="start">
+        <PopoverContent className="w-85 p-0" align="start">
           <Command shouldFilter={false}>
             <CommandInput value={q} onValueChange={setQ} placeholder="Cari pegawai..." className="h-10" />
             <CommandList>
@@ -473,7 +473,7 @@ export default function TelaahanForm({
 
                   <Card className="rounded-xl border-border/40 shadow-none bg-muted/5 p-5">
                     <div className="text-[10px] font-bold uppercase text-muted-foreground mb-4 flex items-center gap-2">
-                      <Users className="w-3.5 h-3.5" /> Personel Roster
+                      <Users className="w-3.5 h-3.5" /> Personel
                     </div>
                     <div className="space-y-2">
                       {roster.map((r, i) => (

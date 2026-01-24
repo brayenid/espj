@@ -440,7 +440,7 @@ export default function DopdForm({
   const [saving, setSaving] = useState(false)
 
   // Sort roster so Kepala is always first
-  const rosterSorted = useMemo(() => [...roster].sort((a, b) => (a.role === 'KEPALA_JALAN' ? -1 : 1)), [roster])
+  const rosterSorted = useMemo(() => [...roster].sort((a) => (a.role === 'KEPALA_JALAN' ? -1 : 1)), [roster])
 
   const [items, setItems] = useState<DraftItem[]>(() =>
     initialItems.map((it) => ({

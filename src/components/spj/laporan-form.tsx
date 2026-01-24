@@ -18,7 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 
 // Import Dialog & ScrollArea untuk Preset Picker
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog'
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog'
 import { ScrollArea } from '@/components/ui/scroll-area'
 
 // Import JSON Preset Laporan
@@ -26,6 +26,7 @@ import PRESETS_LAPORAN from '@/data/laporan-preset.json'
 
 import {
   ClipboardCheck,
+  Crown,
   FileText,
   Loader2,
   Plus,
@@ -216,7 +217,6 @@ function SignerCombobox({
   return (
     <div className="space-y-3">
       <div className="flex items-center gap-2">
-        <UserCheck className="w-3.5 h-3.5 text-muted-foreground" />
         <span className="text-[11px] font-bold uppercase tracking-wider text-muted-foreground">{label}</span>
       </div>
 
@@ -224,7 +224,7 @@ function SignerCombobox({
         <PopoverTrigger asChild>
           <div
             className={cn(
-              'group flex flex-col items-start p-4 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-none',
+              'group flex flex-col items-start p-3 w-full rounded-xl border border-border/50 bg-background hover:border-border transition-all cursor-pointer shadow-none',
               value && 'border-primary/20 bg-primary/2'
             )}>
             {value ? (
@@ -243,7 +243,7 @@ function SignerCombobox({
           </div>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[340px] p-0" align="start">
+        <PopoverContent className="w-85 p-0" align="start">
           <Command shouldFilter={false}>
             <CommandInput value={q} onValueChange={setQ} placeholder="Cari pegawai..." className="h-10" />
             <CommandList>
@@ -429,7 +429,7 @@ export default function LaporanForm({
         <div className="lg:col-span-4 space-y-6">
           <Card className="rounded-xl border-border/40 shadow-none bg-card/50">
             <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
+              <CardTitle className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground flex items-center gap-2">
                 <UserCheck className="w-4 h-4 text-primary" /> Penandatangan
               </CardTitle>
             </CardHeader>
@@ -449,28 +449,29 @@ export default function LaporanForm({
             </CardContent>
           </Card>
 
-          <Card className="rounded-xl border-border/40 shadow-none bg-card/50">
-            <CardHeader className="pb-4">
-              <CardTitle className="text-sm font-bold flex items-center gap-2">
-                <Users className="w-4 h-4 text-primary" /> Pelaksana
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-2">
-              {rosterSorted.map((p, i) => (
-                <div
-                  key={p.id}
-                  className="flex items-center justify-between p-3 rounded-lg border border-border/40 bg-background/50">
-                  <div className="text-sm font-semibold truncate leading-none">
-                    {i + 1}. {p.nama}
+          {/* Personel List */}
+          <Card className="rounded-xl border-border/40 shadow-none bg-muted/5 p-5">
+            <div className="text-[10px] font-bold uppercase text-muted-foreground mb-4 flex items-center gap-2">
+              <Users className="w-3.5 h-3.5" /> Personel
+            </div>
+            {rosterSorted.length === 0 ? (
+              <div className="text-[11px] text-muted-foreground italic p-4 text-center border border-dashed rounded-lg">
+                Roster kosong.
+              </div>
+            ) : (
+              <div className="space-y-2">
+                {rosterSorted.map((r, i) => (
+                  <div
+                    key={r.id}
+                    className="flex items-center justify-between p-2.5 rounded-lg border border-border/40 bg-background text-[11px] font-semibold">
+                    <span className="truncate pr-2">
+                      {i + 1}. {r.nama}
+                    </span>
+                    {r.role === 'KEPALA_JALAN' && <Crown className="w-3 h-3 text-primary shrink-0" />}
                   </div>
-                  <Badge
-                    variant={p.role === 'KEPALA_JALAN' ? 'default' : 'secondary'}
-                    className="text-[8px] font-bold uppercase">
-                    {p.role === 'KEPALA_JALAN' ? 'Kepala' : 'Pengikut'}
-                  </Badge>
-                </div>
-              ))}
-            </CardContent>
+                ))}
+              </div>
+            )}
           </Card>
         </div>
 

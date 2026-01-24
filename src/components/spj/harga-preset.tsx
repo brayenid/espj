@@ -1,14 +1,13 @@
 'use client'
 
 import * as React from 'react'
-import { Banknote, Search, AlertCircle, Info, X } from 'lucide-react'
+import { Banknote, AlertCircle, Info } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Command, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Drawer, DrawerContent, DrawerHeader, DrawerTitle, DrawerTrigger } from '@/components/ui/drawer'
 import { cn } from '@/lib/utils'
-import { useMediaQuery } from '@/hooks/use-media-query' // Pastikan Anda punya hook ini atau gunakan window.innerWidth
-
+import { useMediaQuery } from '@/hooks/use-media-query'
 import daftarBiaya from '@/data/standar-biaya.json'
 
 interface HargaPresetPickerProps {
@@ -58,19 +57,13 @@ export function HargaPresetPicker({ onPick }: HargaPresetPickerProps) {
   // Konten Utama Picker (di-extract agar bisa dipakai di Popover maupun Drawer)
   const PickerContent = (
     <Command shouldFilter={false} className="flex flex-col h-[80vh] md:h-full bg-popover">
-      <div className="flex items-center border-b px-3 border-border/40 bg-muted/5">
-        <CommandInput
-          value={search}
-          onValueChange={setSearch}
-          placeholder="Cari rute atau kategori..."
-          className="flex h-11 w-full rounded-md bg-transparent py-3 text-sm outline-none border-none focus:ring-0"
-        />
-        {!isDesktop && (
-          <Button variant="ghost" size="icon" onClick={() => setOpen(false)} className="md:hidden">
-            <X className="w-4 h-4" />
-          </Button>
-        )}
-      </div>
+      {/* Container baru untuk mengontrol icon & input */}
+      <CommandInput
+        value={search}
+        onValueChange={setSearch}
+        placeholder="Cari rute atau kategori..."
+        className="flex h-11 w-full! rounded-none bg-transparent py-3 text-sm outline-none border-none focus:ring-0"
+      />
 
       <div
         ref={scrollRef}
@@ -147,11 +140,11 @@ export function HargaPresetPicker({ onPick }: HargaPresetPickerProps) {
               open && 'ring-2 ring-primary/20 bg-primary/10'
             )}>
             <Banknote className="w-3.5 h-3.5 mr-1.5" />
-            PRESET SBU
+            Lihat SBU
           </Button>
         </PopoverTrigger>
         <PopoverContent
-          className="w-[450px] p-0 shadow-2xl border-border/40 overflow-hidden"
+          className="w-112.5 p-0 shadow-2xl border-border/40 overflow-hidden"
           align="end"
           onOpenAutoFocus={(e) => e.preventDefault()}>
           {PickerContent}

@@ -8,7 +8,6 @@ import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Badge } from '@/components/ui/badge'
-import { Input } from '@/components/ui/input'
 
 import {
   AlertDialog,
@@ -24,6 +23,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import { Search, UserPlus, Users, Trash2, Crown, Loader2, X } from 'lucide-react'
+import { cn } from '@/lib/utils'
 
 type RosterItem = {
   id: string
@@ -174,20 +174,29 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
         <Popover open={open} onOpenChange={setOpen}>
           <PopoverTrigger asChild>
             <div className="relative group max-w-xl">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-focus-within:text-foreground transition-colors" />
-              <Input
-                value={q}
-                onChange={(e) => {
-                  setQ(e.target.value)
-                  if (!open) setOpen(true)
-                }}
-                placeholder="Cari berdasarkan Nama, NIP, atau Jabatan..."
-                className="pl-9 pr-12 rounded-md border-border/50 bg-background/50 focus-visible:ring-1 shadow-none h-10"
-              />
+              {/* Ikon Search di Sisi Kiri */}
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground group-hover:text-foreground transition-colors z-10" />
+
+              {/* Div yang Menyerupai Input */}
+              <div
+                onClick={() => setOpen(true)}
+                className={cn(
+                  'flex items-center min-h-10 w-full rounded-md border border-border/50 bg-background/50 pl-9 pr-10 py-2 text-sm transition-all cursor-pointer',
+                  'hover:bg-background hover:border-border',
+                  'focus-within:ring-1 focus-within:ring-ring focus-within:outline-none',
+                  open && 'ring-1 ring-ring border-border bg-background'
+                )}>
+                <span className="text-muted-foreground">Cari berdasarkan Nama, NIP, atau Jabatan...</span>
+              </div>
+
+              {/* Tombol Clear (X) di Sisi Kanan */}
               {q && (
                 <button
-                  onClick={() => setQ('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+                  onClick={(e) => {
+                    e.stopPropagation() // Mencegah Popover terbuka saat klik Clear
+                    setQ('')
+                  }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground hover:bg-muted transition-all z-10">
                   <X className="h-3.5 w-3.5" />
                 </button>
               )}
@@ -249,7 +258,7 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
         <CardHeader className="flex flex-row items-center justify-between border-b border-border/40 bg-muted/20 px-6 py-4">
           <div className="flex items-center gap-2">
             <Users className="w-4 h-4 text-muted-foreground" />
-            <CardTitle className="text-sm font-medium">Daftar Roster Personel</CardTitle>
+            <CardTitle className="text-sm font-medium">Daftar Personel</CardTitle>
           </div>
           <Badge variant="outline" className="text-[10px] font-mono border-border/60 font-medium">
             {items.length} Personel
@@ -261,15 +270,13 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
             <Table>
               <TableHeader className="bg-muted/10">
                 <TableRow className="hover:bg-transparent border-border/40">
-                  <TableHead className="w-[60px] text-center text-[11px] font-bold uppercase tracking-wider">
-                    #
-                  </TableHead>
+                  <TableHead className="w-15 text-center text-[11px] font-bold uppercase tracking-wider">#</TableHead>
                   <TableHead className="text-[11px] font-bold uppercase tracking-wider">Informasi Pegawai</TableHead>
                   <TableHead className="hidden md:table-cell text-[11px] font-bold uppercase tracking-wider">
                     Jabatan
                   </TableHead>
-                  <TableHead className="w-[100px] text-[11px] font-bold uppercase tracking-wider">Peran</TableHead>
-                  <TableHead className="w-[180px]" />
+                  <TableHead className="w-25 text-[11px] font-bold uppercase tracking-wider">Peran</TableHead>
+                  <TableHead className="w-45" />
                 </TableRow>
               </TableHeader>
 
@@ -348,7 +355,7 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
 
       {/* ====== ALERTS ====== */}
       <AlertDialog open={confirmAddOpen} onOpenChange={setConfirmAddOpen}>
-        <AlertDialogContent className="rounded-md border-border/50 max-w-[400px]">
+        <AlertDialogContent className="rounded-md border-border/50 max-w-100">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-sm font-semibold">Konfirmasi Tambah</AlertDialogTitle>
             <AlertDialogDescription className="text-xs leading-relaxed">
@@ -375,7 +382,7 @@ export default function PersonelRoster({ spjId, items }: { spjId: string; items:
       </AlertDialog>
 
       <AlertDialog open={confirmDeleteOpen} onOpenChange={setConfirmDeleteOpen}>
-        <AlertDialogContent className="rounded-md border-border/50 max-w-[400px]">
+        <AlertDialogContent className="rounded-md border-border/50 max-w-100">
           <AlertDialogHeader>
             <AlertDialogTitle className="text-sm font-semibold text-destructive">Hapus Personel</AlertDialogTitle>
             <AlertDialogDescription className="text-xs leading-relaxed">
