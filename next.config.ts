@@ -12,7 +12,7 @@ const withPWA = withPWAInit({
 export default withPWA({
   /* config options here */
   reactCompiler: true,
-  webpack: (config, { isServer }) => {
+  webpack: (config, {}) => {
     return config
   },
   turbopack: {}

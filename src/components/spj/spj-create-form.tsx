@@ -12,7 +12,7 @@ import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 
 import { CalendarIcon, ArrowLeft, Save, Loader2, WifiOff } from 'lucide-react'
-import { cn } from '@/lib/utils'
+import { cn, SpjNumberGenerator } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 
@@ -240,7 +240,7 @@ export default function SpjCreateForm() {
           <div className="space-y-2.5">
             <Label className="text-[13px] font-medium text-muted-foreground">No. Telaahan</Label>
             <Input
-              value={values.noTelaahan ?? ''}
+              value={values.noTelaahan ?? SpjNumberGenerator.generateTelaahan()}
               onChange={set('noTelaahan')}
               className="h-9 border-border/50 bg-muted/20 rounded-md font-mono text-xs"
             />
@@ -248,7 +248,7 @@ export default function SpjCreateForm() {
           <div className="space-y-2.5">
             <Label className="text-[13px] font-medium text-muted-foreground">No. Surat Tugas</Label>
             <Input
-              value={values.noSuratTugas ?? ''}
+              value={values.noSuratTugas ?? SpjNumberGenerator.generateSuratTugas()}
               onChange={set('noSuratTugas')}
               className="h-9 border-border/50 bg-muted/20 rounded-md font-mono text-xs"
             />
@@ -256,7 +256,7 @@ export default function SpjCreateForm() {
           <div className="space-y-2.5">
             <Label className="text-[13px] font-medium text-muted-foreground">No. SPD</Label>
             <Input
-              value={values.noSpd ?? ''}
+              value={values.noSpd ?? SpjNumberGenerator.generateSpd()}
               onChange={set('noSpd')}
               className="h-9 border-border/50 bg-muted/20 rounded-md font-mono text-xs"
             />

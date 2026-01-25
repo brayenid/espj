@@ -19,7 +19,7 @@ export default function SpjNewPage() {
 
       <div className="relative">
         {/* Decorative subtle glow ala Linear */}
-        <div className="absolute -left-4 top-0 bottom-0 w-[2px] bg-gradient-to-b from-primary/50 via-border to-transparent opacity-50" />
+        <div className="absolute -left-4 top-0 bottom-0 w-0.5 bg-linear-to-b from-primary/50 via-border to-transparent opacity-50" />
 
         <div className="pl-6">
           <SpjCreateForm />
