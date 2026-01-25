@@ -1,7 +1,6 @@
 'use server'
 import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
-import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createSpjDraftSchema } from './schemas'
 import { SpjNumberGenerator } from '@/lib/utils'
@@ -50,6 +49,7 @@ export async function createSpjDraft(input: unknown) {
 
   const spj = await prisma.spj.create({
     data: {
+      id: data.id,
       createdById: session.user.id,
 
       tempatTujuan: data.tempatTujuan,
