@@ -3,7 +3,7 @@
     {
       "id": "hp-standar",
       "title": "Pembuka: Laporan Standar",
-      "text": "Sehubungan dengan pelaksanaan perjalanan dinas tersebut di atas dalam rangka koordinasi dan konsultasi teknis, bersama ini disampaikan poin-poin hasil kegiatan sebagai berikut:"
+      "text": "Sehubungan dengan pelaksanaan perjalanan dinas tersebut di atas, bersama ini disampaikan poin-poin hasil kegiatan sebagai berikut:"
     },
     {
       "id": "hp-instruksi",
@@ -34,7 +34,22 @@
     },
     {
       "id": "pt-5",
-      "title": "SKM: Sosialisasi Laporan",
+      "title": "SKM: Sosialisasi Laporan 1",
+      "text": "Tim memberikan panduan dasar cara membuat laporan SKM dengan memberikan format dasar laporan SKM."
+    },
+    {
+      "id": "pt-5a",
+      "title": "SKM: Sosialisasi Laporan 2",
+      "text": "Tim menyampaikan tentang latar belakang SKM bersama dengan kebutuhan akan penerapannya dalam pelayanan publik."
+    },
+    {
+      "id": "pt-5b",
+      "title": "SKM: Sosialisasi Laporan 3",
+      "text": "Tim meminta data admin yang membidangi SKM serta menjelaskan urgensi kebutuhan untuk dapat dimasukan dalam Surat Keputusan Bupati tentang SKM."
+    },
+    {
+      "id": "pt-5c",
+      "title": "SKM: Sosialisasi Laporan 4",
       "text": "Tim memberikan panduan dasar cara membuat laporan SKM dengan memberikan format dasar laporan SKM."
     },
     {

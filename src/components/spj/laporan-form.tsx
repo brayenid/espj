@@ -25,12 +25,13 @@ import { ScrollArea } from '@/components/ui/scroll-area'
 import PRESETS_LAPORAN from '@/data/laporan-preset.json'
 
 import {
-  ClipboardCheck,
   Crown,
+  FileSignature,
   FileText,
   Loader2,
   Plus,
   Printer,
+  RotateCcw,
   Save,
   Search,
   Trash2,
@@ -285,6 +286,18 @@ function SignerCombobox({
   )
 }
 
+function SyncButton({ onClick }: { onClick: () => void }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      className="ml-2 inline-flex items-center gap-1 px-1.5 py-0.5 rounded border border-primary/20 bg-primary/5 text-[9px] font-bold text-primary hover:bg-primary/10 transition-colors active:scale-95 uppercase tracking-tighter">
+      <RotateCcw className="w-2.5 h-2.5" />
+      Sinkron
+    </button>
+  )
+}
+
 export default function LaporanForm({
   spjId,
   spj,
@@ -392,31 +405,51 @@ export default function LaporanForm({
     setActivePoinIndex(null)
   }
 
+  // Handler Sinkronisasi
+  const syncField = (field: 'dasar' | 'kegiatan' | 'lokasi' | 'tujuan') => {
+    switch (field) {
+      case 'dasar':
+        setDasarLaporan(`Surat Tugas Nomor ${spj.noSuratTugas ?? '-'}`)
+        break
+      case 'kegiatan':
+        setKegiatan(spj.maksudDinas ?? '')
+        break
+      case 'lokasi':
+        setLokasi(spj.tempatTujuan ?? '')
+        break
+      case 'tujuan':
+        setTujuan(spj.tempatTujuan ?? '')
+        break
+    }
+    toast.info(`Data ${field} disinkronkan dari SPJ master.`, { duration: 1500 })
+  }
+
   return (
     <div className="space-y-6 pb-20 animate-in fade-in duration-500 text-left">
       <div className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border border-border/40 p-6 rounded-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-        <div className="flex items-center gap-4">
-          <div className="p-2.5 bg-primary/10 rounded-lg">
-            <ClipboardCheck className="w-5 h-5 text-primary" />
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-background rounded-md border border-border/50 shadow-xs">
+            <FileSignature className="w-4 h-4 text-muted-foreground" />
           </div>
           <div>
-            <h1 className="text-sm font-bold tracking-tight uppercase text-muted-foreground/80">
-              Laporan Hasil Perjalanan
-            </h1>
+            <CardTitle className="text-sm font-semibold tracking-tight uppercase">Laporan</CardTitle>
+            <p className="text-[11px] text-muted-foreground mt-0.5 font-medium uppercase tracking-wider">
+              Pembuatan laporan pasca perjalanan
+            </p>
           </div>
         </div>
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
             size="sm"
-            className="rounded-lg h-9 font-semibold text-sm border-border/60 shadow-none"
+            className="rounded-lg h-9 font-semibold text-xs border-border/60 shadow-none"
             onClick={() => window.open(`/spj/${spjId}/laporan/print`, '_blank')}
             disabled={rosterSorted.length === 0}>
             <Printer className="w-3.5 h-3.5 mr-2" /> Preview PDF
           </Button>
           <Button
             size="sm"
-            className="rounded-lg h-9 px-6 font-semibold text-sm shadow-none"
+            className="rounded-lg h-9 px-6 font-semibold text-xs shadow-none"
             onClick={onSave}
             disabled={saving}>
             {saving ? <Loader2 className="w-3.5 h-3.5 animate-spin mr-2" /> : <Save className="w-3.5 h-3.5 mr-2" />}
@@ -485,7 +518,10 @@ export default function LaporanForm({
             <CardContent className="p-6 space-y-8">
               <div className="grid gap-6 sm:grid-cols-2">
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold uppercase text-muted-foreground">Dasar Laporan</label>
+                  <div className="flex items-center">
+                    <label className="text-[11px] font-bold uppercase text-muted-foreground">Dasar Laporan</label>
+                    <SyncButton onClick={() => syncField('dasar')} />
+                  </div>
                   <Input
                     value={dasarLaporan}
                     onChange={(e) => setDasarLaporan(e.target.value)}
@@ -501,7 +537,10 @@ export default function LaporanForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold uppercase text-muted-foreground">Lokasi</label>
+                  <div className="flex items-center">
+                    <label className="text-[11px] font-bold uppercase text-muted-foreground">Lokasi</label>
+                    <SyncButton onClick={() => syncField('lokasi')} />
+                  </div>
                   <Input
                     value={lokasi}
                     onChange={(e) => setLokasi(e.target.value)}
@@ -509,7 +548,10 @@ export default function LaporanForm({
                   />
                 </div>
                 <div className="space-y-2">
-                  <label className="text-[11px] font-bold uppercase text-muted-foreground">Tujuan</label>
+                  <div className="flex items-center">
+                    <label className="text-[11px] font-bold uppercase text-muted-foreground">Tujuan</label>
+                    <SyncButton onClick={() => syncField('tujuan')} />
+                  </div>
                   <Input
                     value={tujuan}
                     onChange={(e) => setTujuan(e.target.value)}
@@ -519,7 +561,10 @@ export default function LaporanForm({
               </div>
 
               <div className="space-y-2">
-                <label className="text-[11px] font-bold uppercase text-muted-foreground">Kegiatan</label>
+                <div className="flex items-center">
+                  <label className="text-[11px] font-bold uppercase text-muted-foreground">Kegiatan</label>
+                  <SyncButton onClick={() => syncField('kegiatan')} />
+                </div>
                 <Textarea
                   value={kegiatan}
                   onChange={(e) => setKegiatan(e.target.value)}
