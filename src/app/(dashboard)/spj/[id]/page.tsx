@@ -5,7 +5,7 @@ import { ChevronRight, Home, CheckCircle2, AlertCircle, Info } from 'lucide-reac
 import Link from 'next/link'
 
 type PageProps = {
-  params: { id: string } | Promise<{ id: string }>
+  params: Promise<{ id: string }>
 }
 
 export default async function SpjMasterPage(props: PageProps) {

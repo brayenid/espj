@@ -11,10 +11,13 @@ import { Input } from '@/components/ui/input'
 import { Textarea } from '@/components/ui/textarea'
 import { Label } from '@/components/ui/label'
 
-import { CalendarIcon, ArrowLeft, Save, Loader2 } from 'lucide-react'
+import { CalendarIcon, ArrowLeft, Save, Loader2, WifiOff } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import { Calendar } from '@/components/ui/calendar'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
+
+// Import Database Offline
+import { db } from '@/lib/offline-db'
 
 const schema = z.object({
   tempatTujuan: z.string().min(2, 'Tempat tujuan minimal 2 karakter'),
@@ -122,25 +125,57 @@ export default function SpjCreateForm() {
     }
 
     setLoading(true)
+
     try {
-      const res = await fetch('/api/spj', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(parsed.data)
+      // Pastikan DB terbuka (Penting untuk Next.js 16)
+      if (!db.isOpen()) await db.open()
+
+      const tempId = window.crypto.randomUUID()
+      // Deep clone payload agar benar-benar serializable (menghindari error IndexedDB)
+      const cleanPayload = JSON.parse(JSON.stringify(parsed.data))
+
+      // 1. SIMPAN LOKAL (Dual Write)
+      // Kita gunakan await secara ketat agar tidak ada race condition dengan navigasi
+      await db.offlineQueue.put({
+        id: tempId,
+        type: 'TELAAHAN',
+        payload: cleanPayload,
+        synced: 0,
+        updatedAt: Date.now()
       })
 
-      const json: unknown = await res.json()
-      if (!res.ok) {
-        toast.error('Gagal menyimpan SPJ draft.')
-        return
+      // 2. LOGIKA ONLINE
+      if (navigator.onLine) {
+        try {
+          const res = await fetch('/api/spj', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ ...cleanPayload, id: tempId })
+          })
+
+          if (res.ok) {
+            await db.offlineQueue.update(tempId, { synced: 1 })
+            toast.success('SPJ draft berhasil dibuat online.')
+            router.push(`/spj/${tempId}`)
+            router.refresh()
+            return // Keluar dari fungsi jika sukses online
+          }
+        } catch (fetchError) {
+          console.error('Gagal fetch ke server:', fetchError)
+        }
       }
 
-      const data = json as { ok: true; id: string }
-      toast.success('SPJ draft berhasil dibuat.')
-      router.push(`/spj/${data.id}`)
-      router.refresh()
-    } catch {
-      toast.error('Terjadi kesalahan jaringan.')
+      // 3. FALLBACK OFFLINE
+      // Baris ini dieksekusi jika sedang offline atau fetch gagal
+      toast('Tersimpan secara lokal (Offline Mode)', {
+        description: 'Data akan otomatis disinkronkan saat internet kembali menyala.',
+        icon: <WifiOff className="w-4 h-4 text-amber-500" />
+      })
+
+      router.push(`/spj/${tempId}`)
+    } catch (error) {
+      console.error('Save Error:', error)
+      toast.error('Gagal menyimpan draf ke perangkat.')
     } finally {
       setLoading(false)
     }
@@ -148,7 +183,6 @@ export default function SpjCreateForm() {
 
   return (
     <form onSubmit={onSubmit} className="space-y-10">
-      {/* Group: Core Info */}
       <section className="space-y-6">
         <div className="grid gap-6 md:grid-cols-2">
           <div className="space-y-2.5">
@@ -198,7 +232,6 @@ export default function SpjCreateForm() {
         </div>
       </section>
 
-      {/* Group: Administrative */}
       <div className="space-y-4">
         <h3 className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground/60">
           Detail Administrasi (Opsional)
@@ -231,7 +264,6 @@ export default function SpjCreateForm() {
         </div>
       </div>
 
-      {/* Sticky-like Footer Action */}
       <div className="pt-6 border-t border-border/40 flex items-center justify-between">
         <Button asChild type="button" variant="ghost" size="sm" className="text-muted-foreground hover:text-foreground">
           <Link href="/spj" className="flex items-center gap-2">

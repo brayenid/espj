@@ -4,6 +4,8 @@ import './globals.css'
 import { Toaster } from '@/components/ui/sonner'
 import { AuthProvider } from '@/components/providers/session-provider'
 import NextTopLoader from 'nextjs-toploader'
+import SyncManager from '@/components/SyncManager'
+import OfflineStatus from '@/components/offline-status'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -17,7 +19,8 @@ const geistMono = Geist_Mono({
 
 export const metadata: Metadata = {
   title: 'SPJ Organisasi',
-  description: 'E-SPJ Bagian Organisasi'
+  description: 'E-SPJ Bagian Organisasi',
+  manifest: '/manifest.json'
 }
 
 export default function RootLayout({
@@ -30,6 +33,8 @@ export default function RootLayout({
       <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         <NextTopLoader />
         <AuthProvider>
+          <SyncManager />
+          <OfflineStatus />
           {children}
           <Toaster />
         </AuthProvider>
