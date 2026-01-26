@@ -76,7 +76,13 @@ export async function listSpjForCurrentUser(options?: { q?: string; skip?: numbe
             nama: true,
             role: true
           }
-        }
+        },
+        telaahan: true,
+        spjSuratTugas: true,
+        visum: true,
+        kuitansi: true,
+        laporan: true,
+        rincian: true
       }
     }),
     prisma.spj.count({ where })

@@ -23,11 +23,6 @@ function fmtDateTime(d: Date) {
   })
 }
 
-function safe(s?: string | null, fb = '-') {
-  const t = (s ?? '').trim()
-  return t.length ? t : fb
-}
-
 function buildQueryString(base: Record<string, string | undefined | null>) {
   const q = new URLSearchParams()
   for (const [k, v] of Object.entries(base)) {
@@ -62,12 +57,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
     redirect(buildQueryString({ q: qRaw, page: String(totalPages) }) || '?page=1')
   }
 
-  const getRosterPreview = (roster: { nama: string; role: string }[]) => {
-    if (!roster || roster.length === 0) return '-'
-    const kepala = roster.find((r) => r.role === 'KEPALA_JALAN') ?? roster[0]
-    const pengikutCount = roster.filter((r) => r.role === 'PENGIKUT').length
-    return pengikutCount > 0 ? `${kepala.nama} + ${pengikutCount} orang` : kepala.nama
-  }
   const rosterView = (roster: { nama: string; role: string }[]) => {
     const firstNames = roster.map((data) => {
       // 1. Ambil kata pertama setelah trim spasi
@@ -137,7 +126,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
               <TableHead className="hidden xl:table-cell py-3 font-medium text-foreground text-center">
                 Dibuat
               </TableHead>
-              <TableHead className="table-cell py-3 font-medium text-foreground">No. Surat</TableHead>
+              <TableHead className="py-3 font-medium text-foreground">Status Dokumen</TableHead>
               <TableHead className="w-40" />
             </TableRow>
           </TableHeader>
@@ -182,8 +171,17 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                     <div className="text-[11px] font-mono text-muted-foreground/80">{fmtDateTime(spj.createdAt)}</div>
                   </TableCell>
 
-                  <TableCell className="table-cell py-4 text-sm text-muted-foreground font-mono pointer-events-none">
-                    {safe(spj.noSuratTugas)}
+                  {/* CELL BARU: Menggantikan No. Surat Tugas dengan Status Badge */}
+                  <TableCell className="py-4 pointer-events-none">
+                    <div className="flex flex-wrap gap-1 max-w-45">
+                      <StatusBadge label="TS" active={!!spj.telaahan} />
+                      <StatusBadge label="ST" active={!!spj.spjSuratTugas} />
+                      <StatusBadge label="SPD" active={true} /> {/* SPD Selalu aktif karena entry point */}
+                      <StatusBadge label="DOPD" active={spj.rincian?.length > 0} />
+                      <StatusBadge label="KUI" active={!!spj.kuitansi} />
+                      <StatusBadge label="VIS" active={!!spj.visum} />
+                      <StatusBadge label="LAP" active={!!spj.laporan} />
+                    </div>
                   </TableCell>
 
                   <TableCell className="text-right py-4 relative z-20">
@@ -245,6 +243,19 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
           </div>
         </div>
       </div>
+    </div>
+  )
+}
+
+function StatusBadge({ label, active }: { label: string; active: boolean }) {
+  return (
+    <div
+      className={`px-2 py-1 rounded text-[10px] font-bold border transition-all ${
+        active
+          ? 'bg-emerald-500/5 text-emerald-600 border-emerald-500/20 shadow-[0_0_8px_rgba(16,185,129,0.1)]'
+          : 'bg-muted/30 text-muted-foreground/50 border-border/40 grayscale'
+      }`}>
+      {label}
     </div>
   )
 }

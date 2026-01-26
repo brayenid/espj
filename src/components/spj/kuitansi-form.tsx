@@ -3,19 +3,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
-
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Input } from '@/components/ui/input'
 import { Separator } from '@/components/ui/separator'
 import { Badge } from '@/components/ui/badge'
-
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem, CommandList } from '@/components/ui/command'
 import {
   Banknote,
   Calendar,
-  ChevronRight,
   FileCheck,
   FileSpreadsheet,
   Info,
@@ -23,11 +20,9 @@ import {
   Printer,
   Save,
   Search,
-  UserCircle,
-  Wallet
+  UserCircle
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
-import { Textarea } from '../ui/textarea'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/select'
 
 type PegawaiResult = {
@@ -144,7 +139,7 @@ function SignerCombobox({
           </div>
         </PopoverTrigger>
 
-        <PopoverContent className="w-[340px] p-0" align="start">
+        <PopoverContent className="w-85 p-0" align="start">
           <Command shouldFilter={false}>
             <CommandInput value={q} onValueChange={setQ} placeholder="Nama/NIP Pejabat..." className="h-10" />
             <CommandList>
@@ -250,6 +245,19 @@ export default function KuitansiForm({
   const REKENING_OPTIONS = [
     { kode: '5.1.02.04.001.00001', judul: 'Belanja Perjalanan Dinas Biasa' },
     { kode: '5.1.02.04.001.00003', judul: 'Belanja Perjalanan Dinas Dalam Kota' }
+  ]
+
+  const MASTER_KEGIATAN = [
+    { kode: '4.01.01.2.13', judul: 'Penataan Organisasi' },
+    { kode: '4.01.01.2.06', judul: 'Administrasi Kepegawaian' }
+  ]
+
+  const MASTER_SUB_KEGIATAN = [
+    { kode: '4.01.01.2.13.0002', judul: 'Fasilitasi Pelayanan Publik dan Tata Laksana' },
+    {
+      kode: '4.01.01.2.13.0004',
+      judul: 'Monitoring, Evaluasi, dan Pengendalian Kualitas Pelayanan Publik dan Tata Laksana'
+    }
   ]
 
   return (
@@ -429,6 +437,60 @@ export default function KuitansiForm({
 
               <Separator className="bg-border/40" />
 
+              {/* --- TAMBAHAN: KEGIATAN --- */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Kegiatan</label>
+                <Select
+                  value={anggaran.kodeKegiatan}
+                  onValueChange={(val) => {
+                    const matched = MASTER_KEGIATAN.find((k) => k.kode === val)
+                    setAnggaran({
+                      ...anggaran,
+                      kodeKegiatan: val,
+                      judulKegiatan: matched?.judul || ''
+                    })
+                  }}>
+                  <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50">
+                    <SelectValue placeholder="Pilih Kegiatan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MASTER_KEGIATAN.map((k) => (
+                      <SelectItem key={k.kode} value={k.kode} className="text-xs">
+                        <span className="font-bold">{k.kode}</span>
+                        <p className="text-[10px] opacity-70 truncate">{k.judul}</p>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
+              {/* --- TAMBAHAN: SUB KEGIATAN --- */}
+              <div className="space-y-2">
+                <label className="text-[10px] font-bold uppercase text-muted-foreground ml-1">Sub Kegiatan</label>
+                <Select
+                  value={anggaran.kodeSubKegiatan}
+                  onValueChange={(val) => {
+                    const matched = MASTER_SUB_KEGIATAN.find((sk) => sk.kode === val)
+                    setAnggaran({
+                      ...anggaran,
+                      kodeSubKegiatan: val,
+                      judulSubKegiatan: matched?.judul || ''
+                    })
+                  }}>
+                  <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50">
+                    <SelectValue placeholder="Pilih Sub Kegiatan" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {MASTER_SUB_KEGIATAN.map((sk) => (
+                      <SelectItem key={sk.kode} value={sk.kode} className="text-xs">
+                        <span className="font-bold">{sk.kode}</span>
+                        <p className="text-[10px] opacity-70 truncate">{sk.judul}</p>
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -453,7 +515,7 @@ export default function KuitansiForm({
                         <SelectValue placeholder="Pilih Kode Rekening..." />
                       </div>
                     </SelectTrigger>
-                    <SelectContent className="z-[100] rounded-xl border-border/50 shadow-xl max-w-(--radix-select-trigger-width)">
+                    <SelectContent className="z-100 rounded-xl border-border/50 shadow-xl max-w-(--radix-select-trigger-width)">
                       {REKENING_OPTIONS.map((opt) => (
                         <SelectItem key={opt.kode} value={opt.kode} className="text-xs">
                           <span className="font-bold">{opt.kode}</span>

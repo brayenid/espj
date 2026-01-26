@@ -20,7 +20,18 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: 'SPJ Organisasi',
   description: 'E-SPJ Bagian Organisasi',
-  manifest: '/manifest.json'
+  manifest: '/manifest.json',
+  icons: [
+    {
+      rel: 'icon',
+      url: '/icons/favicon.ico'
+    },
+    {
+      rel: 'apple-touch-icon',
+      url: '/icons/apple-touch-icon.png',
+      sizes: '180x180'
+    }
+  ]
 }
 
 export default function RootLayout({

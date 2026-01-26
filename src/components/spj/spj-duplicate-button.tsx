@@ -46,10 +46,10 @@ export default function SpjDuplicateButton({ id, className }: { id: string; clas
           // Mencegah navigasi baris tabel saat tombol diklik
           onClick={(e) => e.stopPropagation()}
           className={cn(
-            'h-8 px-3 rounded-md border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2 cursor-pointer shadow-none',
+            'h-7 px-2 rounded-md border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary transition-all flex items-center gap-2 cursor-pointer shadow-none',
             className
           )}>
-          {isPending ? <Loader2 className="h-3 w-3 animate-spin" /> : <Copy className="h-3 w-3" />}
+          {isPending ? <Loader2 className="h-2 w-2 animate-spin" /> : <Copy className="h-2 w-2" />}
           <span className="text-[10px] font-bold uppercase tracking-wider">Duplikat</span>
         </Button>
       </AlertDialogTrigger>

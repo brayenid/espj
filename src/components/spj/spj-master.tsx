@@ -30,7 +30,6 @@ import {
   PenTool,
   CheckCircle2,
   ChevronRight,
-  LayoutDashboard,
   Clock,
   Landmark,
   Link2,
@@ -205,8 +204,36 @@ export default function SpjMaster({
     })
   }
 
+  const isBuktiDukungMissing = !spj.buktiDukungUrl || spj.buktiDukungUrl.trim().length === 0
+
   return (
     <div className="space-y-8 animate-in fade-in duration-500">
+      {/* --- MINIMALIST FLOATING REMINDER WITH PING EFFECT --- */}
+      {isBuktiDukungMissing && (
+        <div className="fixed bottom-1 right-6 z-50 animate-in fade-in slide-in-from-right-8 duration-500 cursor-pointer! hover:scale-105">
+          <div className="relative group">
+            {/* Efek Ping di Luar Container */}
+            <div className="absolute inset-0 rounded-full bg-amber-500/10 opacity-50 animate-ping" />
+
+            <button
+              onClick={() => setOpen('META')}
+              className="relative flex items-center gap-3 bg-background/95 backdrop-blur-md border border-amber-500/30 hover:border-amber-500/60 p-1.5 pr-4 rounded-full shadow-lg shadow-amber-500/10 transition-all hover:shadow-amber-500/20 active:scale-95">
+              {/* Icon dengan Pulsing Dot */}
+              <div className="relative h-7 w-7 flex items-center justify-center rounded-full bg-amber-500/10 text-amber-600">
+                <Link2 className="w-3.5 h-3.5" />
+                <span className="absolute top-0 right-0 h-2 w-2 bg-amber-500 rounded-full border-2 border-background animate-pulse" />
+              </div>
+
+              <div className="flex flex-col items-start leading-none gap-1">
+                <span className="text-[12px] font-bold text-amber-600 uppercase tracking-tight">Bukti Dukung</span>
+                <span className="text-[10px] text-muted-foreground">Belum ditautkan</span>
+              </div>
+
+              <ChevronRight className="w-3 h-3 text-muted-foreground group-hover:translate-x-0.5 transition-transform" />
+            </button>
+          </div>
+        </div>
+      )}
       {/* 1. Header & Quick Actions */}
       <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 bg-muted/20 p-5 rounded-xl border border-border/50 backdrop-blur-md">
         <div className="flex items-center gap-4">

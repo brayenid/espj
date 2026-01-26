@@ -19,6 +19,8 @@ import { cn } from '@/lib/utils'
 import { Loader2, Save, Link2, Landmark, ClipboardList, CalendarDays } from 'lucide-react'
 import { Checkbox } from '@/components/ui/checkbox'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
+import Link from 'next/link'
+import { MdiGoogleDrive } from '@/components/icons/drive'
 
 // QA: Validasi Cross-Field untuk rentang tanggal
 const schema = z
@@ -586,17 +588,40 @@ export default function SpjMetaForm({
             control={form.control}
             name="buktiDukungUrl"
             render={({ field }) => (
-              <FormItem>
-                <FormLabel className="text-[13px] text-muted-foreground flex items-center gap-1.5">
-                  <Link2 className="w-3.5 h-3.5" /> Bukti Dukung URL
-                </FormLabel>
+              <FormItem className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <FormLabel className="text-[13px] text-muted-foreground flex items-center gap-1.5">
+                    <Link2 className="w-3.5 h-3.5" /> Bukti Dukung URL
+                  </FormLabel>
+
+                  {/* Tombol Aksi Mandiri */}
+                  <Button
+                    asChild
+                    variant="outline"
+                    size="sm"
+                    className="h-7 px-2.5 rounded-md border-primary/20 bg-primary/5 text-primary hover:bg-primary/10 hover:text-primary transition-all shadow-none gap-1.5">
+                    <Link
+                      href="https://drive.google.com/drive/u/3/folders/10N-NmZSzQ8QYYWqwlmgfoqb5EP471snp"
+                      target="_blank"
+                      rel="noreferrer">
+                      <MdiGoogleDrive className="w-2 h-2 text-slate-700" />
+                      <span className="text-[10px] font-bold uppercase tracking-tight">Buka Google Drive</span>
+                    </Link>
+                  </Button>
+                </div>
+
                 <FormControl>
-                  <Input
-                    className="rounded-md border-border/50 bg-background/50 h-9 font-mono text-[12px] shadow-none"
-                    {...field}
-                    value={field.value ?? ''}
-                    placeholder="https://..."
-                  />
+                  <div className="relative group">
+                    <Input
+                      className="rounded-lg border-border/50 bg-background/50 h-10 font-mono text-[12px] shadow-none focus-visible:ring-1 focus-visible:ring-primary/20 transition-all pr-10"
+                      {...field}
+                      value={field.value ?? ''}
+                      placeholder="https://drive.google.com/..."
+                    />
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2 opacity-30 group-focus-within:opacity-100 transition-opacity">
+                      <Link2 className="w-4 h-4" />
+                    </div>
+                  </div>
                 </FormControl>
                 <FormMessage className="text-[11px]" />
               </FormItem>
