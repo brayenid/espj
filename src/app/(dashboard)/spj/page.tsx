@@ -1,16 +1,21 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 
+// Asumsi: Fungsi query backend Anda sudah update menerima parameter 'sort'
+// Jika belum, Anda perlu update fungsi listSpjForCurrentUser di backend.
 import { listSpjForCurrentUser } from '@/server/spj/queries'
 import { Button } from '@/components/ui/button'
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table'
 import { Separator } from '@/components/ui/separator'
 
 import SpjSearchBar from '@/components/spj/spj-search-bar'
+// Pastikan buat komponen ini (kode ada di bawah)
+
 import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus } from 'lucide-react'
 import SpjDuplicateButton from '@/components/spj/spj-duplicate-button'
 import { fmtDateId } from '@/lib/utils'
 import SpjExportModal from '@/components/spj/spj-export-modal'
+import SpjSortSelect from '@/components/spj/spj-sort-select'
 
 function fmtDateTime(d: Date) {
   return new Date(d).toLocaleDateString('id-ID', {
@@ -35,46 +40,47 @@ function buildQueryString(base: Record<string, string | undefined | null>) {
   return s ? `?${s}` : ''
 }
 
-type SearchParams = Promise<{ q?: string; page?: string }>
+// Update Type SearchParams untuk menerima 'sort'
+type SearchParams = Promise<{ q?: string; page?: string; sort?: string }>
 
 export default async function SpjListPage({ searchParams }: { searchParams: SearchParams }) {
   const sp = await searchParams
   const qRaw = (sp.q ?? '').trim()
   const pageRaw = (sp.page ?? '1').trim()
+  // Default sort: departure_desc (Keberangkatan Terbaru)
+  const sortRaw = (sp.sort ?? 'departure_desc').trim()
 
   const pageNum = Number.isFinite(Number(pageRaw)) ? Math.max(1, Math.floor(Number(pageRaw))) : 1
   const pageSize = 10
 
+  // Pass 'sort' ke query database
   const { items: pageItems, total } = await listSpjForCurrentUser({
     q: qRaw,
     skip: (pageNum - 1) * pageSize,
-    take: pageSize
+    take: pageSize,
+    sort: sortRaw // Pastikan backend menangani ini
   })
 
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
+  // Redirect jika page melebihi total, tapi pertahankan sort & q
   if (pageNum > totalPages && totalPages > 0) {
-    redirect(buildQueryString({ q: qRaw, page: String(totalPages) }) || '?page=1')
+    redirect(buildQueryString({ q: qRaw, page: String(totalPages), sort: sortRaw }) || '?page=1')
   }
 
   const rosterView = (roster: { nama: string; role: string }[]) => {
     const firstNames = roster.map((data) => {
-      // 1. Ambil kata pertama setelah trim spasi
       const firstNameRaw = data.nama.trim().split(/\s+/)[0]
-
-      // 2. Sanitasi: Hanya ambil karakter huruf dan angka
-      // Menghapus simbol seperti . , ( ) [ ] dll.
       const sanitizedName = firstNameRaw.replace(/[^a-zA-Z0-9]/g, '')
-
       return sanitizedName
     })
-
-    // 3. Gabungkan dengan koma, filter jika ada string kosong
     return firstNames.filter(Boolean).join(', ')
   }
 
-  const prevHref = buildQueryString({ q: qRaw, page: String(Math.max(1, pageNum - 1)) })
-  const nextHref = buildQueryString({ q: qRaw, page: String(Math.min(totalPages, pageNum + 1)) })
+  // Update Pagination Link agar menyertakan 'sort'
+  const prevHref = buildQueryString({ q: qRaw, page: String(Math.max(1, pageNum - 1)), sort: sortRaw })
+  const nextHref = buildQueryString({ q: qRaw, page: String(Math.min(totalPages, pageNum + 1)), sort: sortRaw })
+
   const windowSize = 5
   const half = Math.floor(windowSize / 2)
   const pStart = Math.max(1, pageNum - half)
@@ -106,11 +112,19 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
       <Separator className="bg-border/50" />
 
       <div className="space-y-4">
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="w-full max-w-md">
-            <SpjSearchBar initialQ={qRaw} />
+        {/* Layout disesuaikan untuk menampung SearchBar dan SortSelect */}
+        <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+          <div className="flex flex-col sm:flex-row gap-3 w-full max-w-3xl">
+            <div className="flex-1">
+              <SpjSearchBar initialQ={qRaw} />
+            </div>
+            <div className="w-full sm:w-60">
+              {/* Komponen Sort Baru */}
+              <SpjSortSelect currentSort={sortRaw} />
+            </div>
           </div>
-          <div className="text-[13px] text-muted-foreground tabular-nums bg-muted/30 px-3 py-1 rounded-full border border-border/40">
+
+          <div className="text-[13px] text-muted-foreground tabular-nums bg-muted/30 px-3 py-1 rounded-full border border-border/40 whitespace-nowrap">
             Total: <span className="font-medium text-foreground">{total}</span> entri
           </div>
         </div>
@@ -143,7 +157,6 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
               pageItems.map((spj) => (
                 <TableRow key={spj.id} className="group border-border/40 transition-colors hover:bg-muted/10 relative">
                   <TableCell className="p-0 relative">
-                    {/* Perbaikan: Menghindari whitespace antar elemen di dalam TableCell */}
                     <Link href={`/spj/${spj.id}`} className="absolute inset-0 z-10" />
                     <div className="py-4 px-4">
                       <div className="font-medium text-[14px]">{spj.tempatTujuan}</div>
@@ -171,12 +184,11 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                     <div className="text-[11px] font-mono text-muted-foreground/80">{fmtDateTime(spj.createdAt)}</div>
                   </TableCell>
 
-                  {/* CELL BARU: Menggantikan No. Surat Tugas dengan Status Badge */}
                   <TableCell className="py-4 pointer-events-none">
                     <div className="flex flex-wrap gap-1 max-w-45">
                       <StatusBadge label="TS" active={!!spj.telaahan} />
                       <StatusBadge label="ST" active={!!spj.spjSuratTugas} />
-                      <StatusBadge label="SPD" active={true} /> {/* SPD Selalu aktif karena entry point */}
+                      <StatusBadge label="SPD" active={true} />
                       <StatusBadge label="DOPD" active={spj.rincian?.length > 0} />
                       <StatusBadge label="KUI" active={!!spj.kuitansi} />
                       <StatusBadge label="VIS" active={!!spj.visum} />
@@ -214,6 +226,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
           <div className="flex items-center gap-1.5">
             <Button asChild variant="outline" size="icon" className="h-8 w-8" disabled={pageNum <= 1}>
               <Link
+                // Sertakan sort pada link pagination
                 href={pageNum <= 1 ? '#' : prevHref || '?page=1'}
                 className={pageNum <= 1 ? 'pointer-events-none opacity-50' : ''}>
                 <ArrowLeft className="h-3.5 w-3.5" />
@@ -223,7 +236,8 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
               {pages.map((p) => (
                 <Link
                   key={p}
-                  href={buildQueryString({ q: qRaw, page: String(p) }) || `?page=${p}`}
+                  // Sertakan sort pada link page number
+                  href={buildQueryString({ q: qRaw, page: String(p), sort: sortRaw }) || `?page=${p}`}
                   className={`text-xs w-8 h-8 flex items-center justify-center rounded-md transition-colors ${
                     p === pageNum
                       ? 'bg-foreground text-background font-medium'
@@ -235,6 +249,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
             </div>
             <Button asChild variant="outline" size="icon" className="h-8 w-8" disabled={pageNum >= totalPages}>
               <Link
+                // Sertakan sort pada link pagination
                 href={pageNum >= totalPages ? '#' : nextHref || `?page=${totalPages}`}
                 className={pageNum >= totalPages ? 'pointer-events-none opacity-50' : ''}>
                 <ArrowRight className="h-3.5 w-3.5" />

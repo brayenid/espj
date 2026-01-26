@@ -2,18 +2,20 @@ import { prisma } from '@/lib/prisma'
 import { auth } from '@/auth'
 import { Prisma } from '@prisma/client'
 
-export async function listSpjForCurrentUser(options?: { q?: string; skip?: number; take?: number }) {
+// 1. Tambahkan properti sort pada interface opsi
+export async function listSpjForCurrentUser(options?: { q?: string; skip?: number; take?: number; sort?: string }) {
   const session = await auth()
   if (!session?.user?.id) throw new Error('Unauthorized')
 
   const role = session.user.role
   const userId = session.user.id
-  const { q, skip, take } = options ?? {}
+  // 2. Destructure sort dari options
+  const { q, skip, take, sort } = options ?? {}
 
-  // 1. Filter dasar berdasarkan kepemilikan data & Role
+  // Filter dasar berdasarkan kepemilikan data & Role
   const baseWhere: Prisma.SpjWhereInput = role === 'SUPER_ADMIN' ? {} : { createdById: userId }
 
-  // 2. Konstruksi Search Filter
+  // Konstruksi Search Filter
   let searchWhere: Prisma.SpjWhereInput = {}
 
   if (q) {
@@ -22,7 +24,6 @@ export async function listSpjForCurrentUser(options?: { q?: string; skip?: numbe
       { noSuratTugas: { contains: q, mode: 'insensitive' } },
       { noSpd: { contains: q, mode: 'insensitive' } },
       { noTelaahan: { contains: q, mode: 'insensitive' } },
-      // SEARCH BERDASARKAN ROSTER (Nama Pegawai di Roster)
       {
         roster: {
           some: {
@@ -33,7 +34,6 @@ export async function listSpjForCurrentUser(options?: { q?: string; skip?: numbe
     ]
 
     // SEARCH BERDASARKAN TANGGAL
-    // Jika input '2025' -> cari sepanjang tahun 2025
     if (/^\d{4}$/.test(q)) {
       const year = parseInt(q)
       searchConditions.push({
@@ -42,9 +42,7 @@ export async function listSpjForCurrentUser(options?: { q?: string; skip?: numbe
           lte: new Date(`${year}-12-31`)
         }
       })
-    }
-    // Jika input '2025-11' -> cari di bulan November 2025
-    else if (/^\d{4}-\d{2}$/.test(q)) {
+    } else if (/^\d{4}-\d{2}$/.test(q)) {
       const [y, m] = q.split('-').map(Number)
       searchConditions.push({
         tglBerangkat: {
@@ -61,15 +59,36 @@ export async function listSpjForCurrentUser(options?: { q?: string; skip?: numbe
     AND: [baseWhere, searchWhere]
   }
 
-  // 3. Eksekusi Query
+  // 3. Tentukan logika orderBy berdasarkan parameter sort
+  let orderBy: Prisma.SpjOrderByWithRelationInput = { tglBerangkat: 'desc' } // Default yang masuk akal
+
+  switch (sort) {
+    case 'departure_desc':
+      orderBy = { tglBerangkat: 'desc' }
+      break
+    case 'departure_asc':
+      orderBy = { tglBerangkat: 'asc' }
+      break
+    case 'created_desc':
+      orderBy = { createdAt: 'desc' }
+      break
+    case 'created_asc':
+      orderBy = { createdAt: 'asc' }
+      break
+    default:
+      // Default fallback jika sort tidak dikenali
+      orderBy = { tglBerangkat: 'desc' }
+  }
+
+  // Eksekusi Query
   const [items, total] = await Promise.all([
     prisma.spj.findMany({
       where,
       skip,
       take,
-      orderBy: { createdAt: 'desc' }, // Urutkan berdasarkan tanggal berangkat terbaru
+      // 4. Gunakan variabel orderBy yang dinamis
+      orderBy,
       include: {
-        // Langsung ambil roster untuk preview di tabel agar hemat query
         roster: {
           orderBy: { order: 'asc' },
           select: {
