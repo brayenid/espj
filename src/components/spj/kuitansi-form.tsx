@@ -450,14 +450,17 @@ export default function KuitansiForm({
                       judulKegiatan: matched?.judul || ''
                     })
                   }}>
-                  <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50">
+                  {/* QA: Tambahkan [&>span]:truncate untuk memotong teks panjang pada trigger */}
+                  <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50 [&>span]:truncate [&>span]:max-w-[calc(100%-20px)]">
                     <SelectValue placeholder="Pilih Kegiatan" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-50 w-(--radix-select-trigger-width) min-w-75">
                     {MASTER_KEGIATAN.map((k) => (
                       <SelectItem key={k.kode} value={k.kode} className="text-xs">
-                        <span className="font-bold">{k.kode}</span>
-                        <p className="text-[10px] opacity-70 truncate">{k.judul}</p>
+                        <div className="flex flex-col text-left w-full overflow-hidden">
+                          <span className="font-bold truncate">{k.kode}</span>
+                          <p className="text-[10px] opacity-70 truncate w-full">{k.judul}</p>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -477,20 +480,24 @@ export default function KuitansiForm({
                       judulSubKegiatan: matched?.judul || ''
                     })
                   }}>
-                  <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50">
+                  {/* QA: Pastikan text alignment left agar truncate terlihat rapi dari kiri */}
+                  <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50 [&>span]:truncate [&>span]:max-w-[calc(100%-20px)] text-left">
                     <SelectValue placeholder="Pilih Sub Kegiatan" />
                   </SelectTrigger>
-                  <SelectContent>
+                  <SelectContent className="max-h-50 w-(--radix-select-trigger-width) min-w-75">
                     {MASTER_SUB_KEGIATAN.map((sk) => (
                       <SelectItem key={sk.kode} value={sk.kode} className="text-xs">
-                        <span className="font-bold">{sk.kode}</span>
-                        <p className="text-[10px] opacity-70 truncate">{sk.judul}</p>
+                        <div className="flex flex-col text-left w-full overflow-hidden">
+                          <span className="font-bold truncate">{sk.kode}</span>
+                          <p className="text-[10px] opacity-70 truncate max-w-40">{sk.judul}</p>
+                        </div>
                       </SelectItem>
                     ))}
                   </SelectContent>
                 </Select>
               </div>
 
+              {/* --- REKENING BELANJA --- */}
               <div className="space-y-4">
                 <div className="space-y-2">
                   <div className="flex items-center justify-between">
@@ -502,7 +509,6 @@ export default function KuitansiForm({
                   <Select
                     value={anggaran.kodeRekening}
                     onValueChange={(val) => {
-                      // Logika cerdas: Update kode dan judul sekaligus berdasarkan pilihan
                       const selected = REKENING_OPTIONS.find((opt) => opt.kode === val)
                       setAnggaran({
                         ...anggaran,
@@ -510,24 +516,29 @@ export default function KuitansiForm({
                         judulRekening: selected?.judul || ''
                       })
                     }}>
-                    <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50 overflow-hidden">
-                      <div className="truncate text-left">
-                        <SelectValue placeholder="Pilih Kode Rekening..." />
-                      </div>
+                    {/* QA: Tambahkan overflow-hidden pada trigger induk dan truncate pada child */}
+                    <SelectTrigger className="h-9 w-full rounded-lg text-xs bg-white shadow-none border-border/50 overflow-hidden [&>span]:truncate [&>span]:max-w-[calc(100%-20px)] text-left">
+                      <SelectValue placeholder="Pilih Kode Rekening..." />
                     </SelectTrigger>
-                    <SelectContent className="z-100 rounded-xl border-border/50 shadow-xl max-w-(--radix-select-trigger-width)">
+
+                    {/* QA: width disesuaikan dengan trigger, tapi diberi min-width agar terbaca di mobile */}
+                    <SelectContent className="z-50 rounded-xl border-border/50 shadow-xl w-(--radix-select-trigger-width) min-w-75 max-h-75">
                       {REKENING_OPTIONS.map((opt) => (
                         <SelectItem key={opt.kode} value={opt.kode} className="text-xs">
-                          <span className="font-bold">{opt.kode}</span>
-                          <p className="text-[10px] text-muted-foreground truncate opacity-70">{opt.judul}</p>
+                          <div className="flex flex-col text-left w-full overflow-hidden">
+                            <span className="font-bold truncate">{opt.kode}</span>
+                            <p className="text-[10px] text-muted-foreground truncate opacity-70 max-w-40">
+                              {opt.judul}
+                            </p>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>
                   </Select>
 
-                  {/* Deskripsi otomatis muncul di sini (Read-only atau tetap bisa edit) */}
+                  {/* Deskripsi Read-only */}
                   <div className="rounded-lg bg-muted/30 p-3 border border-dashed border-border/50">
-                    <p className="text-[11px] text-muted-foreground leading-relaxed">
+                    <p className="text-[11px] text-muted-foreground leading-relaxed wrap-break-word">
                       {anggaran.judulRekening || 'Judul rekening akan muncul otomatis setelah kode dipilih.'}
                     </p>
                   </div>
