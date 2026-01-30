@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import ExcelJS from 'exceljs'
 import { z } from 'zod'
+import { fmtDateId } from '@/lib/utils'
 
 const exportSchema = z.object({
   dateFrom: z.string().optional(),
@@ -60,8 +61,8 @@ export async function POST(req: NextRequest) {
       const rowData: any = {}
 
       if (columns.includes('tujuan')) rowData.tujuan = spj.tempatTujuan
-      if (columns.includes('tglBerangkat')) rowData.tglBerangkat = spj.tglBerangkat.toLocaleDateString('id-ID')
-      if (columns.includes('tglKembali')) rowData.tglKembali = spj.tglKembali.toLocaleDateString('id-ID')
+      if (columns.includes('tglBerangkat')) rowData.tglBerangkat = fmtDateId(spj.tglBerangkat)
+      if (columns.includes('tglKembali')) rowData.tglKembali = fmtDateId(spj.tglKembali)
       if (columns.includes('personel')) {
         rowData.personel = spj.roster
           .map((r) => {
@@ -79,7 +80,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (columns.includes('sudahBerangkat')) {
-        rowData.sudahBerangkat = now >= new Date(spj.tglBerangkat) ? 'Selesai/Jalan' : 'Belum'
+        rowData.sudahBerangkat = now >= new Date(fmtDateId(spj.tglBerangkat)) ? 'Selesai/Jalan' : 'Belum'
       }
 
       if (columns.includes('totalBiaya')) {
