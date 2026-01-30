@@ -24,7 +24,8 @@ const AVAILABLE_COLUMNS = [
   { id: 'personel', label: 'Nama Personel', default: true },
   { id: 'sudahBerangkat', label: 'Status Berangkat', default: true },
   { id: 'totalBiaya', label: 'Total Biaya', default: false },
-  { id: 'pencairan', label: 'Status Pencairan', default: false }
+  { id: 'pencairan', label: 'Status Pencairan', default: false },
+  { id: 'buktiDukung', label: 'Bukti Dukung', default: false }
 ]
 
 export default function SpjExportModal() {

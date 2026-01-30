@@ -45,7 +45,8 @@ export async function POST(req: NextRequest) {
       personel: { header: 'PERSONEL', key: 'personel', width: 40 },
       sudahBerangkat: { header: 'STATUS JALAN', key: 'sudahBerangkat', width: 15 },
       totalBiaya: { header: 'TOTAL BIAYA', key: 'totalBiaya', width: 20 },
-      pencairan: { header: 'PENCAIRAN', key: 'pencairan', width: 15 }
+      pencairan: { header: 'PENCAIRAN', key: 'pencairan', width: 15 },
+      buktiDukung: { header: 'BUKTI DUKUNG', key: 'buktiDukung', width: 15 }
     }
 
     // Filter columns based on user selection
@@ -90,6 +91,10 @@ export async function POST(req: NextRequest) {
 
       if (columns.includes('pencairan')) {
         rowData.pencairan = spj.pencairan ? 'Sudah' : 'Belum'
+      }
+
+      if (columns.includes('buktiDukung')) {
+        rowData.buktiDukung = spj.buktiDukungUrl ? 'Ada' : 'Tidak Ada'
       }
 
       const row = worksheet.addRow(rowData)
