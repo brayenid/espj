@@ -33,9 +33,6 @@ export default async function SpjLayout({
             <ChevronLeft className="w-5 h-5" />
           </Link>
           <div className="flex flex-col">
-            <div className="text-[10px] uppercase tracking-[0.2em] font-bold text-muted-foreground">
-              Dokumen Perjalanan Dinas
-            </div>
             <div className="flex items-center gap-2 text-sm font-bold">
               <span className="flex items-center gap-1.5">
                 <Home className="w-3.5 h-3.5 text-primary" /> {spj.tempatBerangkat}

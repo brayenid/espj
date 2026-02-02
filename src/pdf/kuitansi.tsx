@@ -90,7 +90,7 @@ function sum(nums: number[]) {
 
 function safeText(v: string | null | undefined) {
   const s = (v ?? '').toString().trim()
-  return s.length ? s : '-'
+  return s.length ? s : ' '
 }
 
 function BudgetRow({ label, v1, v2 }: { label: string; v1: string | null; v2?: string | null }) {

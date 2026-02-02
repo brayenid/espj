@@ -14,15 +14,15 @@ export function UraianPresetPicker({ onPick, asal = '[Asal]', tujuan = '[Tujuan]
   const URAIAN_PRESETS = [
     {
       label: `Transportasi: ${asal} - ${tujuan} (PP)`,
-      value: `Transportasi dari ${asal} ke ${tujuan} (PP)`
+      value: `Transportasi ${asal} - ${tujuan} (PP)`
     },
     {
       label: `Udara: ${asal} - ${tujuan} (PP)`,
-      value: `Transportasi udara rute ${asal} - ${tujuan} (PP)`
+      value: `Transportasi udara ${asal} - ${tujuan} (PP)`
     },
     {
       label: 'Penginapan (Hotel)',
-      value: `Biaya penginapan / hotel di ${tujuan} selama pelaksanaan tugas`
+      value: `Biaya penginapan / hotel di ${tujuan}`
     },
     {
       label: 'Sewa Kendaraan',
@@ -34,7 +34,7 @@ export function UraianPresetPicker({ onPick, asal = '[Asal]', tujuan = '[Tujuan]
     },
     {
       label: 'Uang Harian',
-      value: `Uang harian perjalanan dinas ke ${tujuan}`
+      value: `Uang harian di ${tujuan}`
     }
   ]
 

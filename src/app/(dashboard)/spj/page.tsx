@@ -11,7 +11,7 @@ import { Separator } from '@/components/ui/separator'
 import SpjSearchBar from '@/components/spj/spj-search-bar'
 // Pastikan buat komponen ini (kode ada di bawah)
 
-import { ArrowLeft, ArrowRight, ChevronRight, FileText, Plus } from 'lucide-react'
+import { ArrowLeft, ArrowRight, Check, ChevronRight, FileClockIcon, FileText, Plus } from 'lucide-react'
 import SpjDuplicateButton from '@/components/spj/spj-duplicate-button'
 import { fmtDateId } from '@/lib/utils'
 import SpjExportModal from '@/components/spj/spj-export-modal'
@@ -100,7 +100,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
         </div>
         <div className="flex items-center gap-4">
           <SpjExportModal />
-          <Button asChild size="sm" className="h-9 bg-foreground text-background hover:bg-foreground/90">
+          <Button asChild size="sm" className="h-9 bg-primary text-background hover:bg-primary/90">
             <Link href="/spj/new">
               <Plus className="mr-2 h-4 w-4" />
               Buat SPJ
@@ -137,9 +137,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
               <TableHead className="py-3 font-medium text-foreground">Tujuan</TableHead>
               <TableHead className="table-cell py-3 font-medium text-foreground">Pelaksana</TableHead>
               <TableHead className="py-3 font-medium text-foreground">Periode</TableHead>
-              <TableHead className="hidden xl:table-cell py-3 font-medium text-foreground text-center">
-                Dibuat
-              </TableHead>
+              <TableHead className="table-cell py-3 font-medium text-foreground text-center">Pencairan</TableHead>
               <TableHead className="py-3 font-medium text-foreground">Status Dokumen</TableHead>
               <TableHead className="w-40" />
             </TableRow>
@@ -160,8 +158,8 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                     <Link href={`/spj/${spj.id}`} className="absolute inset-0 z-10" />
                     <div className="py-4 px-4">
                       <div className="font-medium text-[14px]">{spj.tempatTujuan}</div>
-                      <div className="text-[10px] text-muted-foreground mt-0.5 xl:hidden italic">
-                        Dibuat: {fmtDateId(spj.createdAt)}
+                      <div className="text-[10px] text-muted-foreground mt-0.5">
+                        Dibuat: {fmtDateTime(spj.createdAt)}
                       </div>
                     </div>
                   </TableCell>
@@ -181,7 +179,13 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                   </TableCell>
 
                   <TableCell className="hidden xl:table-cell py-4 text-center pointer-events-none">
-                    <div className="text-[11px] font-mono text-muted-foreground/80">{fmtDateTime(spj.createdAt)}</div>
+                    <div className="text-[11px] text-muted-foreground/80">
+                      {spj.pencairan ? (
+                        <Check className="w-4 h-4 mx-auto text-emerald-600" />
+                      ) : (
+                        <FileClockIcon className="w-4 h-4 mx-auto text-amber-600" />
+                      )}
+                    </div>
                   </TableCell>
 
                   <TableCell className="py-4 pointer-events-none">
@@ -193,6 +197,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                       <StatusBadge label="KUI" active={!!spj.kuitansi} />
                       <StatusBadge label="VIS" active={!!spj.visum} />
                       <StatusBadge label="LAP" active={!!spj.laporan} />
+                      <StatusBadge label="BUKTI" active={!!spj.buktiDukungUrl} />
                     </div>
                   </TableCell>
 
@@ -247,7 +252,12 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                 </Link>
               ))}
             </div>
-            <Button asChild variant="outline" size="icon" className="h-8 w-8" disabled={pageNum >= totalPages}>
+            <Button
+              asChild
+              variant="outline"
+              size="icon"
+              className="h-8 w-8 shadow-none"
+              disabled={pageNum >= totalPages}>
               <Link
                 // Sertakan sort pada link pagination
                 href={pageNum >= totalPages ? '#' : nextHref || `?page=${totalPages}`}

@@ -107,11 +107,8 @@ export default async function DashboardLayout({ children }: { children: React.Re
       {/* --- FOOTER --- */}
       <footer className="w-full border-t border-border/40 py-8 bg-white/40">
         <div className="max-w-7xl mx-auto px-4 flex flex-col items-center gap-2">
-          <div className="w-6 h-6 bg-muted rounded flex items-center justify-center mb-2">
-            <FileStack className="w-3 h-3 text-muted-foreground" />
-          </div>
-          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-[0.2em]">
-            © 2026 Bagian Organisasi - Sekretariat Daerah
+          <p className="text-[10px] font-bold text-muted-foreground uppercase tracking-wide">
+            © 2026 Bagian Organisasi
           </p>
           <p className="text-[9px] text-muted-foreground/60 uppercase tracking-widest">Kabupaten Kutai Barat</p>
         </div>
@@ -129,7 +126,7 @@ function NavButton({ href, icon, children }: { href: string; icon: React.ReactNo
     <Button
       asChild
       variant="ghost"
-      className="rounded-lg h-9 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all font-medium text-xs gap-2">
+      className="rounded-lg h-9 px-3 text-muted-foreground hover:text-foreground hover:bg-muted/50 transition-all font-medium text-xs gap-2 shadow-none">
       <Link href={href}>
         {icon}
         <span className="uppercase tracking-widest text-[10px] font-bold">{children}</span>
@@ -147,11 +144,7 @@ function Separator({
 }) {
   return (
     <div
-      className={cn(
-        'shrink-0 bg-border',
-        orientation === 'horizontal' ? 'h-[1px] w-full' : 'h-full w-[1px]',
-        className
-      )}
+      className={cn('shrink-0 bg-border', orientation === 'horizontal' ? 'h-px w-full' : 'h-full w-px', className)}
     />
   )
 }
