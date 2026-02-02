@@ -36,7 +36,6 @@ export default async function SpdPage({ params }: { params: Promise<{ id: string
       initial={{
         noSpd: access.spj.noSpd,
         tglSpd: access.spj.tglSpd,
-        kotaTandaTangan: access.spj.kotaTandaTangan,
         signerPegawaiId: signer?.pegawaiId ?? null
       }}
       roster={roster}
