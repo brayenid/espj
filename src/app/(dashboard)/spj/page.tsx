@@ -178,7 +178,7 @@ export default async function SpjListPage({ searchParams }: { searchParams: Sear
                     </div>
                   </TableCell>
 
-                  <TableCell className="hidden xl:table-cell py-4 text-center pointer-events-none">
+                  <TableCell className="table-cell py-4 text-center pointer-events-none">
                     <div className="text-[11px] text-muted-foreground/80">
                       {spj.pencairan ? (
                         <Check className="w-4 h-4 mx-auto text-emerald-600" />
