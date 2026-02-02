@@ -18,9 +18,9 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
   const body = await req.json().catch(() => null)
   if (!body) return NextResponse.json({ ok: false }, { status: 400 })
 
-  const { noSpd, tglSpd, kotaTandaTangan, signerPegawaiId } = body as {
+  const { noSpd, tanggal, kotaTandaTangan, signerPegawaiId } = body as {
     noSpd?: string | null
-    tglSpd?: string // yyyy-mm-dd
+    tanggal: string
     kotaTandaTangan?: string
     signerPegawaiId?: string | null
   }
@@ -29,7 +29,7 @@ export async function PUT(req: Request, ctx: { params: Promise<{ id: string }> }
     where: { id },
     data: {
       noSpd: (noSpd ?? '').trim() ? (noSpd ?? '').trim() : null,
-      tglSpd: tglSpd ? new Date(tglSpd) : access.spj.tglSpd,
+      tglSpd: tanggal ? new Date(tanggal) : access.spj.tglSpd,
       kotaTandaTangan: (kotaTandaTangan ?? '').trim() ? kotaTandaTangan!.trim() : access.spj.kotaTandaTangan
     },
     select: { id: true }

@@ -15,14 +15,14 @@ import { Separator } from '@/components/ui/separator'
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover'
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandList, CommandItem } from '@/components/ui/command'
 
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
+import { Form, FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form'
 import {
+  Calendar,
   ClipboardCheck,
   Crown,
   FileSignature,
   Hash,
   Loader2,
-  MapPin,
   Printer,
   Save,
   Search,
@@ -35,8 +35,8 @@ import { cn } from '@/lib/utils'
 
 const schema = z.object({
   noSpd: z.string().optional().nullable(),
-  kotaTandaTangan: z.string().min(2, 'Kota wajib diisi'),
-  signerPegawaiId: z.string().optional().nullable()
+  signerPegawaiId: z.string().optional().nullable(),
+  tanggal: z.date()
 })
 
 type FormValues = z.infer<typeof schema>
@@ -89,7 +89,6 @@ export default function SpdForm({
   initial: {
     noSpd: string | null
     tglSpd: Date
-    kotaTandaTangan: string
     signerPegawaiId: string | null
   }
   roster: Roster[]
@@ -110,8 +109,8 @@ export default function SpdForm({
   const defaultValues = useMemo<FormValues>(
     () => ({
       noSpd: initial.noSpd ?? '',
-      kotaTandaTangan: initial.kotaTandaTangan ?? 'Sendawar',
-      signerPegawaiId: initial.signerPegawaiId ?? '__none__'
+      signerPegawaiId: initial.signerPegawaiId ?? '__none__',
+      tanggal: initial.tglSpd
     }),
     [initial]
   )
@@ -170,8 +169,8 @@ export default function SpdForm({
     try {
       const payload = {
         noSpd: values.noSpd?.trim() || null,
-        kotaTandaTangan: values.kotaTandaTangan.trim(),
-        signerPegawaiId: values.signerPegawaiId === '__none__' ? null : values.signerPegawaiId
+        signerPegawaiId: values.signerPegawaiId === '__none__' ? null : values.signerPegawaiId,
+        tanggal: values.tanggal
       }
       const res = await fetch(`/api/spj/${spjId}/spd`, {
         method: 'PUT',
@@ -350,7 +349,7 @@ export default function SpdForm({
                 {/* MAIN FORM AREA (Kanan) */}
                 <div className="lg:col-span-8 space-y-8">
                   {/* Row: Nomor SPD & Kota (Tanggal Dihapus) */}
-                  <div className="grid gap-6 sm:grid-cols-2 bg-muted/10 p-4 sm:p-6 rounded-lg border border-border/30">
+                  <div className="bg-muted/10 p-4 sm:p-6 rounded-lg border border-border/30 grid grid-cols-2 gap-2">
                     <FormField
                       control={form.control}
                       name="noSpd"
@@ -370,29 +369,43 @@ export default function SpdForm({
                               placeholder="094/002/..."
                             />
                           </FormControl>
+                          <FormDescription className="text-[10px]">
+                            Biarkan kosong jika belum ada nomor (Draft).
+                          </FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}
                     />
 
+                    {/* Tanggal Surat */}
                     <FormField
                       control={form.control}
-                      name="kotaTandaTangan"
+                      name="tanggal"
                       render={({ field }) => (
                         <FormItem className="space-y-3">
                           <div className="flex items-center gap-2">
-                            <MapPin className="w-3.5 h-3.5 text-muted-foreground" />
+                            <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
                             <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
-                              Kota Tanda Tangan
+                              Tanggal Surat
                             </FormLabel>
                           </div>
                           <FormControl>
                             <Input
-                              {...field}
+                              type="date"
+                              value={
+                                field.value instanceof Date && !isNaN(field.value.getTime())
+                                  ? field.value.toISOString().split('T')[0]
+                                  : ''
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value
+                                field.onChange(value ? new Date(value) : undefined)
+                              }}
+                              onBlur={field.onBlur}
                               className="h-10 rounded-md border-border/50 bg-background shadow-none text-xs"
-                              placeholder="Sendawar"
                             />
                           </FormControl>
+                          <FormDescription className="text-[10px]">Tanggal penetapan surat tugas.</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

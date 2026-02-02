@@ -233,7 +233,7 @@ export default function KuitansiPdf({
 const styles = StyleSheet.create({
   page: {
     paddingTop: 34,
-    paddingHorizontal: 56,
+    paddingHorizontal: 40,
     paddingBottom: 36,
     fontSize: 10,
     lineHeight: 1.35

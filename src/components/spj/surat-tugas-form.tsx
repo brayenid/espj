@@ -27,7 +27,8 @@ import {
   Search,
   UserCheck,
   Users,
-  AlertCircle
+  AlertCircle,
+  Calendar
 } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
@@ -39,7 +40,8 @@ const schema = z.object({
   signerPegawaiId: z
     .string()
     .min(1, 'Penandatangan wajib dipilih')
-    .refine((v) => v !== '__none__', 'Penandatangan wajib dipilih')
+    .refine((v) => v !== '__none__', 'Penandatangan wajib dipilih'),
+  tanggal: z.date()
 })
 
 type FormValues = z.infer<typeof schema>
@@ -72,6 +74,9 @@ type Spj = {
 type Initial = {
   untuk: string
   signerPegawaiId: string | null
+  spj: {
+    tglSuratTugas: Date
+  }
 } | null
 
 type PegawaiResult = {
@@ -121,14 +126,16 @@ export default function SuratTugasForm({
     [roster]
   )
 
-  const defaultValues = useMemo<FormValues>(
-    () => ({
+  const defaultValues = useMemo<FormValues>(() => {
+    const rawDate = initial?.spj?.tglSuratTugas
+
+    return {
       nomor: spj.noSuratTugas ?? '',
       untuk: initial?.untuk ?? spj.maksudDinas ?? '',
-      signerPegawaiId: initial?.signerPegawaiId ?? '__none__'
-    }),
-    [initial, spj]
-  )
+      signerPegawaiId: initial?.signerPegawaiId ?? '__none__',
+      tanggal: rawDate ? new Date(rawDate) : new Date()
+    }
+  }, [initial, spj])
 
   const form = useForm<FormValues>({
     resolver: zodResolver(schema),
@@ -185,7 +192,8 @@ export default function SuratTugasForm({
       const payload = {
         nomor: values.nomor?.trim() || null,
         untuk: values.untuk,
-        signerPegawaiId: values.signerPegawaiId
+        signerPegawaiId: values.signerPegawaiId,
+        tanggal: values.tanggal
       }
       const res = await fetch(`/api/spj/${spjId}/surat-tugas`, {
         method: 'PUT',
@@ -357,7 +365,7 @@ export default function SuratTugasForm({
                 {/* MAIN FORM AREA (Kanan) */}
                 <div className="lg:col-span-8 space-y-8">
                   {/* Row: Nomor Surat */}
-                  <div className="bg-muted/10 p-4 sm:p-6 rounded-lg border border-border/30">
+                  <div className="bg-muted/10 p-4 sm:p-6 rounded-lg border border-border/30 grid grid-cols-2 gap-2">
                     <FormField
                       control={form.control}
                       name="nomor"
@@ -380,6 +388,40 @@ export default function SuratTugasForm({
                           <FormDescription className="text-[10px]">
                             Biarkan kosong jika belum ada nomor (Draft).
                           </FormDescription>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                    {/* Tanggal Surat */}
+                    <FormField
+                      control={form.control}
+                      name="tanggal"
+                      render={({ field }) => (
+                        <FormItem className="space-y-3">
+                          <div className="flex items-center gap-2">
+                            <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
+                            <FormLabel className="text-[11px] font-bold uppercase tracking-widest text-muted-foreground">
+                              Tanggal Surat
+                            </FormLabel>
+                          </div>
+                          <FormControl>
+                            <Input
+                              type="date"
+                              value={
+                                field.value instanceof Date && !isNaN(field.value.getTime())
+                                  ? field.value.toISOString().split('T')[0]
+                                  : ''
+                              }
+                              onChange={(e) => {
+                                const value = e.target.value
+                                field.onChange(value ? new Date(value) : undefined)
+                              }}
+                              onBlur={field.onBlur}
+                              className="h-10 rounded-md border-border/50 bg-background shadow-none text-xs"
+                            />
+                          </FormControl>
+                          <FormDescription className="text-[10px]">Tanggal penetapan surat tugas.</FormDescription>
                           <FormMessage />
                         </FormItem>
                       )}

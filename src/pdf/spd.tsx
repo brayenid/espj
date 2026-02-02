@@ -126,9 +126,8 @@ function sortRoster(roster: RosterItem[]) {
   })
 }
 
-function fmtMonthYearNow() {
-  const now = new Date()
-  return now.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
+function fmtMonthYear(d: Date) {
+  return d.toLocaleDateString('id-ID', { month: 'long', year: 'numeric' })
 }
 
 function fmtPangkatGol(pangkat: string | null, golongan: string | null) {
@@ -412,7 +411,7 @@ export function buildSpdDocument(props: SpdPdfProps): React.ReactElement<Documen
           <View style={styles.signBox}>
             <Text>Dikeluarkan di {props.spj.kotaTandaTangan}</Text>
             <Text>
-              Tanggal, {'            '} {fmtMonthYearNow()}
+              Tanggal, {'            '} {fmtMonthYear(props.spj.tglSpd)}
             </Text>
             <Text>{signerJabatan ? `${signerJabatan},` : ''}</Text>
             <View style={styles.signSpace} />

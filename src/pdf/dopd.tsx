@@ -199,6 +199,8 @@ export default function DopdPdf({
 
             {/* Right signer: BPP */}
             <View style={styles.signerCol}>
+              <View style={styles.space} />
+
               <Text style={styles.signerTitle}>Bendahara Pengeluaran Pembantu</Text>
 
               <View style={styles.signerSpace} />
@@ -376,8 +378,8 @@ function RincianTable({
 
 const styles = StyleSheet.create({
   page: {
-    paddingTop: 48,
-    paddingHorizontal: 48,
+    paddingTop: 38,
+    paddingHorizontal: 38,
     paddingBottom: 48,
     fontSize: 8,
     lineHeight: 1.35
@@ -514,6 +516,7 @@ const styles = StyleSheet.create({
   signerTitle: { textAlign: 'center' },
 
   signerSpace: { height: 34 },
+  space: { height: 10 },
 
   signerNameUnderline: { fontWeight: 700, textDecoration: 'underline' },
   signerNip: { marginTop: 2 }

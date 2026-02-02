@@ -6,7 +6,8 @@ export const suratTugasSchema = z.object({
   nomor: z.string().optional().nullable(),
   untuk: z.string().min(3, "Kolom 'Untuk' wajib diisi"),
   assignedRosterItemId: z.string().optional().nullable(),
-  signerPegawaiId: z.string().optional().nullable()
+  signerPegawaiId: z.string().optional().nullable(),
+  tanggal: z.string()
 })
 
 export type SuratTugasInput = z.infer<typeof suratTugasSchema>
@@ -26,7 +27,12 @@ export async function getSuratTugasForCurrentUser(spjId: string) {
         signerNama: true,
         signerNip: true,
         signerJabatan: true,
-        signerPangkatGolongan: true
+        signerPangkatGolongan: true,
+        spj: {
+          select: {
+            tglSuratTugas: true
+          }
+        }
       }
     }),
     prisma.spjRosterItem.findMany({
@@ -105,8 +111,17 @@ export async function upsertSuratTugasForCurrentUser(spjId: string, input: unkno
 
   if (data.signerPegawaiId) {
     const p = await prisma.pegawai.findUnique({
-      where: { id: data.signerPegawaiId },
-      select: { id: true, nama: true, nip: true, jabatan: true, pangkat: true, golongan: true }
+      where: {
+        id: data.signerPegawaiId
+      },
+      select: {
+        id: true,
+        nama: true,
+        nip: true,
+        jabatan: true,
+        pangkat: true,
+        golongan: true
+      }
     })
     if (!p) {
       return {
@@ -136,7 +151,6 @@ export async function upsertSuratTugasForCurrentUser(spjId: string, input: unkno
           spjId,
           untuk: data.untuk || defaultUntuk,
           assignedRosterItemId: data.assignedRosterItemId ?? null,
-
           signerPegawaiId: signerSnapshot?.signerPegawaiId ?? null,
           signerNama: signerSnapshot?.signerNama ?? '-',
           signerNip: signerSnapshot?.signerNip ?? null,
@@ -146,7 +160,6 @@ export async function upsertSuratTugasForCurrentUser(spjId: string, input: unkno
         update: {
           untuk: data.untuk,
           assignedRosterItemId: data.assignedRosterItemId ?? null,
-
           ...(signerSnapshot
             ? {
                 signerPegawaiId: signerSnapshot.signerPegawaiId,
@@ -160,10 +173,13 @@ export async function upsertSuratTugasForCurrentUser(spjId: string, input: unkno
         select: { id: true }
       })
 
-      // 2. Denormalisasi nomor surat ke tabel utama SPJ
+      // 2. Update tglSuratTugas pada SPJ
       await tx.spj.update({
         where: { id: spjId },
-        data: { noSuratTugas: data.nomor }
+        data: {
+          tglSuratTugas: new Date(data.tanggal),
+          noSuratTugas: data.nomor
+        }
       })
 
       return saved
