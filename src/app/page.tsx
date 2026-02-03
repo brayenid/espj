@@ -5,6 +5,7 @@ import { ArrowRight, LayoutDashboard, Users, Contact2, FileStack, LogIn, ShieldC
 import { Button } from '@/components/ui/button'
 import { Metadata } from 'next'
 import { cn } from '@/lib/utils'
+import Image from 'next/image'
 
 export const metadata: Metadata = {
   title: 'SIPADIN - Bagian Organisasi',
@@ -32,13 +33,13 @@ export default async function HomePage() {
         <header className="sticky top-0 z-50 mt-4 rounded-2xl border border-slate-200/60 bg-white/70 backdrop-blur-md px-6 py-4 shadow-sm transition-all duration-300">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
-              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-slate-900 text-white shadow-md">
-                <FileStack className="h-4 w-4" />
-              </div>
-              <div className="flex flex-col">
-                <span className="text-sm font-extrabold tracking-tight text-slate-900">SIPADIN</span>
-                <span className="text-[10px] font-medium text-slate-500 hidden sm:inline-block">Bagian Organisasi</span>
-              </div>
+              <Image
+                src="/sipadin.png"
+                alt="Logo Kabupaten Kutai Barat"
+                width={80}
+                height={80}
+                className="rounded-sm w-full h-auto object-contain group-hover:scale-105 transition-transform"
+              />
             </div>
 
             <div className="flex items-center gap-3">

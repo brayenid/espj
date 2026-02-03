@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, FileStack, Users, Contact2 } from 'lucide-react'
+import { LayoutDashboard, Users, Contact2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -14,6 +14,7 @@ import {
 import { Avatar, AvatarFallback } from '@/components/ui/avatar'
 import { cn } from '@/lib/utils'
 import UserActions from '@/components/layout/user-actions'
+import Image from 'next/image'
 
 export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
   const session = await auth()
@@ -33,10 +34,13 @@ export default async function DashboardLayout({ children }: { children: React.Re
           {/* Left: Brand & Main Nav */}
           <div className="flex items-center gap-8">
             <Link href="/" className="flex items-center gap-2 group">
-              <div className="w-8 h-8 bg-foreground rounded-lg flex items-center justify-center transition-transform group-hover:scale-95 shadow-sm">
-                <FileStack className="w-4 h-4 text-background" />
-              </div>
-              <span className="font-bold tracking-tighter text-lg">Sipadin</span>
+              <Image
+                src="/sipadin.png"
+                alt="Logo Kabupaten Kutai Barat"
+                width={80}
+                height={80}
+                className="rounded-sm w-full h-auto object-contain group-hover:scale-105 transition-transform"
+              />
             </Link>
 
             <Separator orientation="vertical" className="h-6 bg-border/40 hidden md:block" />
