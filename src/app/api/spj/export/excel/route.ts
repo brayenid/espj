@@ -96,7 +96,7 @@ export async function POST(req: NextRequest) {
       }
 
       if (columns.includes('buktiDukung')) {
-        rowData.buktiDukung = spj.buktiDukungUrl ? 'Ada' : 'Tidak Ada'
+        rowData.buktiDukung = spj.buktiDukungUrl ? spj.buktiDukungUrl : 'Tidak Ada'
       }
 
       if (columns.includes('nomorRekening')) {
