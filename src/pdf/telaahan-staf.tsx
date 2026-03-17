@@ -121,8 +121,8 @@ const styles = StyleSheet.create({
   },
   metaBlock: {
     marginTop: 10,
-    marginBottom: 10,
-    width: '70%'
+    marginBottom: 10
+    // width: '70%'
   },
   metaRow: {
     flexDirection: 'row',
