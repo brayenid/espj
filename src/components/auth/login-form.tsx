@@ -59,7 +59,7 @@ export default function LoginForm() {
       toast.success('Akses diberikan. Mengarahkan...')
 
       // Mengarahkan pengguna
-      router.push(callbackUrl)
+      router.replace(callbackUrl)
       router.refresh()
     } catch {
       toast.error('Gagal terhubung ke server autentikasi.')
