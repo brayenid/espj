@@ -2,7 +2,7 @@ import { auth } from '@/auth'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { LayoutDashboard, Users, Contact2 } from 'lucide-react'
+import { LayoutDashboard, Users, Contact2, Database } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -54,9 +54,14 @@ export default async function DashboardLayout({ children }: { children: React.Re
                 Pegawai
               </NavButton>
               {userRole === 'SUPER_ADMIN' && (
-                <NavButton href="/users" icon={<Users className="w-4 h-4" />}>
-                  Pengguna
-                </NavButton>
+                <>
+                  <NavButton href="/users" icon={<Users className="w-4 h-4" />}>
+                    Pengguna
+                  </NavButton>
+                  <NavButton href="/api/spj/export-json" icon={<Database className="w-4 h-4" />}>
+                    Ekspor JSON
+                  </NavButton>
+                </>
               )}
             </div>
           </div>
