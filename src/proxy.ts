@@ -1,12 +1,13 @@
 import { auth } from '@/auth'
 
 export default auth((req) => {
-  const isLoggedIn = !!req.auth
-  const isSpjRoute = req.nextUrl.pathname.startsWith('/spj')
+  const { pathname } = req.nextUrl
 
-  if (isSpjRoute && !isLoggedIn) {
-    const url = new URL('/login', req.nextUrl.origin)
-    url.searchParams.set('callbackUrl', req.nextUrl.pathname)
+  // Daftar sub-routes utama yang dialihkan ke halaman depan (/)
+  const pathsToRedirect = ['/spj', '/pegawai', '/users']
+
+  if (pathsToRedirect.some(path => pathname === path || pathname.startsWith(path + '/'))) {
+    const url = new URL('/', req.nextUrl.origin)
     return Response.redirect(url)
   }
 
@@ -14,5 +15,5 @@ export default auth((req) => {
 })
 
 export const config = {
-  matcher: ['/spj/:path*']
+  matcher: ['/spj/:path*', '/pegawai/:path*', '/users/:path*']
 }
