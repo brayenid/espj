@@ -196,7 +196,20 @@ export default function SpjMetaForm({
                       </FormControl>
                     </PopoverTrigger>
                     <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
+                      <Calendar
+                        mode="single"
+                        selected={field.value}
+                        onSelect={(date) => {
+                          field.onChange(date)
+                          if (date) {
+                            const currentKembali = form.getValues('tglKembali')
+                            if (currentKembali && currentKembali < date) {
+                              form.setValue('tglKembali', date, { shouldValidate: true })
+                            }
+                          }
+                        }}
+                        initialFocus
+                      />
                     </PopoverContent>
                   </Popover>
                   <FormMessage className="text-[11px]" />
@@ -206,30 +219,46 @@ export default function SpjMetaForm({
             <FormField
               control={form.control}
               name="tglKembali"
-              render={({ field }) => (
-                <FormItem className="flex flex-col">
-                  <FormLabel className="text-[13px] text-muted-foreground">Tanggal Kembali</FormLabel>
-                  <Popover>
-                    <PopoverTrigger asChild>
-                      <FormControl>
-                        <Button
-                          variant={'outline'}
-                          className={cn(
-                            'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50 shadow-none',
-                            !field.value && 'text-muted-foreground'
-                          )}>
-                          {field.value ? format(field.value, 'PPP', { locale: localeId }) : <span>Pilih tanggal</span>}
-                          <CalendarDays className="ml-auto h-4 w-4 opacity-50" />
-                        </Button>
-                      </FormControl>
-                    </PopoverTrigger>
-                    <PopoverContent className="w-auto p-0" align="start">
-                      <Calendar mode="single" selected={field.value} onSelect={field.onChange} initialFocus />
-                    </PopoverContent>
-                  </Popover>
-                  <FormMessage className="text-[11px]" />
-                </FormItem>
-              )}
+              render={({ field }) => {
+                const tglBerangkatVal = form.watch('tglBerangkat')
+                return (
+                  <FormItem className="flex flex-col">
+                    <FormLabel className="text-[13px] text-muted-foreground">Tanggal Kembali</FormLabel>
+                    <Popover>
+                      <PopoverTrigger asChild>
+                        <FormControl>
+                          <Button
+                            variant={'outline'}
+                            className={cn(
+                              'w-full pl-3 text-left font-normal h-10 rounded-lg border-border/50 shadow-none',
+                              !field.value && 'text-muted-foreground'
+                            )}>
+                            {field.value ? format(field.value, 'PPP', { locale: localeId }) : <span>Pilih tanggal</span>}
+                            <CalendarDays className="ml-auto h-4 w-4 opacity-50" />
+                          </Button>
+                        </FormControl>
+                      </PopoverTrigger>
+                      <PopoverContent className="w-auto p-0" align="start">
+                        <Calendar
+                          mode="single"
+                          selected={field.value}
+                          disabled={(date) => {
+                            if (!tglBerangkatVal) return false
+                            const cur = new Date(date)
+                            cur.setHours(0, 0, 0, 0)
+                            const start = new Date(tglBerangkatVal)
+                            start.setHours(0, 0, 0, 0)
+                            return cur < start
+                          }}
+                          onSelect={field.onChange}
+                          initialFocus
+                        />
+                      </PopoverContent>
+                    </Popover>
+                    <FormMessage className="text-[11px]" />
+                  </FormItem>
+                )
+              }}
             />
           </div>
 

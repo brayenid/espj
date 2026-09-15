@@ -19,18 +19,23 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 // Import Database Offline
 import { db } from '@/lib/offline-db'
 
-const schema = z.object({
-  tempatTujuan: z.string().min(2, 'Tempat tujuan minimal 2 karakter'),
-  maksudDinas: z.string().min(5, 'Maksud dinas minimal 5 karakter'),
-  alatAngkut: z.string().optional(),
-  tempatBerangkat: z.string().optional(),
-  kotaTandaTangan: z.string().optional(),
-  tglBerangkat: z.string().min(8, 'Tanggal berangkat wajib diisi'),
-  tglKembali: z.string().min(8, 'Tanggal kembali wajib diisi'),
-  noSuratTugas: z.string().optional(),
-  noSpd: z.string().optional(),
-  noTelaahan: z.string().optional()
-})
+const schema = z
+  .object({
+    tempatTujuan: z.string().min(2, 'Tempat tujuan minimal 2 karakter'),
+    maksudDinas: z.string().min(5, 'Maksud dinas minimal 5 karakter'),
+    alatAngkut: z.string().optional(),
+    tempatBerangkat: z.string().optional(),
+    kotaTandaTangan: z.string().optional(),
+    tglBerangkat: z.string().min(8, 'Tanggal berangkat wajib diisi'),
+    tglKembali: z.string().min(8, 'Tanggal kembali wajib diisi'),
+    noSuratTugas: z.string().optional(),
+    noSpd: z.string().optional(),
+    noTelaahan: z.string().optional()
+  })
+  .refine((data) => data.tglKembali >= data.tglBerangkat, {
+    message: 'Tanggal kembali tidak boleh sebelum tanggal berangkat',
+    path: ['tglKembali']
+  })
 
 type FormState = z.infer<typeof schema>
 
@@ -73,12 +78,14 @@ function DatePickerStringField({
   label,
   value,
   onChange,
-  placeholder = 'Pilih tanggal'
+  placeholder = 'Pilih tanggal',
+  disabledDate
 }: {
   label: string
   value: string
   onChange: (v: string) => void
   placeholder?: string
+  disabledDate?: (date: Date) => boolean
 }) {
   const selected = parseYMD(value)
 
@@ -99,7 +106,13 @@ function DatePickerStringField({
           </Button>
         </PopoverTrigger>
         <PopoverContent className="w-auto p-0" align="start">
-          <Calendar mode="single" selected={selected} onSelect={(d) => onChange(d ? formatYMD(d) : '')} initialFocus />
+          <Calendar
+            mode="single"
+            selected={selected}
+            disabled={disabledDate}
+            onSelect={(d) => onChange(d ? formatYMD(d) : '')}
+            initialFocus
+          />
         </PopoverContent>
       </Popover>
       <input type="hidden" value={value} readOnly />
@@ -120,7 +133,8 @@ export default function SpjCreateForm() {
     e.preventDefault()
     const parsed = schema.safeParse(values)
     if (!parsed.success) {
-      toast.error('Cek kembali input yang wajib diisi.')
+      const firstError = parsed.error.issues[0]?.message || 'Cek kembali input yang wajib diisi.'
+      toast.error(firstError)
       return
     }
 
@@ -181,6 +195,8 @@ export default function SpjCreateForm() {
     }
   }
 
+  const dBerangkat = parseYMD(values.tglBerangkat)
+
   return (
     <form onSubmit={onSubmit} className="space-y-10">
       <section className="space-y-6">
@@ -209,12 +225,29 @@ export default function SpjCreateForm() {
           <DatePickerStringField
             label="Tanggal Berangkat"
             value={values.tglBerangkat}
-            onChange={(v) => setValues((prev) => ({ ...prev, tglBerangkat: v }))}
+            onChange={(v) => {
+              setValues((prev) => {
+                const next = { ...prev, tglBerangkat: v }
+                // Jika tglKembali ada dan lebih awal dari tglBerangkat yang baru, reset atau sesuaikan tglKembali
+                if (next.tglKembali && v && next.tglKembali < v) {
+                  next.tglKembali = v
+                }
+                return next
+              })
+            }}
           />
 
           <DatePickerStringField
             label="Tanggal Kembali"
             value={values.tglKembali}
+            disabledDate={(date) => {
+              if (!dBerangkat) return false
+              const cur = new Date(date)
+              cur.setHours(0, 0, 0, 0)
+              const start = new Date(dBerangkat)
+              start.setHours(0, 0, 0, 0)
+              return cur < start
+            }}
             onChange={(v) => setValues((prev) => ({ ...prev, tglKembali: v }))}
           />
         </div>
